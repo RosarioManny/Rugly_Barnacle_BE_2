@@ -1,8 +1,5 @@
 from django.db import models
 
-# Create your models here.
-from django.db import models
-
 # To Create an enums or choice 
 PRICES = (
   ('3ft', '$150-$249'),
