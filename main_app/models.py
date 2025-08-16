@@ -13,21 +13,26 @@ PRICES = (
 class Category(models.Model):
   class Meta: 
     verbose_name_plural = "Categories"
+    db_table = 'category'
   slug = models.SlugField(unique=True)
   name = models.CharField(max_length=100)
   
   def __str__(self):
     return self.name
-  
-
-
 
 class Property(models.Model):
+  class Meta:
+    db_table = 'properties'
   name = models.CharField(max_length=32, unique=True)
   display_name = models.CharField(max_length=32)
+
+  def __str__(self):
+    return f"{self.id} - {self.display_name}"
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
 
 class Product(models.Model):
+  class Meta:
+    db_table = 'product'
   name = models.CharField(max_length=100, unique=True)
   price = models.DecimalField(decimal_places=2, max_digits=10)
   category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)

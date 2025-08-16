@@ -80,13 +80,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'rbproduct',
-        'USER': os.getenv('RB_USER'),
-        'PASSWORD': os.getenv('RB_PASSWORD'),
+        'USER': os.getenv('RB_USER', 'rb_admin'),
+        'PASSWORD': os.getenv('RB_PASSWORD', 'RBadmin2025'),
     }
 }
-# RB_USER=rb_admin
-# RB_DATABASE=rbproduct
-# RB_PASSWORD=1234rugs
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
