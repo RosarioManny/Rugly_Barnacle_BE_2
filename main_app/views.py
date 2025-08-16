@@ -8,7 +8,7 @@ from .serializers import *
 # Database Home view
 class Home(APIView):
   def get(self, request):
-    content = {'Rugly Barncale: Welcome to the Rugly Barnacle Database!'}
+    content = {'message': 'Rugly Barncale: Welcome to the Rugly Barnacle Database!'}
     return Response(content)
 
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
@@ -41,7 +41,7 @@ class CartView(generics.RetrieveAPIView):
       session_key = self.request.session.session_key
     
     
-    cart, created = Cart.objects.get_or_create(session_key=session_key)
+    cart, _ = Cart.objects.get_or_create(session_key=session_key)
     # Create a Cart. Setting it's session_key to the currant one created.
   
     return cart
@@ -98,7 +98,7 @@ class AddtoCartView(generics.CreateAPIView):
     serializer = self.get_serializer(cart_item)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-  
+# CartItems in cart
 class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ItemSerializer
 
@@ -111,7 +111,6 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     return CartItem.objects.filter(cart__session_key=session_key)
     # filter cart items in the current user's cart
-
 
 # ------------------------------------------------------ CUSTOM ORDER ------------------------------------------------------
 
@@ -136,7 +135,9 @@ class CustomOrderView(generics.ListCreateAPIView):
         headers=headers
       )
 
-# TODO: Create Category 
+# TODO: Create CategoryView - Get a list of all categories - Use for filters and Dropdowns
+# TODO: Create PropertiesView - Get list of all properties
+
 """
 
 NOTES:: 

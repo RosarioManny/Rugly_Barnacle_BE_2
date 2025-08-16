@@ -80,8 +80,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'rbproduct',
-        'USER': os.getenv('RB_USER', 'rb_admin'),
-        'PASSWORD': os.getenv('RB_PASSWORD', 'RBadmin2025'),
+        'USER': os.getenv('RB_USER'),
+        'PASSWORD': os.getenv('RB_PASSWORD'),
     }
 }
 

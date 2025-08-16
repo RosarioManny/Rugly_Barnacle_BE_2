@@ -11,7 +11,9 @@ urlpatterns = [
   path('cart/items/', AddtoCartView.as_view(), name='add-to-cart'),
   path('cart/items/<int:id>', CartItemDetailView.as_view(), name='cart-item-detail'),
 # CUSTOM ORDER
-  path('custom/', CustomOrderView.as_view(), name='custom-order')
+  path('custom/', CustomOrderView.as_view(), name='custom-order'),
   # TODO :: Create categories/ route
   # TODO :: Create custom/ route
+  # TODO :: Create properties/ route
+  path('properties/', PropertiesView.as_view(), name='properties')
 ]
