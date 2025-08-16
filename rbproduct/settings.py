@@ -79,12 +79,14 @@ WSGI_APPLICATION = 'rbproduct.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('RB_USER'),
-        'USER': os.getenv('RB_DATABASE'),
+        'NAME': 'rbproduct',
+        'USER': os.getenv('RB_USER'),
         'PASSWORD': os.getenv('RB_PASSWORD'),
     }
 }
-
+# RB_USER=rb_admin
+# RB_DATABASE=rbproduct
+# RB_PASSWORD=1234rugs
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
