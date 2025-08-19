@@ -1,5 +1,5 @@
-from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from rest_framework.response import Response
 from rest_framework import generics, status 
 from ..models import Cart, Product, CartItem
@@ -39,21 +39,23 @@ class AddtoCartView(generics.CreateAPIView):
     # Validate Product
     product_id = request.data.get('product_id')
     if not product_id:
-      return Response({"error": "product_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+      return Response({"error": "No product_id is provided"}, status=status.HTTP_400_BAD_REQUEST)
     
     # Wanted quantity
     requested_quantity = int(request.data.get('quantity', 1)) #Two args. either the specified quantity or default to 1
     
-    # Attempt to get product
-    try: 
-      product = get_object_or_404(Product, id=product_id)
-      if product.quantity < requested_quantity:
-        return Response(
-              {"error": f"Only {product.quantity} items available"},
-              status=status.HTTP_400_BAD_REQUEST
-            )
-    except Product.DoesNotExist:
-      return Response({"error": "Product not found"}, status=status.HTTP_400_BAD_REQUEST)
+    with transaction.atomic():
+      try:
+        product = Product.objects.select_for_update().get(id=product_id)
+      except Product.DoesNotExist:
+        return Response({"error": "Product not found"}, status=status.HTTP_400_BAD_REQUEST)
+      
+    if product.quantity < requested_quantity:
+      return Response(
+          {"error": f"Only {product.quantity} available"}, 
+          status=status.HTTP_400_BAD_REQUEST
+        )
+    
     # Check if product already exists in cart. Handling when it's already in cart
     cart_item, created = CartItem.objects.get_or_create(
       cart=cart,
@@ -62,14 +64,14 @@ class AddtoCartView(generics.CreateAPIView):
     )
 
     if not created:
+      new_quantity = cart_item.quantity + requested_quantity
       # Check if adding requested quantity would exceed availability
-      if (cart_item.quantity + requested_quantity) > product.quantity:
+      if  new_quantity > product.quantity:
           return Response(
               {"error": f"Cannot add {requested_quantity} more. Only {product.quantity - cart_item.quantity} available"},
               status=status.HTTP_400_BAD_REQUEST
           )
-      cart_item.quantity += requested_quantity
-      cart_item.save()
+      cart_item.quantity = new_quantity
 
     # Save the cart item
     serializer = self.get_serializer(cart_item)
@@ -96,7 +98,7 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = self.filter_queryset(self.get_queryset())
     obj = generics.get_object_or_404(queryset, id=self.kwargs["id"])
     return obj
-  # Then it tries to find the object with the given 'id' WITHIN that filtered queryset.
+  # This tries to find the object with the given 'id' WITHIN that filtered queryset.
   # If the id isn't in the user's cart, it will naturally return a 404.
 
 """
