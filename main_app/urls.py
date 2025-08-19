@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from .views.cartviews import CartView, Add
 
 urlpatterns = [
   path('', Home.as_view(), name='home'),
@@ -13,7 +14,7 @@ urlpatterns = [
 # CUSTOM ORDER
   path('custom/', CustomOrderView.as_view(), name='custom-order'),
   # TODO :: Create categories/ route
-  # TODO :: Create custom/ route
+  path('category/', CategoryView.as_view(), name='category'),
   # TODO :: Create properties/ route
   path('properties/', PropertiesView.as_view(), name='properties')
 ]
