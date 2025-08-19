@@ -42,6 +42,7 @@ class Product(models.Model):
   properties = models.ManyToManyField(Property, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
+  # TODO: in_stock checker. 
 
   # Change the name of the display on admin panel
   def __str__(self):

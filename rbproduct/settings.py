@@ -41,8 +41,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'main_app',
+    'django_filters' # <-- pip install django-filters / ALLOW for filters
 ]
 
+# For Filtering abilities add REST_FRAMEWORK variable.
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend', # <-- This enables filtering
+        'rest_framework.filters.SearchFilter',               # <-- This enables searching
+        'rest_framework.filters.OrderingFilter',             # <-- This enables sorting
+    ],
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

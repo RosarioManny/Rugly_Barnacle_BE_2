@@ -79,6 +79,7 @@ class AddtoCartView(generics.CreateAPIView):
 
 class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ItemSerializer
+  lookup_field = 'id'
 
   def get_queryset(self):
     session_key = self.request.session.session_key
@@ -89,7 +90,14 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     return CartItem.objects.filter(cart__session_key=session_key)
     # filter cart items in the current user's cart
-
+  
+  # SECURITY CODE 
+  def get_object(self):
+    queryset = self.filter_queryset(self.get_queryset())
+    obj = generics.get_object_or_404(queryset, id=self.kwargs["id"])
+    return obj
+  # Then it tries to find the object with the given 'id' WITHIN that filtered queryset.
+  # If the id isn't in the user's cart, it will naturally return a 404.
 
 """
 NOTES:: 
