@@ -1,6 +1,8 @@
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework import generics, status 
-from ..models import *
-from ..serializers import *
+from rest_framework import generics
+from ..models import Category
+from ..serializers import CategorySerializer
+
+# TODO: Create CategoryView - Get a list of all categories - Use for filters and Dropdowns
+class CategoryView(generics.ListCreateAPIView):
+  queryset = Category.objects.all()
+  serializer_class = CategorySerializer

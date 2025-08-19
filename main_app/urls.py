@@ -1,6 +1,11 @@
 from django.urls import path
-from .views import *
-from .views.cartviews import CartView, Add
+from .views.homeview import Home
+from .views.cartviews import CartView, AddtoCartView, CartItemDetailView
+from .views.categoryviews import CategoryView
+from .views.customOrdersviews import CustomOrderView
+from .views.productviews import ProductList, ProductDetails
+from .views.propertiesview import PropertiesView
+
 
 urlpatterns = [
   path('', Home.as_view(), name='home'),

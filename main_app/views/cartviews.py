@@ -89,3 +89,13 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     return CartItem.objects.filter(cart__session_key=session_key)
     # filter cart items in the current user's cart
+
+
+"""
+NOTES:: 
+  < CARTVIEW > 
+  get_or_create() returns a tuple (object, created) where:
+    - object = is the retrieved or created instance
+    - created = is a boolean indicating whether a new object was created
+
+"""
