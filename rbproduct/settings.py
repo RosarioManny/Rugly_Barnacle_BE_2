@@ -46,11 +46,15 @@ INSTALLED_APPS = [
 
 # For Filtering abilities add REST_FRAMEWORK variable.
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': [
+    'DEFAULT_FILTER_BACKENDS': {
         'django_filters.rest_framework.DjangoFilterBackend', # <-- This enables filtering
         'rest_framework.filters.SearchFilter',               # <-- This enables searching
         'rest_framework.filters.OrderingFilter',             # <-- This enables sorting
-    ],
+    },
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '8/day',  # Limit anonymous users to 5 requests per day
+        'user': '20/day', # Limit logged-in users to 20 per day
+    }
 }
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

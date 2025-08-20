@@ -79,6 +79,7 @@ class CustomOrder(models.Model):
     verbose_name="Rug Size & Price Range"
   )
   created_at = models.DateTimeField(auto_now_add=True)
+  # TODO: Create an Accepted / Rejected / Pending
 
   def __str__(self):
     return f"Custom order {self.id}: {self.email} - ({self.created_at.date()})"
