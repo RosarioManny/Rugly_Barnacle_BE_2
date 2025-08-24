@@ -8,6 +8,12 @@ class CategorySerializer(serializers.ModelSerializer):
     model = Category
     fields = '__all__'
 
+# PROPERTY
+class PropertySerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Property
+    fields = '__all__'
+    
 # PRODUCT
 class ProductSerializer(serializers.ModelSerializer):
   
@@ -16,12 +22,12 @@ class ProductSerializer(serializers.ModelSerializer):
   class Meta:
     model = Product
     fields = '__all__'
+
+    properties = serializers.PrimaryKeyRelatedField(
+    many=True, 
+    queryset=Property.objects.all()
+  )
     
-# PROPERTY
-class PropertySerializer(serializers.ModelSerializer):
-  class Meta:
-    model = Property
-    fields = '__all__'
 # CART
 
 class CartSerializer(serializers.ModelSerializer):

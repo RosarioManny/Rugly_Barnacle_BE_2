@@ -5,11 +5,11 @@ from ..serializers import ProductSerializer
 
 class ProductList(generics.ListCreateAPIView):
   # Shows a list of all available products
-  queryset = Product.objects.all()
+  queryset = Product.objects.all().prefetch_related('properties')
   serializer_class = ProductSerializer
   
   # This adds the filter backedn
-  filter_backends = [DjangoFilterBackend, filters.SearchFilters, filters.OrderingFilters]
+  filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
   # Select items with the category Id
   filterset_fields = ['category']
@@ -22,3 +22,4 @@ class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
   queryset = Product.objects.all()
   serializer_class = ProductSerializer
   lookup_field = 'id'
+  filter_backends = []
