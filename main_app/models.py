@@ -65,7 +65,7 @@ class CartItem(models.Model):
   quantity = models.PositiveIntegerField(default=1)
 
   def __str__(self):
-    return f"Amount: {self.quantity}x - Product: {self.product.name} - Cart: {self.cart.id} - Date: {self.added_at.month} / {self.added_at.day} / {self.added_at.year}"
+    return f"{self.quantity}x {self.product.name} - {self.added_at.month} / {self.added_at.day} / {self.added_at.year} - Cart: {self.cart.id} "
   
 # ------------------------------------------------------ CUSTOM ------------------------------------------------------ 
 

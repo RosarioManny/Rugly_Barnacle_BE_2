@@ -17,10 +17,9 @@ class CartView(generics.RetrieveAPIView):
       self.request.session.save() # Create a session.
       session_key = self.request.session.session_key
     
-    
     cart, _ = Cart.objects.get_or_create(session_key=session_key)
     # Create a Cart. Setting it's session_key to the currant one created.
-  
+
     return cart
   
 class AddtoCartView(generics.CreateAPIView):
@@ -78,6 +77,10 @@ class AddtoCartView(generics.CreateAPIView):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # ------------------------------------------------------ CARTITEMS ------------------------------------------------------
+
+class CartItemList(generics.ListAPIView):
+  serializer_class = ItemSerializer
+  lookup_field = 'id'
 
 class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ItemSerializer
