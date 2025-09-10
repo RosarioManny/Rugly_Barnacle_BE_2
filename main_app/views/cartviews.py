@@ -55,8 +55,7 @@ class AddtoCartView(generics.CreateAPIView):
           status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Check if product already exists in cart. Handling when it's already in cart
-    cart_item, created = CartItem.objects.get_or_create(
+    cart_item, created = CartItem.objects.get_or_create( # Check if product already exists in cart. Handling when it's already in cart
       cart=cart,
       product=product,
       defaults={'quantity': requested_quantity}
@@ -64,8 +63,8 @@ class AddtoCartView(generics.CreateAPIView):
 
     if not created:
       new_quantity = cart_item.quantity + requested_quantity
-      # Check if adding requested quantity would exceed availability
-      if  new_quantity > product.quantity:
+      
+      if  new_quantity > product.quantity: # Check if adding requested quantity would exceed availability
           return Response(
               {"error": f"Cannot add {requested_quantity} more. Only {product.quantity - cart_item.quantity} available"},
               status=status.HTTP_400_BAD_REQUEST
@@ -75,6 +74,41 @@ class AddtoCartView(generics.CreateAPIView):
     # Save the cart item
     serializer = self.get_serializer(cart_item)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class RemoveFromCartView(generics.DestroyAPIView):
+  serializer_class = CartSerializer
+
+  def delete(self, request, *args, **kwargs):
+    session_key = self.request.session.session_key
+    if not session_key:
+      self.request.session.save()
+      session_key = request.session.session_key
+
+    cart, _ = Cart.objects.get_or_create(session_key=session_key)
+
+    product_id = request.data.get('product_id')
+    if not product_id:
+      return Response({"error": "No product_id is provided"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    remove_quantity = int(request.data.get('quantity', 1)) # Amount wanted to remove
+
+    try:
+      # 
+      cart_item = CartItem.objects.get(cart=cart, product_id=product_id) # Get the item by id and the proper cart it's in
+
+      with transaction.atomic():
+        if remove_quantity >= cart_item.quantity: # If amount wanted to move is equal or more than, delete object
+          cart_item.delete()
+        else:
+          cart_item.quantity -= remove_quantity # Remove the specified amount
+          cart_item.save()
+        
+        serializer = self.get_serializer(cart)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except CartItem.DoesNotExist:
+      return Response("Failed to remove Item", status=status.HTTP_404_NOT_FOUND)
+
 
 # ------------------------------------------------------ CARTITEMS ------------------------------------------------------
 
@@ -89,12 +123,12 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
   def get_queryset(self):
     session_key = self.request.session.session_key
 
-    if not session_key:
+    if not session_key: # If no session is available, set to an empty object. No crash/error
       return CartItem.objects.none()
-      # If no session is available, set to an empty object. No crash/error
+      
 
-    return CartItem.objects.filter(cart__session_key=session_key)
-    # filter cart items in the current user's cart
+    return CartItem.objects.filter(cart__session_key=session_key) # filter cart items in the current user's cart
+    
   
   # SECURITY CODE 
   def get_object(self):
