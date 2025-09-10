@@ -1,10 +1,44 @@
-from django.contrib import admin 
-from .models import Product, Property, Category, CartItem, Cart, CustomOrder
+# admin.py
+from django.contrib import admin
+from django.utils.safestring import mark_safe
+from .models import *
 
-# Register your models here.
-admin.site.register(Cart)
-admin.site.register(CartItem)
-admin.site.register(CustomOrder)
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
+    fields = ('image', 'is_primary', 'image_preview')
+    readonly_fields = ('image_preview',)
+    
+    def image_preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px; max-width: 100px;" />')
+        return "No Image"
+    image_preview.short_description = 'Preview'
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['name', 'price', 'category', 'quantity', 'created_at', 'get_primary_image']
+    list_filter = ['category', 'created_at', 'properties']
+    search_fields = ['name', 'description']
+    inlines = [ProductImageInline]
+    filter_horizontal = ['properties']
+    
+    # Add a method to display primary image in list view
+    def get_primary_image(self, obj):
+        primary_image = obj.images.filter(is_primary=True).first()
+        if primary_image:
+            return mark_safe(f'<img src="{primary_image.image.url}" style="max-height: 50px; max-width: 50px;" />')
+        # Fallback to first image if no primary
+        first_image = obj.images.first()
+        if first_image:
+            return mark_safe(f'<img src="{first_image.image.url}" style="max-height: 50px; max-width: 50px;" />')
+        return "No Image"
+    get_primary_image.short_description = 'Image'
+    
+    # Optional: Show properties in list view
+    def get_properties_list(self, obj):
+        return ", ".join([p.display_name for p in obj.properties.all()])
+    get_properties_list.short_description = 'Properties'
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -16,16 +50,7 @@ class PropertyAdmin(admin.ModelAdmin):
     list_display = ['name', 'display_name']
     search_fields = ['name', 'display_name']
 
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'category', 'quantity', 'created_at']
-    list_filter = ['category', 'created_at', 'properties']
-    search_fields = ['name', 'description']
-    filter_horizontal = ['properties']  # This adds the nice selector widget
-    # OR use filter_vertical if you prefer vertical layout
-    # filter_vertical = ['properties']
-    
-    # Optional: Show properties in list view
-    def get_properties_list(self, obj):
-        return ", ".join([p.display_name for p in obj.properties.all()])
-    get_properties_list.short_description = 'Properties'
+# Register other models
+admin.site.register(Cart)
+admin.site.register(CartItem)
+admin.site.register(CustomOrder)

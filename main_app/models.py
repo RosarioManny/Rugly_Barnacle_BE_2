@@ -1,4 +1,8 @@
+from django.core.files.base import ContentFile
 from django.db import models
+from io import BytesIO
+from PIL import Image
+import os
 
 # To Create an enums or choice 
 PRICES = (
@@ -87,13 +91,80 @@ class CustomOrder(models.Model):
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
 
 # 6. TODO:: Create ProductImage Model
-# class ProductImage(models.Model):
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-#     image = models.ImageField(upload_to='products/')
-#     is_primary = models.BooleanField(default=False)  # Mark the main image
 
-#     def __str__(self):
-#         return f"Image for {self.product.name}"
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/')
+    thumbnail = models.ImageField(upload_to='products/thumbnails/', blank=True, null=True)
+    is_primary = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        # First save to generate image path
+        if not self.pk:
+            super().save(*args, **kwargs)
+        
+        # Process image if it's new or changed
+        if self.image:
+            # Open the original image
+            img = Image.open(self.image)
+            
+            # Resize main image if too large
+            if img.height > 800 or img.width > 800:
+                output_size = (800, 800)
+                img.thumbnail(output_size)
+                
+                # Save the resized image
+                buffer = BytesIO()
+                if img.format == 'PNG':
+                    img.save(buffer, format='PNG')
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + '.png',
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+                else:
+                    img.save(buffer, format='JPEG', quality=85)
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + '.jpg',
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+            
+            # Create thumbnail
+            img.thumbnail((200, 200))
+            thumb_buffer = BytesIO()
+            if img.format == 'PNG':
+                img.save(thumb_buffer, format='PNG')
+                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
+            else:
+                img.save(thumb_buffer, format='JPEG', quality=75)
+                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
+            
+            self.thumbnail.save(
+                thumb_name,
+                ContentFile(thumb_buffer.getvalue()),
+                save=False
+            )
+        
+        # Ensure only one primary image per product
+        if self.is_primary:
+            ProductImage.objects.filter(
+                product=self.product, 
+                is_primary=True
+            ).exclude(id=self.id).update(is_primary=False)
+            
+        super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        # Delete associated files
+        if self.image:
+            self.image.delete(save=False)
+        if self.thumbnail:
+            self.thumbnail.delete(save=False)
+        super().delete(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Image for {self.product.name}"
 """
 Make migrations::
 > python manage.py makemigrations

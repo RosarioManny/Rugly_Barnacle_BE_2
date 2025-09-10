@@ -1,6 +1,6 @@
 from rest_framework import generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from ..models import Product
+from ..models import Product, ProductImage
 from ..serializers import ProductSerializer
 
 class ProductList(generics.ListCreateAPIView):
@@ -23,3 +23,7 @@ class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ProductSerializer
   lookup_field = 'id'
   filter_backends = []
+
+class ProductImage(generics.ListCreateAPIView):
+  queryset = ProductImage.objects.all()
+  serializer_class = ProductSerializer
