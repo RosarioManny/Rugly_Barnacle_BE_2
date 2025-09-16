@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Property, CartItem, Cart, CustomOrder, Category
+from .models import *
 
 # CATEGORY
 class CategorySerializer(serializers.ModelSerializer):
@@ -14,20 +14,31 @@ class PropertySerializer(serializers.ModelSerializer):
     model = Property
     fields = '__all__'
     
+# PRODUCT IMAGE 
+class ProductImageSerializer(serializers.ModelSerializer):
+  class Meta:
+      model = ProductImage
+      fields = ['id', 'image', 'thumbnail', 'is_primary']
+      read_only_fields = ['id', 'thumbnail']
+
 # PRODUCT
 class ProductSerializer(serializers.ModelSerializer):
-  
   category = CategorySerializer(read_only=True)
+  images = ProductImageSerializer(
+    many=True, 
+    read_only=True
+    )
+  properties = serializers.PrimaryKeyRelatedField(
+    many=True, 
+    queryset=Property.objects.all()
+    )
+
 
   class Meta:
     model = Product
     fields = '__all__'
 
-    properties = serializers.PrimaryKeyRelatedField(
-    many=True, 
-    queryset=Property.objects.all()
-  )
-    
+
 # CART
 
 class ItemSerializer(serializers.ModelSerializer):

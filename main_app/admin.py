@@ -17,9 +17,9 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'category', 'quantity', 'created_at', 'get_primary_image']
-    list_filter = ['category', 'created_at', 'properties']
-    search_fields = ['name', 'description']
+    list_display = ['name', 'price', 'category', 'quantity', 'created_at', 'get_primary_image', 'id'] # < - this Columns of the item details
+    list_filter = ['category', 'created_at', 'properties'] # < - this creates a filter sidebar
+    search_fields = ['name', 'description'] # < - this creates a search bar. These are the parameters that it uses to look through
     inlines = [ProductImageInline]
     filter_horizontal = ['properties']
     
@@ -27,7 +27,7 @@ class ProductAdmin(admin.ModelAdmin):
     def image_preview(self, obj):
         if obj.image:
             return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px; max-width: 100px;" />')
-        return "No Image"
+        return "N/A"
 
     def get_primary_image(self, obj):
         primary_image = obj.images.filter(is_primary=True).first()
@@ -37,7 +37,7 @@ class ProductAdmin(admin.ModelAdmin):
         first_image = obj.images.first()
         if first_image:
             return mark_safe(f'<img src="{first_image.image.url}" style="max-height: 50px; max-width: 50px;" />')
-        return "No Image"
+        return "N/A"
     
     # Optional: Show properties in list view
     def get_properties_list(self, obj):
