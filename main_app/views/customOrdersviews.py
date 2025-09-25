@@ -4,10 +4,10 @@ from ..models import CustomOrder
 from ..serializers import CustomOrderSerializer
 
 class CustomOrderView(generics.ListCreateAPIView):
-  # ).order_by('-created_at') allows you to see the most recent in the list
+  # .order_by('-created_at') allows you to see the most recent in the list
   queryset = CustomOrder.objects.all().order_by('-created_at')
   serializer_class = CustomOrderSerializer
-
+  
   # CONTROL PERMISSIONS
   def get_permissions(self):
     if self.request.method == 'GET':
@@ -15,7 +15,7 @@ class CustomOrderView(generics.ListCreateAPIView):
       return [permissions.IsAdminUser()]
     elif self.request.method == 'POST':
       # Anyone can create a post
-      return [permissions.AllowAny]
+      return [permissions.AllowAny()]
     return super().get_permissions()
   
   # Create the custom Order
@@ -24,7 +24,7 @@ class CustomOrderView(generics.ListCreateAPIView):
     serializer.is_valid(raise_exception = True)
     self.perform_create(serializer)
 
-    # TODO:: NOT YET MADE - Send notification funtion
+    # TODO:: NOT YET MADE - Send email notification funtion
     # send_order_notification(serializer.data)
     print("New Custom order: ",serializer.data)
 
@@ -34,3 +34,9 @@ class CustomOrderView(generics.ListCreateAPIView):
         status= status.HTTP_201_CREATED,
         headers=headers
       )
+
+class CustomOrderDetailView(generics.RetrieveAPIView):
+  serializer_class = CustomOrder
+  lookup_field = 'reference_id'
+  queryset = CustomOrder.objects.all()
+  permission_classe = [permissions.AllowAny()]  

@@ -2,7 +2,7 @@ from django.urls import path
 from .views.homeview import Home
 from .views.cartviews import CartView, AddtoCartView, CartItemDetailView, RemoveFromCartView
 from .views.categoryviews import CategoryView
-from .views.customOrdersviews import CustomOrderView
+from .views.customOrdersviews import CustomOrderView, CustomOrderDetailView
 from .views.productviews import ProductList, ProductDetails
 from .views.propertiesview import PropertiesView
 
@@ -21,10 +21,11 @@ urlpatterns = [
 
 # CUSTOM ORDER
   path('custom/', CustomOrderView.as_view(), name='custom-order'),
+  path('custom/<str:reference_id>/', CustomOrderDetailView.as_view(), name='custom-order-details'),
 
 # CATEGORY
-
   path('category/', CategoryView.as_view(), name='category'),
+
 # PROPERTY
   path('properties/', PropertiesView.as_view(), name='properties')
 ]

@@ -96,7 +96,7 @@ class CustomOrder(models.Model):
     super().save(*args, **kwargs)
 
   def __str__(self):
-    return f"{self.reference_id}: {self.customer_name}"
+    return f"{self.reference_id}: {self.customer_name} - {self.email}"
   
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
 
