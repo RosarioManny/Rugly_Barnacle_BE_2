@@ -1,8 +1,10 @@
 from django.core.files.base import ContentFile
 from django.db import models
+from django.utils import timezone
 from io import BytesIO
 from PIL import Image
 import os
+import uuid
 
 # To Create an enums or choice 
 PRICES = (
@@ -74,19 +76,27 @@ class CartItem(models.Model):
 # ------------------------------------------------------ CUSTOM ------------------------------------------------------ 
 
 class CustomOrder(models.Model):
+  customer_name = models.CharField(max_length=100, blank=True)
   description = models.TextField(max_length=400, blank=True, null=True)
-  email = models.EmailField(max_length=64, null=True)
-  size_with_price = models.CharField(
-    max_length=10, 
-    choices=PRICES, 
-    default=PRICES[0][0], 
-    verbose_name="Rug Size & Price Range"
-  )
+  email = models.EmailField(max_length=250, blank=True, null=True)
+  reference_id = models.CharField(max_length=20, unique=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
-  # TODO: Create an Accepted / Rejected / Pending
+  STATUS_CHOICE = [ 
+    ('canceled', 'Canceled'),
+    ('pending', 'Pending'),
+    ('in_progress', 'In Progress'),
+    ('completed', 'Completed')
+  ]
+  status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='pending', blank=True, )
+  owner_notes = models.TextField(blank=True, null=True)
+
+  def save(self, *args, **kwargs):
+    if not self.reference_id:
+        self.reference_id = f"CUST-{uuid.uuid4().hex[:6].upper()}"
+    super().save(*args, **kwargs)
 
   def __str__(self):
-    return f"Custom order {self.id}: {self.email} - ({self.created_at.date()})"
+    return f"{self.reference_id}: {self.customer_name}"
   
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
 
