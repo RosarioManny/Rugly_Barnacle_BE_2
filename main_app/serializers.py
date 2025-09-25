@@ -78,5 +78,5 @@ class CustomOrderSerializer(serializers.ModelSerializer):
   
   class Meta: 
     model = CustomOrder
-    fields = ['customer_name', 'description', 'email', 'owner_notes', 'status']
+    fields = ['customer_name', 'description', 'email', 'admin_notes', 'status']
     read_only_fields = ['reference_id', 'created_at']

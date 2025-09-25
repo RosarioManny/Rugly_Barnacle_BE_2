@@ -88,7 +88,7 @@ class CustomOrder(models.Model):
     ('completed', 'Completed')
   ]
   status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='pending', blank=True, )
-  owner_notes = models.TextField(blank=True, null=True)
+  admin_notes = models.TextField(blank=True, null=True)
 
   def save(self, *args, **kwargs):
     if not self.reference_id:
