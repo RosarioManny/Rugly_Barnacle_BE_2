@@ -74,9 +74,24 @@ class CartSerializer(serializers.ModelSerializer):
     def get_item_count(self, obj):
         return obj.items.count()
 # CUSTOM 
+class CustomOrderImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomOrderImage
+        fields = ['id', 'image', 'thumbnail', 'uploaded_at']
+        read_only_fields = ['id', 'thumbnail', 'uploaded_at']
+
 class CustomOrderSerializer(serializers.ModelSerializer):
-  
-  class Meta: 
-    model = CustomOrder
-    fields = ['customer_name', 'description', 'email', 'admin_notes', 'status']
-    read_only_fields = ['reference_id', 'created_at']
+    images = CustomOrderImageSerializer(many=True, read_only=True)
+    image_count = serializers.SerializerMethodField()
+    
+    class Meta: 
+        model = CustomOrder
+        fields = [
+            'reference_id', 'customer_name', 'description', 'email', 
+            'contact_method', 'contact_info', 'admin_notes', 'status', 
+            'created_at', 'images', 'image_count'
+        ]
+        read_only_fields = ['reference_id', 'created_at']
+    
+    def get_image_count(self, obj):
+        return obj.images.count()

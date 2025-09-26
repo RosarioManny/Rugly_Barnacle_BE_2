@@ -1,7 +1,10 @@
 # admin.py
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from .models import *
+
+# ------------------------------------------------------ INLINE CLASSES ------------------------------------------------------
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -15,46 +18,140 @@ class ProductImageInline(admin.TabularInline):
         return "No Image"
     image_preview.short_description = 'Preview'
 
+class CustomOrderImageInline(admin.TabularInline):
+    model = CustomOrderImage
+    extra = 1
+    fields = ('image', 'thumbnail_preview')
+    readonly_fields = ('thumbnail_preview',)
+    
+    def thumbnail_preview(self, obj):
+        if obj.thumbnail:
+            return mark_safe(f'<img src="{obj.thumbnail.url}" style="max-height: 100px; max-width: 100px;" />')
+        elif obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px; max-width: 100px;" />')
+        return "No Image"
+    thumbnail_preview.short_description = 'Preview'
+
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 0
+    readonly_fields = ['product', 'quantity', 'added_at', 'subtotal']
+    
+    def subtotal(self, obj):
+        return f"${obj.quantity * obj.product.price:.2f}"
+    subtotal.short_description = 'Subtotal'
+
+# ------------------------------------------------------ MODEL ADMIN CLASSES ------------------------------------------------------
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'category', 'quantity', 'created_at', 'get_primary_image', 'id'] # < - this Columns of the item details
-    list_filter = ['category', 'created_at', 'properties'] # < - this creates a filter sidebar
-    search_fields = ['name', 'description'] # < - this creates a search bar. These are the parameters that it uses to look through
+    list_display = ['name', 'price', 'category', 'quantity', 'created_at', 'get_primary_image', 'id']
+    list_filter = ['category', 'created_at', 'properties']
+    search_fields = ['name', 'description']
     inlines = [ProductImageInline]
     filter_horizontal = ['properties']
     
-    # Add a method to display primary image in list view
-    def image_preview(self, obj):
-        if obj.image:
-            return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px; max-width: 100px;" />')
-        return "N/A"
-
     def get_primary_image(self, obj):
         primary_image = obj.images.filter(is_primary=True).first()
         if primary_image:
             return mark_safe(f'<img src="{primary_image.image.url}" style="max-height: 50px; max-width: 50px;" />')
-        # Fallback to first image if no primary
         first_image = obj.images.first()
         if first_image:
             return mark_safe(f'<img src="{first_image.image.url}" style="max-height: 50px; max-width: 50px;" />')
         return "N/A"
-    
-    # Optional: Show properties in list view
+    get_primary_image.short_description = 'Image'
+
     def get_properties_list(self, obj):
         return ", ".join([p.display_name for p in obj.properties.all()])
     get_properties_list.short_description = 'Properties'
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug']
+    list_display = ['name', 'slug', 'product_count']
     prepopulated_fields = {'slug': ('name',)}
+    search_fields = ['name']
+    
+    def product_count(self, obj):
+        return obj.product_set.count()
+    product_count.short_description = 'Products'
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'display_name']
+    list_display = ['name', 'display_name', 'product_count']
     search_fields = ['name', 'display_name']
+    
+    def product_count(self, obj):
+        return obj.product_set.count()
+    product_count.short_description = 'Products'
 
-# Register other models
-admin.site.register(Cart)
-admin.site.register(CartItem)
-admin.site.register(CustomOrder)
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ['id', 'session_key', 'created_at', 'item_count', 'total_value']
+    list_filter = ['created_at']
+    search_fields = ['session_key']
+    readonly_fields = ['created_at', 'updated_at']
+    inlines = [CartItemInline]
+    
+    def item_count(self, obj):
+        return obj.items.count()
+    item_count.short_description = 'Items'
+    
+    def total_value(self, obj):
+        total = sum(item.quantity * item.product.price for item in obj.items.all())
+        return f"${total:.2f}"
+    total_value.short_description = 'Total Value'
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ['id', 'cart', 'product', 'quantity', 'subtotal', 'added_at']
+    list_filter = ['added_at']
+    search_fields = ['cart__session_key', 'product__name']
+    readonly_fields = ['added_at', 'subtotal_calc']
+    
+    def subtotal(self, obj):
+        return f"${obj.quantity * obj.product.price:.2f}"
+    subtotal.short_description = 'Subtotal'
+    
+    def subtotal_calc(self, obj):
+        return f"${obj.quantity * obj.product.price:.2f}"
+    subtotal_calc.short_description = 'Subtotal'
+
+@admin.register(CustomOrder)
+class CustomOrderAdmin(admin.ModelAdmin):
+    list_display = ['reference_id', 'customer_name', 'email', 'contact_method', 'contact_info', 'status', 'created_at', 'image_count']
+    list_filter = ['status', 'contact_method', 'created_at']
+    search_fields = ['reference_id', 'customer_name', 'email', 'contact_info']
+    readonly_fields = ['reference_id', 'created_at', 'images_preview']
+    inlines = [CustomOrderImageInline]
+    
+    fieldsets = (
+        ('Order Information', {
+            'fields': ('reference_id', 'created_at', 'status')
+        }),
+        ('Customer Details', {
+            'fields': ('customer_name', 'email', 'contact_method', 'contact_info')
+        }),
+        ('Order Details', {
+            'fields': ('description', 'admin_notes')
+        }),
+    )
+    
+    def image_count(self, obj):
+        return obj.images.count()
+    image_count.short_description = 'Images'
+    
+    def images_preview(self, obj):
+        images = obj.images.all()[:5]
+        if images:
+            html = '<div style="display: flex; gap: 10px; flex-wrap: wrap;">'
+            for image in images:
+                if image.thumbnail:
+                    html += f'<img src="{image.thumbnail.url}" width="100" height="100" style="object-fit: cover; border: 1px solid #ddd;" />'
+                elif image.image:
+                    html += f'<img src="{image.image.url}" width="100" height="100" style="object-fit: cover; border: 1px solid #ddd;" />'
+            html += '</div>'
+            return mark_safe(html)
+        return "No images"
+    images_preview.short_description = 'Reference Images Preview'
+
+# No need to register CustomOrderImage separately since it's inline with CustomOrder

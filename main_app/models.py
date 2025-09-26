@@ -42,7 +42,7 @@ class Product(models.Model):
   name = models.CharField(max_length=100, unique=True)
   price = models.DecimalField(decimal_places=2, max_digits=10)
   category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-  description = models.TextField(max_length=400, blank=True, null=True)
+  description = models.TextField(max_length=600, blank=True, null=True)
   dimensions = models.CharField(max_length=40)
   quantity = models.PositiveIntegerField(default=1)
   properties = models.ManyToManyField(Property, blank=True)
@@ -78,6 +78,16 @@ class CartItem(models.Model):
 class CustomOrder(models.Model):
   customer_name = models.CharField(max_length=100, blank=True)
   description = models.TextField(max_length=400, blank=True, null=True)
+  contact_method = models.CharField(
+      max_length=20, 
+      choices=[
+          ('instagram', 'Instagram'),
+          ('phone', 'Phone'),
+          ('email', 'Email')
+      ], 
+      default='email'
+  )
+  contact_info = models.CharField(max_length=100, blank=True, null=True)
   email = models.EmailField(max_length=250, blank=True, null=True)
   reference_id = models.CharField(max_length=20, unique=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
@@ -98,9 +108,69 @@ class CustomOrder(models.Model):
   def __str__(self):
     return f"{self.reference_id}: {self.customer_name} - {self.email}"
   
+class CustomOrderImage(models.Model):
+    custom_order = models.ForeignKey(CustomOrder, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='custom_orders/')
+    thumbnail = models.ImageField(upload_to='custom_orders/thumbnails/', blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def save(self, *args, **kwargs):
+        # Similar to your ProductImage save method
+        if not self.pk:
+            super().save(*args, **kwargs)
+        
+        if self.image:
+            img = Image.open(self.image)
+            
+            # Resize main image if too large
+            if img.height > 800 or img.width > 800:
+                output_size = (800, 800)
+                img.thumbnail(output_size)
+                
+                buffer = BytesIO()
+                if img.format == 'PNG':
+                    img.save(buffer, format='PNG')
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + '.png',
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+                else:
+                    img.save(buffer, format='JPEG', quality=85)
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + '.jpg',
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+            
+            # Create thumbnail
+            img.thumbnail((200, 200))
+            thumb_buffer = BytesIO()
+            if img.format == 'PNG':
+                img.save(thumb_buffer, format='PNG')
+                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
+            else:
+                img.save(thumb_buffer, format='JPEG', quality=75)
+                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
+            
+            self.thumbnail.save(
+                thumb_name,
+                ContentFile(thumb_buffer.getvalue()),
+                save=False
+            )
+        
+        super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        if self.image:
+            self.image.delete(save=False)
+        if self.thumbnail:
+            self.thumbnail.delete(save=False)
+        super().delete(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Image for {self.custom_order.reference_id}"
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
-
-# 6. TODO:: Create ProductImage Model
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
