@@ -1,6 +1,7 @@
 # CUSTOM ORDER VIEWS
 from rest_framework.response import Response
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status
+from rest_framework.permissions import AllowAny, IsAdminUser
 from ..models import CustomOrder, CustomOrderImage
 from ..serializers import CustomOrderSerializer
 
@@ -10,10 +11,8 @@ class CustomOrderView(generics.ListCreateAPIView):
     
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [permissions.IsAdminUser()]
-        elif self.request.method == 'POST':
-            return [permissions.AllowAny()]
-        return super().get_permissions()
+            return [IsAdminUser()]
+        return [AllowAny()]
     
     def create(self, request, *args, **kwargs):
         # Handle file uploads separately
@@ -41,4 +40,5 @@ class CustomOrderDetailView(generics.RetrieveAPIView):
     serializer_class = CustomOrderSerializer
     lookup_field = 'reference_id'
     queryset = CustomOrder.objects.all()
-    permission_classes = [permissions.AllowAny()]
+    permission_classes = [AllowAny]
+    filter_backends = []

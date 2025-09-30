@@ -21,7 +21,7 @@ urlpatterns = [
 
 # CUSTOM ORDER
   path('custom/', CustomOrderView.as_view(), name='custom-order'),
-  path('custom/<str:reference_id>/', CustomOrderDetailView.as_view(), name='custom-order-details'),
+  path('custom/<str:reference_id>/', CustomOrderDetailView.as_view(), name='custom-order-detail'),
 
 # CATEGORY
   path('category/', CategoryView.as_view(), name='category'),
