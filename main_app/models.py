@@ -115,7 +115,6 @@ class CustomOrderImage(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
-        # Similar to your ProductImage save method
         if not self.pk:
             super().save(*args, **kwargs)
         

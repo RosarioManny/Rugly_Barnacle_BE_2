@@ -51,14 +51,33 @@ class ItemSerializer(serializers.ModelSerializer):
     )
   dimensions = serializers.CharField(source='product.dimensions', read_only=True)
   subtotal = serializers.SerializerMethodField()
+  product_images = serializers.SerializerMethodField()
 
   class Meta:
     model = CartItem
-    fields = ['id', 'product', 'dimensions', 'product_name', 'product_price', 'quantity', 'subtotal', 'added_at']
+    fields = ['id', 'product', 'dimensions', 'product_images', 'product_name', 'product_price', 'quantity', 'subtotal', 'added_at']
 
   def get_subtotal(self, obj):
     return obj.quantity * obj.product.price
   
+  def get_product_images(self, obj):
+    images = obj.product.images.all()
+
+    if images.exists():
+      primary_image = images.filter(is_primary=True).first()
+      if primary_image:
+        return {
+          'primary': primary_image.image.url,
+          'thumbnail': primary_image.thumbnail.url if primary_image.thumbnail else None 
+        }
+      first_image = images.first()
+      return {
+              'primary': first_image.image.url,
+              'thumbnail': first_image.thumbnail.url if first_image.thumbnail else None
+          }
+    return None
+  
+
 class CartSerializer(serializers.ModelSerializer):
     items = ItemSerializer(many=True, read_only=True)
     total = serializers.SerializerMethodField()
