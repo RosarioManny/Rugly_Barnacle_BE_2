@@ -4,7 +4,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAdminUser
 from ..models import CustomOrder, CustomOrderImage
 from ..serializers import CustomOrderSerializer
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, send_mail
 from django.template.loader import render_to_string
 import os
 
@@ -40,127 +40,94 @@ class CustomOrderView(generics.ListCreateAPIView):
             status=status.HTTP_201_CREATED,
             headers=headers
         )
-    
-#     def send_order_notification(self, custom_order):
-#         try: 
-#             subject = f"New Order - #{custom_order.reference_id}"
-            
-#             html_message = render_to_string('/emails/custom_order_notification.html', { # < - Two args. The Html file and the dynamic object to populate
-#                 'order': custom_order
-#             })
-#             plain_message = f"""
-# NEW CUSTOM ORDER RECEIVED!
-
-# ORDER DETAILS:
-# ──────────────
-# Reference ID: #{custom_order.reference_id}
-# Customer Name: {custom_order.customer_name}
-# Customer Email: {custom_order.email}
-# Preferred Contact: {custom_order.contact_method.title()}
-# Contact Info: {custom_order.contact_info or 'Use email above'}
-
-# DESIGN DESCRIPTION:
-# ──────────────────
-# {custom_order.description}
-
-# ORDER STATUS:
-# ─────────────
-# Status: {custom_order.status.title()}
-# Submitted: {custom_order.created_at}
-
-# ACTION REQUIRED:
-# Review the order details above
-# Update order status in admin panel
-# Contact customer within 24-48 hours
-# Provide quote and timeline
-# """
-#             osTest = os.getenv('TEST_EMAIL_HOST_USER')
-#             print(f"EMAIL > {osTest}")
-#             sender = os.getenv('TEST_EMAIL_HOST_USER')
-#             receiver = osTest
-            
-#             email = EmailMessage(
-#                 subject=subject,
-#                 body=html_message,
-#                 from_email=sender,
-#                 to=[receiver],
-#             )
-#             email.content_subtype = "html"
-
-#             email.reply_to = [custom_order.email]
-#             email.send(fail_silently=False)
-#             print(f"Order notification email sent for order #{custom_order.reference_id}")
-
-#         except Exception as e:
-#             print(f"Failed to send email notification: {str(e)}")
-            
+        
     def send_order_notification(self, custom_order):
-        try: 
-            subject = f"New Order - #{custom_order.reference_id}"
-            
-            # Debug: List all available templates
-            from django.template.loader import get_template
-            from django.template import TemplateDoesNotExist
-            
-            print("=== TEMPLATE LOADING DEBUG ===")
-            
-            # Try to find the template
-            try:
-                template = get_template('emails/custom_order_notification.html')
-                print("✓ Template found using get_template()")
-            except TemplateDoesNotExist:
-                print("✗ Template not found with get_template()")
-                # List what templates are available
-                from django.template.loaders.filesystem import Loader
-                loader = Loader()
-                template_dirs = loader.get_dirs()
-                print(f"Template directories: {template_dirs}")
-            
-            # Try render_to_string with different paths
+        try:
+            subject = f"RB New Custom Order - #{custom_order.reference_id}"
+
+            html_message = None
             template_paths_to_try = [
                 'emails/custom_order_notification.html',
                 '../templates/emails/custom_order_notification.html',
                 './templates/emails/custom_order_notification.html',
             ]
             
-            html_message = None
             for path in template_paths_to_try:
-                try:
+                try: 
                     html_message = render_to_string(path, {'order': custom_order})
-                    print(f"✓ Template found at: {path}")
                     break
-                except TemplateDoesNotExist as e:
-                    print(f"✗ Template not found at: {path}")
+                except:
                     continue
             
-            if html_message is None:
-                print("DEBUG: All template paths failed, using plain text fallback")
+            if html_message is None: # <- If the html file isn't found. Execute plain text email.
                 self.send_plain_text_email(custom_order)
                 return
             
-            print("=============================")
-            
-            # Rest of your email code...
-            sender = os.getenv('TEST_EMAIL_HOST_USER')
-            receiver = os.getenv('TEST_EMAIL_HOST_USER')
-            
+            host_email = os.getenv('EMAIL_HOST_USER')
+            sender = host_email
+            receiver = os.getenv('rosario.emm47@gmail.com')
+
             email = EmailMessage(
                 subject=subject,
-                body=html_message,
+                body = html_message,
                 from_email=sender,
-                to=[receiver],
-                reply_to=[custom_order.email],
+                to=[receiver], # <- Must be in parathesese becuase EmailMessage is expecting a tuple or list
+                reply_to=[custom_order.email]
             )
-            email.content_subtype = "html"
-            email.send(fail_silently=False)
-            
-            print(f"Order notification email sent for order #{custom_order.reference_id}")
 
+            email.content_subtype = 'html'
+            email.send(fail_silently=False)
+            print(f"Order notification email sent for order #{custom_order.reference_id}")
         except Exception as e:
             print(f"Failed to send email notification: {str(e)}")
-            import traceback
-            traceback.print_exc()
+            self.send_plain_text_email(custom_order)
 
+# Fallback - Plain text custom order email
+    def send_plain_text_email(self, custom_order):
+        try:
+            subject = f"New Order - #{custom_order.reference_id}"
+        
+            plain_message = f"""
+NEW CUSTOM ORDER RECEIVED!
+
+ORDER DETAILS:
+──────────────
+Reference ID: #{custom_order.reference_id}
+Customer Name: {custom_order.customer_name}
+Customer Email: {custom_order.email}
+Preferred Contact: {custom_order.contact_method.title()}
+Contact Info: {custom_order.contact_info or 'Use email above'}
+
+DESIGN DESCRIPTION:
+──────────────────
+{custom_order.description}
+
+ORDER STATUS:
+─────────────
+Status: {custom_order.status.title()}
+Submitted: {custom_order.created_at}
+
+ACTION REQUIRED:
+Review the order details above
+Update order status in admin panel
+Contact customer within 24-48 hours
+Provide quote and timeline
+"""
+            sender = os.getenv('TEST_EMAIL_HOST_USER')
+            receiver = os.getenv('TEST_EMAIL_HOST_USER')
+        
+            send_mail(
+                subject=subject,
+                message=plain_message.strip(),
+                from_email=sender,
+                recipient_list=[receiver],
+                reply_to=[custom_order.email],
+                fail_silently=False
+            )
+            print(f"Plain text email sent for order #{custom_order.reference_id}")
+            
+        except Exception as e:
+            print(f"Failed to send plain text email: {e}")
 class CustomOrderDetailView(generics.RetrieveAPIView):
     serializer_class = CustomOrderSerializer
     lookup_field = 'reference_id'
