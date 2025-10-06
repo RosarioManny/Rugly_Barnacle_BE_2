@@ -92,6 +92,7 @@ class CartSerializer(serializers.ModelSerializer):
     
     def get_item_count(self, obj):
         return obj.items.count()
+    
 # CUSTOM 
 class CustomOrderImageSerializer(serializers.ModelSerializer):
     class Meta:

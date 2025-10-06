@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Custom Order Notification</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #202254; 
+            background: #F0F0F1; 
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #5652E7;
+            color: white;
+            padding: 30px 20px 0 20px;
+            text-align: center;
+            position: relative;
+        }
+        .header-wave {
+            display: block;
+            width: 100%;
+            height: auto;
+            transform: rotate(180deg);
+            margin-bottom: -1px;
+        }
+        .logo {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .order-alert {
+            background: #5652E7;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-style: italic;
+            font-size: 16px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #F0F0F1; 
+            border-radius: 8px;
+            border-left: 4px solid #5652E7;
+        }
+        .customer-info {
+            border-left-color: #9EECE2; 
+        }
+        .design-info {
+            border-left-color: #FEB5FF;
+        }
+        .action-required {
+            background: #114C56; 
+            color: white;
+            border-left-color: #00CEC5; 
+            padding: 30px;
+        }
+        .label {
+            font-weight: bold;
+            color: #5652E7;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .value {
+            color: #202254; 
+            margin-bottom: 12px;
+        }
+        .description-box {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            white-space: pre-line;
+            font-family: inherit;
+        }
+        .action-steps {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .action-steps li {
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+        }
+        .action-steps li:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            color: #00CEC5; 
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .reference-id {
+            background: #FEB5FF;
+            color: #202254; 
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .footer {
+            background: #F0F0F1; 
+            text-align: center;
+            color: #202254; 
+            font-size: 14px;
+        }
+        .footer-wave {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .wave-fill {
+            fill: #114C56; 
+        }
+        .header-wave-fill {
+            fill: #5652E7;
+        }
+        .section-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .star-image {
+            width: 24px; 
+            height: 24px;
+        }
+        .action-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .quick-reply {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" role="main">
+        <!-- Header with Wave -->
+        <header class="header" role="banner">
+            <div class="header-content">
+                <img src="/static/images/RuglyBarnacle_Full_Logo.webp" alt="Rugly Barnacle Logo" class="logo">
+                <h1 style="margin: 0; font-size: 32px;">New Custom Order!</h1>
+            </div>
+            
+        </header>
+
+        <!-- Order Alert -->
+        <div class="order-alert" role="alert" aria-live="polite">
+            <strong>New Rug Order Requires Your Attention</strong>
+        </div>
+        <svg 
+            class="header-wave"
+            data-name="Layer 1" 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 1200 120" 
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            focusable="false"
+        >
+            <path 
+                class="header-wave-fill"
+                d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" 
+            />
+        </svg>
+
+        <div class="content">
+            <!-- Reference ID -->
+            <div class="reference-id">
+                <strong>Order Reference: #{{ order.reference_id }}</strong>
+            </div>
+
+            <!-- Customer Information -->
+            <section class="section customer-info" aria-labelledby="customer-details-heading">
+                <div class="section-header">
+                    <h2 id="customer-details-heading" style="color: #202254; margin: 0;">Customer Details</h2>
+                    <img src="https://yourdomain.com/assets/design/icons/X_Star_Pink.webp" alt="" class="star-image" aria-hidden="true"/>
+                </div>
+                <div>
+                    <span class="label">Name:</span>
+                    <span class="value">{{ order.customer_name }}</span>
+                </div>
+                <div>
+                    <span class="label">Email:</span>
+                    <span class="value">{{ order.email }}</span>
+                </div>
+                <div>
+                    <span class="label">Contact Method:</span>
+                    <span class="value">{{ order.contact_method|title }}</span>
+                </div>
+                {% if order.contact_info %}
+                <div>
+                    <span class="label">Contact Info:</span>
+                    <span class="value">{{ order.contact_info }}</span>
+                </div>
+                {% endif %}
+                <div>
+                    <span class="label">Submitted:</span>
+                    <span class="value">{{ order.created_at|date:"F j, Y g:i A" }}</span>
+                </div>
+            </section>
+
+            <!-- Design Information -->
+            <section class="section design-info" aria-labelledby="design-request-heading">
+                <div class="section-header">
+                    <h2 id="design-request-heading" style="color: #202254; margin: 0;">Design Request</h2>
+                    <img src="https://yourdomain.com/assets/design/icons/X_Star_Pink.webp" alt="" class="star-image" aria-hidden="true"/>
+                </div>
+                <div class="description-box">
+                    {{ order.description|linebreaksbr }}
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer with Action Required -->
+        <svg 
+            class="footer-wave"
+            data-name="Layer 1" 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 1200 120" 
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            focusable="false"
+        >
+            <path 
+                class="wave-fill"
+                d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" 
+            />
+        </svg>
+
+        <footer class="footer" role="contentinfo">
+            <section class="action-required" aria-labelledby="action-required-heading">
+                <div class="action-header">
+                    <img src="https://yourdomain.com/assets/design/icons/X_Star_Pink.webp" alt="" class="star-image" aria-hidden="true" style="margin-bottom: 15px;"/>
+                    <h2 id="action-required-heading" style="color: white; margin: 0;">Action Required</h2>
+                </div>
+                
+                <ul class="action-steps">
+                    <li>✓ Review the order details above</li>
+                    <li>✓ Contact customer within 24-48 hours</li>
+                    <li>✓ Provide quote and timeline</li>
+                    <li>✓ Update order status in admin panel</li>
+                </ul>
+                
+                <div class="quick-reply">
+                    <p><strong>Quick Reply:</strong> Click the email to reply to the customer!
+                    </p>
+                    <p>
+                        <strong style="background:#F0F0F1; padding: 8px;  border-radius: 5px;; ">{{ order.email }}</strong>
+                    </p>
+                </div>
+
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                    <p style="margin: 5px 0; font-size: 13px;">This email was automatically generated by Rugly Barnacle Order System</p>
+                    <p style="margin: 5px 0; font-size: 13px;">Order Reference: #{{ order.reference_id }} • {{ order.created_at|date:"M j, Y" }}</p>
+                </div>
+            </section>
+        </footer>
+    </div>
+</body>
+</html>
