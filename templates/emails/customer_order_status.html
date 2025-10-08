@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Order Status Update</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; margin: 0 auto; background: white;">
+        <!-- Header -->
+        <tr>
+            <td style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" align="center">
+                <img src="https://i.postimg.cc/vm1kzx9c/Rugly-Barnacle-Logo.webp" alt="Rugly Barnacle Logo" style="max-width: 300px; height: auto; display: block; margin: 0 auto 15px auto;" />
+                <h1 style="margin: 0; font-size: 28px; color: white;">
+                    {% if order.status == 'accepted' %}Order Accepted! 🎉{% endif %}
+                    {% if order.status == 'in_progress' %}Order In Progress! 🔧{% endif %}
+                    {% if order.status == 'completed' %}Order Completed! 🎨{% endif %}
+                    {% if order.status == 'declined' %}Order Update 📝{% endif %}
+                </h1>
+            </td>
+        </tr>
+        
+        <!-- Content -->
+        <tr>
+            <td style="padding: 30px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FEB5FF; color: #202254; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong>Order Reference: #{{ order.reference_id }}</strong>
+                        </td>
+                    </tr>
+                </table>
+                
+                <p style="margin: 0 0 20px 0;">Hi <strong>{{ order.customer_name }}</strong>,</p>
+                
+                <!-- Status-specific messages -->
+                {% if order.status == 'accepted' %}
+                <p style="margin: 0 0 20px 0;">Great news! Your custom rug order has been <strong style="color: #114C56;">accepted</strong>! I'm excited to work on your design.</p>
+                
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #9EECE2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Next Steps</h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="padding: 8px 0 8px 25px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">1</span>
+                                        You'll receive a separate email with the quote and payment details
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 25px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">2</span>
+                                        Once the down payment is received, I'll begin creating your rug
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 25px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">3</span>
+                                        You'll receive progress updates along the way
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+                
+                {% if order.status == 'in_progress' %}
+                <p style="margin: 0 0 20px 0;">I'm happy to let you know that work on your custom rug has <strong style="color: #00CEC5;">begun</strong>!</p>
+                
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #00CEC5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Current Status</h2>
+                            <p style="margin: 0; color: #202254;">
+                                Your rug is now in the creation phase. This process typically takes 
+                                {% if order.timeline %}{{ order.timeline }}{% else %}2-3 weeks{% endif %} 
+                                depending on complexity.
+                            </p>
+                            {% if order.admin_notes %}
+                            <p style="margin: 15px 0 0 0; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 4px;">
+                                <strong>Update:</strong> {{ order.admin_notes }}
+                            </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+                
+                {% if order.status == 'completed' %}
+                <p style="margin: 0 0 20px 0;">Fantastic news! Your custom rug is <strong style="color: #114C56;">completed</strong> and ready! 🎨</p>
+                
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FEB5FF; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Ready for Delivery!</h2>
+                            <p style="margin: 0; color: #202254;">
+                                Your unique creation is finished! You'll receive shipping information shortly.
+                            </p>
+                            {% if order.admin_notes %}
+                            <p style="margin: 15px 0 0 0; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 4px;">
+                                <strong>Completion Notes:</strong> {{ order.admin_notes }}
+                            </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+                
+                {% if order.status == 'declined' %}
+                <p style="margin: 0 0 20px 0;">Thank you for your custom order request. After careful review, we're unable to proceed with this particular design at this time.</p>
+                
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Reason</h2>
+                            {% if order.admin_notes %}
+                            <p style="margin: 0; color: #202254;">{{ order.admin_notes }}</p>
+                            {% else %}
+                            <p style="margin: 0; color: #202254;">This may be due to technical constraints, timeline availability, or design complexity that doesn't align with current capabilities.</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+                
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: #666;">
+                    <strong>Order Reference:</strong> #{{ order.reference_id }}<br/>
+                    <strong>Current Status:</strong> {{ order.status|title }}<br/>
+                    <strong>Questions?</strong> Simply reply to this email.
+                </p>
+                
+                <p style="margin: 0; font-style: italic; color: #5652E7;">
+                    Thank you for choosing Rugly Barnacle!<br/>
+                    <strong>The Rugly Barnacle Team</strong>
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

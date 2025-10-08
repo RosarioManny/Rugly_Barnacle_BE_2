@@ -191,6 +191,80 @@ Provide quote and timeline
 
         except Exception as e:
             print(f"Failed to send plain text email: {e}")
+    def send_order_status_update(self, custom_order):
+        """Send status update email to customer"""
+        try:
+            # Map status to subject lines
+            status_subjects = {
+                'accepted': f"Order Accepted! - #{custom_order.reference_id}",
+                'in_progress': f"Order In Progress! - #{custom_order.reference_id}",
+                'completed': f"Order Completed! - #{custom_order.reference_id}",
+                'declined': f"Order Update - #{custom_order.reference_id}",
+            }
+            
+            subject = status_subjects.get(custom_order.status, f"Order Update - #{custom_order.reference_id}")
+            
+            # Try HTML template first
+            html_message = None
+            try:
+                html_message = render_to_string('emails/order_status_update.html', {
+                    'order': custom_order
+                })
+            except:
+                # Fallback to plain text
+                pass
+            
+            if html_message:
+                # HTML email
+                email = EmailMessage(
+                    subject=subject,
+                    body=html_message,
+                    from_email="Rugly Barnacle <orders@ruglybarnacle.com>",
+                    to=[custom_order.email],
+                )
+                email.content_subtype = "html"
+            else:
+                # Plain text fallback
+                status_messages = {
+                    'accepted': "has been accepted! We'll send payment details shortly.",
+                    'in_progress': "is now in progress! Work on your rug has begun.",
+                    'completed': "is completed! Your custom rug is ready.",
+                    'declined': "could not be accepted at this time.",
+                }
+                
+                plain_message = f"""
+Order Status Update
+
+Order Reference: #{custom_order.reference_id}
+
+Hi {custom_order.customer_name},
+
+Your custom rug order {status_messages.get(custom_order.status, 'has been updated.')}
+
+{% if custom_order.admin_notes %}
+Update: {custom_order.admin_notes}
+{% endif %}
+
+Current Status: {custom_order.status.title()}
+
+If you have any questions, please reply to this email.
+
+Thank you,
+The Rugly Barnacle Team
+            """
+                email = EmailMessage(
+                    subject=subject,
+                    body=plain_message.strip(),
+                    from_email="Rugly Barnacle <orders@ruglybarnacle.com>",
+                    to=[custom_order.email],
+                )
+            
+            email.send(fail_silently=False)
+            print(f"Status update email sent for order #{custom_order.reference_id} (Status: {custom_order.status})")
+            
+        except Exception as e:
+            print(f"Failed to send status update email: {str(e)}")
+            
 class CustomOrderDetailView(generics.RetrieveAPIView):
     serializer_class = CustomOrderSerializer
     lookup_field = 'reference_id'
