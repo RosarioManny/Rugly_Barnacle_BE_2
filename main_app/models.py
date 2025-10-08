@@ -1,113 +1,129 @@
 from django.core.files.base import ContentFile
 from django.db import models
-from django.utils import timezone
+# from django.utils import timezone
 from io import BytesIO
 from PIL import Image
 import os
 import uuid
+from .services.email_service import OrderEmailService  
 
 # To Create an enums or choice 
 PRICES = (
-  ('3ft', '$150-$249'),
-  ('4ft', '$250-$349'),
-  ('5ft', '$350-$449'),
-  ('6ft +', '$450+'),
+    ('3ft', '$150-$249'),
+    ('4ft', '$250-$349'),
+    ('5ft', '$350-$449'),
+    ('6ft +', '$450+'),
 )
 
 # ------------------------------------------------------ CATEGORY ------------------------------------------------------
 
 class Category(models.Model):
-  class Meta: 
-    verbose_name_plural = "Categories"
-    db_table = 'category'
-  slug = models.SlugField(unique=True)
-  name = models.CharField(max_length=100)
-  
-  def __str__(self):
-    return self.name
+    class Meta: 
+        verbose_name_plural = "Categories"
+        db_table = 'category'
+    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.name
 
 class Property(models.Model):
-  class Meta:
-    db_table = 'properties'
-  name = models.CharField(max_length=32, unique=True)
-  display_name = models.CharField(max_length=32)
+    class Meta:
+        db_table = 'properties'
+    name = models.CharField(max_length=32, unique=True)
+    display_name = models.CharField(max_length=32)
 
-  def __str__(self):
-    return f"{self.id} - {self.display_name}"
+    def __str__(self):
+        return f"{self.id} - {self.display_name}"
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
 
 class Product(models.Model):
-  class Meta:
-    db_table = 'product'
-  name = models.CharField(max_length=100, unique=True)
-  price = models.DecimalField(decimal_places=2, max_digits=10)
-  category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-  description = models.TextField(max_length=600, blank=True, null=True)
-  dimensions = models.CharField(max_length=40)
-  quantity = models.PositiveIntegerField(default=1)
-  properties = models.ManyToManyField(Property, blank=True)
-  created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now=True)
-  # TODO: in_stock checker. 
+    class Meta:
+        db_table = 'product'
+    name = models.CharField(max_length=100, unique=True)
+    price = models.DecimalField(decimal_places=2, max_digits=10)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    description = models.TextField(max_length=600, blank=True, null=True)
+    dimensions = models.CharField(max_length=40)
+    quantity = models.PositiveIntegerField(default=1)
+    properties = models.ManyToManyField(Property, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    # TODO: in_stock checker. 
 
-  # Change the name of the display on admin panel
-  def __str__(self):
-    return f"Id: {self.id} - {self.name}"
+    def __str__(self): # <- Change the name of the display on admin panel
+        return f"Id: {self.id} - {self.name}"
 
 # ------------------------------------------------------ CART ------------------------------------------------------
 
 class Cart(models.Model):   
-  session_key = models.CharField(max_length=48, unique=True, db_index=True)
-  created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now=True)
+    session_key = models.CharField(max_length=48, unique=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-  def __str__(self):
-    return f"Cart {self.id} - ({self.created_at.date()})"
+    def __str__(self):
+        return f"Cart {self.id} - ({self.created_at.date()})"
 
 class CartItem(models.Model):
-  cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-  product = models.ForeignKey(Product, on_delete=models.CASCADE)
-  added_at = models.DateTimeField(auto_now_add=True)
-  quantity = models.PositiveIntegerField(default=1)
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveIntegerField(default=1)
 
-  def __str__(self):
-    return f"{self.quantity}x {self.product.name} - {self.added_at.month} / {self.added_at.day} / {self.added_at.year} - Cart: {self.cart.id} "
-  
+    def __str__(self):
+        return f"{self.quantity}x {self.product.name} - {self.added_at.month} / {self.added_at.day} / {self.added_at.year} - Cart: {self.cart.id} "
+    
 # ------------------------------------------------------ CUSTOM ------------------------------------------------------ 
 
 class CustomOrder(models.Model):
-  customer_name = models.CharField(max_length=100, blank=True)
-  description = models.TextField(max_length=400, blank=True, null=True)
-  contact_method = models.CharField(
-      max_length=20, 
-      choices=[
-          ('instagram', 'Instagram'),
-          ('phone', 'Phone'),
-          ('email', 'Email')
-      ], 
-      default='email'
-  )
-  contact_info = models.CharField(max_length=100, blank=True, null=True)
-  email = models.EmailField(max_length=250, blank=True, null=True)
-  reference_id = models.CharField(max_length=20, unique=True, blank=True)
-  created_at = models.DateTimeField(auto_now_add=True)
-  STATUS_CHOICE = [ 
-    ('canceled', 'Canceled'),
-    ('pending', 'Pending'),
-    ('in_progress', 'In Progress'),
-    ('completed', 'Completed')
-  ]
-  status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='pending', blank=True, )
-  admin_notes = models.TextField(blank=True, null=True)
+    customer_name = models.CharField(max_length=100, blank=True)
+    description = models.TextField(max_length=400, blank=True, null=True)
+    contact_method = models.CharField(
+        max_length=20, 
+        choices=[
+            ('instagram', 'Instagram'),
+            ('phone', 'Phone'),
+            ('email', 'Email')
+        ], 
+        default='email'
+    )
+    contact_info = models.CharField(max_length=100, blank=True, null=True)
+    email = models.EmailField(max_length=250, blank=True, null=True)
+    reference_id = models.CharField(max_length=20, unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    STATUS_CHOICE = [ 
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('declined', 'Declined')
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='pending', blank=True, )
+    admin_notes = models.TextField(blank=True, null=True)
 
-  def save(self, *args, **kwargs):
-    if not self.reference_id:
-        self.reference_id = f"CUST-{uuid.uuid4().hex[:6].upper()}"
-    super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        old_status = None
+        
+        if not is_new: # <- Get old status if update
+            old_instance = CustomOrder.objects.get(pk=self.pk)
+            old_status = old_instance.status
 
-  def __str__(self):
-    return f"{self.reference_id}: {self.customer_name} - {self.email}"
-  
+        if not self.reference_id: # <- Generate reference_id if it doesn't exist
+            self.reference_id = f"CUST-{uuid.uuid4().hex[:6].upper()}"
+
+        super().save(*args, **kwargs)  # <- Save the model first
+
+        if is_new: # <- New order - send both notifications
+            OrderEmailService.send_order_notification(self)
+            OrderEmailService.send_order_confirmation(self)
+
+        elif old_status != self.status:
+            OrderEmailService.send_status_update(self, old_status) # <- Status changed - send update
+            
+    def __str__(self):
+        return f"{self.reference_id}: {self.customer_name} - {self.email}"
+    
 class CustomOrderImage(models.Model):
     custom_order = models.ForeignKey(CustomOrder, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='custom_orders/')

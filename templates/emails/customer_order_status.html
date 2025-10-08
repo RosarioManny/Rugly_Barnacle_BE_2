@@ -12,10 +12,10 @@
             <td style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" align="center">
                 <img src="https://i.postimg.cc/vm1kzx9c/Rugly-Barnacle-Logo.webp" alt="Rugly Barnacle Logo" style="max-width: 300px; height: auto; display: block; margin: 0 auto 15px auto;" />
                 <h1 style="margin: 0; font-size: 28px; color: white;">
-                    {% if order.status == 'accepted' %}Order Accepted! 🎉{% endif %}
-                    {% if order.status == 'in_progress' %}Order In Progress! 🔧{% endif %}
-                    {% if order.status == 'completed' %}Order Completed! 🎨{% endif %}
-                    {% if order.status == 'declined' %}Order Update 📝{% endif %}
+                    {% if order.status == 'accepted' %}Order Accepted! {% endif %}
+                    {% if order.status == 'in_progress' %}Order In Progress! {% endif %}
+                    {% if order.status == 'completed' %}Order Completed! {% endif %}
+                    {% if order.status == 'declined' %}Order Update {% endif %}
                 </h1>
             </td>
         </tr>
@@ -67,9 +67,9 @@
                 {% endif %}
                 
                 {% if order.status == 'in_progress' %}
-                <p style="margin: 0 0 20px 0;">I'm happy to let you know that work on your custom rug has <strong style="color: #00CEC5;">begun</strong>!</p>
+                <p style="margin: 0 0 20px 0;">I'm happy to let you know that work on your custom rug has <strong style="color: #5652E7;">begun</strong>!</p>
                 
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #00CEC5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #9EECE2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <tr>
                         <td>
                             <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Current Status</h2>
@@ -89,7 +89,7 @@
                 {% endif %}
                 
                 {% if order.status == 'completed' %}
-                <p style="margin: 0 0 20px 0;">Fantastic news! Your custom rug is <strong style="color: #114C56;">completed</strong> and ready! 🎨</p>
+                <p style="margin: 0 0 20px 0;">Fantastic news! Your custom rug is <strong style="color: #114C56;">completed</strong> and ready! </p>
                 
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FEB5FF; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <tr>
@@ -109,7 +109,9 @@
                 {% endif %}
                 
                 {% if order.status == 'declined' %}
-                <p style="margin: 0 0 20px 0;">Thank you for your custom order request. After careful review, we're unable to proceed with this particular design at this time.</p>
+                <p style="margin: 0 0 20px 0;">
+                  Thank you for your custom order request. After careful review, we're unable to proceed with this particular design at this time.
+                </p>
                 
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <tr>
@@ -118,7 +120,9 @@
                             {% if order.admin_notes %}
                             <p style="margin: 0; color: #202254;">{{ order.admin_notes }}</p>
                             {% else %}
-                            <p style="margin: 0; color: #202254;">This may be due to technical constraints, timeline availability, or design complexity that doesn't align with current capabilities.</p>
+                            <p style="margin: 0; color: #202254;">
+                              This may be due to technical constraints, timeline availability, or design complexity that doesn't align with current capabilities.
+                            </p>
                             {% endif %}
                         </td>
                     </tr>
@@ -128,7 +132,7 @@
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #666;">
                     <strong>Order Reference:</strong> #{{ order.reference_id }}<br/>
                     <strong>Current Status:</strong> {{ order.status|title }}<br/>
-                    <strong>Questions?</strong> Simply reply to this email.
+                    <strong>Questions?</strong> Simply reply to this email or check out the website's faq page!
                 </p>
                 
                 <p style="margin: 0; font-style: italic; color: #5652E7;">

@@ -25,8 +25,8 @@ class OrderEmailService:
                 except:
                     continue
             
-            if html_message is None:
-                # Fallback to plain text
+            if html_message is None: # <- Fallback to plain text
+                
                 OrderEmailService._send_plain_text_notification(order)
                 return
             
@@ -50,8 +50,9 @@ class OrderEmailService:
             print(f"Failed to send order notification: {str(e)}")
             OrderEmailService._send_plain_text_notification(order)
     
-    @staticmethod
-    def _send_plain_text_notification(order):
+    
+    @staticmethod 
+    def _send_plain_text_notification(order): # <- FALLBACK EMAIL 
         """Private method for plain text fallback"""
         try:
             subject = f"New Order - #{order.reference_id}"
@@ -103,18 +104,16 @@ Provide quote and timeline
         try:
             subject = f"Custom Order Confirmation - #{order.reference_id}"
             
-            # Try HTML template first
+            
             html_message = None
             try:
                 html_message = render_to_string('emails/customer_confirmation.html', {
                     'order': order
                 })
             except:
-                # Fallback to plain text
-                pass
+                pass  # <- If fail to get html, continue to Fallback to plain text. At this point html_message will remain as None
             
-            if html_message:
-                # HTML email
+            if html_message: # <- HTML email if found
                 email = EmailMessage(
                     subject=subject,
                     body=html_message,
@@ -122,8 +121,7 @@ Provide quote and timeline
                     to=[order.email],
                 )
                 email.content_subtype = "html"
-            else:
-                # Plain text fallback
+            else: # Plain text fallback if html_message is still None
                 plain_message = f"""
 Thank you for your custom order with Rugly Barnacle!
 
@@ -164,8 +162,8 @@ Thank you for choosing Rugly Barnacle!
     def send_status_update(order, old_status):
         """Send status update email to customer"""
         try:
-            # Don't send for initial pending status
-            if old_status == 'pending' and order.status == 'pending':
+            
+            if old_status == 'pending' and order.status == 'pending': # <- Don't send for initial pending status
                 return
                 
             # Map status to subject lines
@@ -178,19 +176,19 @@ Thank you for choosing Rugly Barnacle!
             
             subject = status_subjects.get(order.status, f"Order Update - #{order.reference_id}")
             
-            # Try HTML template first
+            
             html_message = None
             try:
-                html_message = render_to_string('emails/order_status_update.html', {
+                html_message = render_to_string('emails/customer_order_status.html', {
                     'order': order
                 })
             except Exception as template_error:
                 print(f"Template error: {template_error}")
-                # Fallback to plain text
+                
                 pass
             
             if html_message:
-                # HTML email
+                
                 email = EmailMessage(
                     subject=subject,
                     body=html_message,
@@ -199,9 +197,9 @@ Thank you for choosing Rugly Barnacle!
                 )
                 email.content_subtype = "html"
             else:
-                # Plain text fallback
+                
                 status_messages = {
-                    'accepted': "has been accepted! We'll send payment details shortly.",
+                    'accepted': "has been accepted! Waiting for payment to begin. ",
                     'in_progress': "is now in progress! Work on your rug has begun.",
                     'completed': "is completed! Your custom rug is ready.",
                     'declined': "could not be accepted at this time.",
