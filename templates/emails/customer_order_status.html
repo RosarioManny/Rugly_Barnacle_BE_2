@@ -6,11 +6,22 @@
     <title>Order Status Update</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; margin: 0 auto; background: white;">
+    <table 
+      role="presentation" 
+      width="100%" 
+      cellpadding="0" 
+      cellspacing="0" 
+      border="0" 
+      style="max-width: 600px; margin: 0 auto; background: white;">
         <!-- Header -->
         <tr>
-            <td style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" align="center">
-                <img src="https://i.postimg.cc/vm1kzx9c/Rugly-Barnacle-Logo.webp" alt="Rugly Barnacle Logo" style="max-width: 300px; height: auto; display: block; margin: 0 auto 15px auto;" />
+            <td 
+              style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" 
+              align="center">
+                <img 
+                  src="https://i.postimg.cc/vm1kzx9c/Rugly-Barnacle-Logo.webp" 
+                  alt="Rugly Barnacle Logo" 
+                  style="max-width: 300px; height: auto; display: block; margin: 0 auto 15px auto;" />
                 <h1 style="margin: 0; font-size: 28px; color: white;">
                     {% if order.status == 'accepted' %}Order Accepted! {% endif %}
                     {% if order.status == 'in_progress' %}Order In Progress! {% endif %}
@@ -23,7 +34,13 @@
         <!-- Content -->
         <tr>
             <td style="padding: 30px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FEB5FF; color: #202254; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px;">
+                <table 
+                  role="presentation" 
+                  width="100%" 
+                  cellpadding="0" 
+                  cellspacing="0" 
+                  border="0" 
+                  style="background: #FEB5FF; color: #202254; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px;">
                     <tr>
                         <td align="center">
                             <strong>Order Reference: #{{ order.reference_id }}</strong>
@@ -35,13 +52,26 @@
                 
                 <!-- Status-specific messages -->
                 {% if order.status == 'accepted' %}
-                <p style="margin: 0 0 20px 0;">Great news! Your custom rug order has been <strong style="color: #114C56;">accepted</strong>! I'm excited to work on your design.</p>
+                <p style="margin: 0 0 20px 0;">
+                  Great news! Your custom rug order has been <strong style="color: #114C56;">accepted</strong>! I'm excited to work on your design.
+                </p>
                 
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #9EECE2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <table 
+                  role="presentation" 
+                  width="100%" 
+                  cellpadding="0" 
+                  cellspacing="0" 
+                  border="0" 
+                  style="background: #9EECE2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <tr>
                         <td>
                             <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Next Steps</h2>
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <table 
+                              role="presentation" 
+                              width="100%" 
+                              cellpadding="0" 
+                              cellspacing="0" 
+                              border="0">
                                 <tr>
                                     <td style="padding: 8px 0 8px 25px; position: relative;">
                                         <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">1</span>
@@ -67,9 +97,17 @@
                 {% endif %}
                 
                 {% if order.status == 'in_progress' %}
-                <p style="margin: 0 0 20px 0;">I'm happy to let you know that work on your custom rug has <strong style="color: #5652E7;">begun</strong>!</p>
+                <p style="margin: 0 0 20px 0;">
+                  I'm happy to let you know that work on your custom rug has <strong style="color: #5652E7;">begun</strong>!
+                </p>
                 
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #9EECE2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <table 
+                  role="presentation" 
+                  width="100%" 
+                  cellpadding="0" 
+                  cellspacing="0" 
+                  border="0" 
+                  style="background: #9EECE2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <tr>
                         <td>
                             <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Current Status</h2>
@@ -89,9 +127,16 @@
                 {% endif %}
                 
                 {% if order.status == 'completed' %}
-                <p style="margin: 0 0 20px 0;">Fantastic news! Your custom rug is <strong style="color: #114C56;">completed</strong> and ready! </p>
+                <p style="margin: 0 0 20px 0;">
+                  Fantastic news! Your custom rug is <strong style="color: #114C56;">completed</strong> and ready! 
+                </p>
                 
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FEB5FF; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <table 
+                  role="presentation" 
+                  width="100%" 
+                  cellpadding="0" 
+                  cellspacing="0" border="0" 
+                  style="background: #FEB5FF; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <tr>
                         <td align="center">
                             <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Ready for Delivery!</h2>
@@ -113,7 +158,13 @@
                   Thank you for your custom order request. After careful review, we're unable to proceed with this particular design at this time.
                 </p>
                 
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <table 
+                  role="presentation" 
+                  width="100%" 
+                  cellpadding="0" 
+                  cellspacing="0" 
+                  border="0" 
+                  style="background: #F0F0F1; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <tr>
                         <td>
                             <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Reason</h2>
