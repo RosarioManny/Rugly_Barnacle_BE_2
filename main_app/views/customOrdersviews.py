@@ -32,7 +32,8 @@ class CustomOrderView(generics.ListCreateAPIView):
         
         print("New Custom order: ", order_serializer.data)
 
-        self.send_order_notification(custom_order)
+        self.send_order_notification(custom_order) # Send Form request to Owner
+        self.send_order_confirmation(custom_order) # Senf Confirmation to Client
         
         headers = self.get_success_headers(order_serializer.data)
         return Response(
@@ -40,7 +41,7 @@ class CustomOrderView(generics.ListCreateAPIView):
             status=status.HTTP_201_CREATED,
             headers=headers
         )
-        
+    # Order Notifcation to owner  
     def send_order_notification(self, custom_order):
         try:
             subject = f"RB New Custom Order - #{custom_order.reference_id}"
@@ -64,14 +65,14 @@ class CustomOrderView(generics.ListCreateAPIView):
                 return
             
             host_email = os.getenv('EMAIL_HOST_USER')
-            sender = host_email
-            receiver = os.getenv('rosario.emm47@gmail.com')
+            sender = "Rugly Barnacle"
+            receiver = os.getenv('TEST_EMAIL_HOST_USER')
 
             email = EmailMessage(
                 subject=subject,
                 body = html_message,
                 from_email=sender,
-                to=[receiver], # <- Must be in parathesese becuase EmailMessage is expecting a tuple or list
+                to=[receiver], # <- Must be in [] becuase EmailMessage is expecting a tuple or list
                 reply_to=[custom_order.email]
             )
 
@@ -82,7 +83,69 @@ class CustomOrderView(generics.ListCreateAPIView):
             print(f"Failed to send email notification: {str(e)}")
             self.send_plain_text_email(custom_order)
 
-# Fallback - Plain text custom order email
+    def send_order_confirmation(self, custom_order):
+            
+        try:
+            subject = f"Custom Order Confirmation - #{custom_order.reference_id}"
+            
+            # Try HTML template first
+            html_message = None
+            try:
+                html_message = render_to_string('emails/customer_confirmation.html', {
+                    'order': custom_order
+                })
+            except:
+                # Fallback to plain text
+                pass
+            
+            if html_message:
+                # HTML email
+                email = EmailMessage(
+                    subject=subject,
+                    body=html_message,
+                    from_email="Rugly Barnacle - ",
+                    to=[custom_order.email],
+                )
+                email.content_subtype = "html"
+            else:
+                # Plain text fallback
+                plain_message = f"""
+Thank you for your custom order with Rugly Barnacle!
+
+ORDER CONFIRMATION:
+──────────────────
+Order Reference: #{custom_order.reference_id}
+Customer Name: {custom_order.customer_name}
+Submitted: {custom_order.created_at.strftime('%B %d, %Y at %I:%M %p')}
+
+WHAT HAPPENS NEXT:
+─────────────────
+1. I'll review your design request within 24-48 hours
+2. You'll receive a quote and timeline for your custom rug
+3. Once approved, I'll begin creating your unique piece
+
+DESIGN DETAILS:
+───────────────
+{custom_order.description}
+
+If you have any questions, simply reply to this email.
+
+Thank you for choosing Rugly Barnacle!
+            """
+                email = EmailMessage(
+                    subject=subject,
+                    body=plain_message.strip(),
+                    from_email="Rugly Barnacle <orders@ruglybarnacle.com>",
+                    to=[custom_order.email],
+                )
+            
+            email.send(fail_silently=False)
+            print(f"Order confirmation sent to customer for order #{custom_order.reference_id}")
+            
+        except Exception as e:
+            print(f"Failed to send customer confirmation: {str(e)}")
+
+    # Fallback - Plain text custom order email
     def send_plain_text_email(self, custom_order):
         try:
             subject = f"New Order - #{custom_order.reference_id}"
@@ -125,7 +188,7 @@ Provide quote and timeline
                 fail_silently=False
             )
             print(f"Plain text email sent for order #{custom_order.reference_id}")
-            
+
         except Exception as e:
             print(f"Failed to send plain text email: {e}")
 class CustomOrderDetailView(generics.RetrieveAPIView):
