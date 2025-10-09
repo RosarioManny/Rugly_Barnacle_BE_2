@@ -4,9 +4,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAdminUser
 from ..models import CustomOrder, CustomOrderImage
 from ..serializers import CustomOrderSerializer
-from django.core.mail import EmailMessage, send_mail
-from django.template.loader import render_to_string
-import os
+from ..services.email_service import OrderEmailService  
 
 class CustomOrderView(generics.ListCreateAPIView):
     queryset = CustomOrder.objects.all().order_by('-created_at')
@@ -30,8 +28,19 @@ class CustomOrderView(generics.ListCreateAPIView):
         for image_data in images_data:
             CustomOrderImage.objects.create(custom_order=custom_order, image=image_data)
         
+        # Refresh the order from database to ensure we have the latest data including images
+        custom_order.refresh_from_db()
+        
         print("New Custom order: ", order_serializer.data)
-
+        
+        # SEND EMAILS AFTER ORDER AND IMAGES ARE SAVED
+        try:
+            OrderEmailService.send_order_notification(custom_order)
+            OrderEmailService.send_order_confirmation(custom_order)
+            print("Emails sent successfully!")
+        except Exception as e:
+            print(f"Error sending emails: {e}")
+            # Don't fail the order creation if emails fail
         
         headers = self.get_success_headers(order_serializer.data)
         return Response(

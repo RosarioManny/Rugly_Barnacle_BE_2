@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Order Confirmation</title>
+    <title>Order Request Form</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; margin: 0 auto; background: white;">
@@ -11,7 +11,7 @@
         <tr>
             <td style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" align="center">
                 <img src="https://i.postimg.cc/vm1kzx9c/Rugly-Barnacle-Logo.webp" alt="Rugly Barnacle Logo" style="max-width: 300px; height: auto; display: block; margin: 0 auto 15px auto;" />
-                <h1 style="margin: 0; font-size: 28px; color: white;">Order Confirmed!</h1>
+                <h1 style="margin: 0; font-size: 28px; color: white;">Order Request Form!</h1>
             </td>
         </tr>
         
@@ -28,7 +28,7 @@
                 
                 <p style="margin: 0 0 20px 0;">Hi <strong>{{ order.customer_name }}</strong>,</p>
                 
-                <p style="margin: 0 0 20px 0;">Thank you for your custom order! I'm excited to bring your rug vision to life.</p>
+                <p style="margin: 0 0 20px 0;">Thank you for your custom order! I will review your order as soon as possible!</p>
                 
                 <!-- Order Details Section -->
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; border-left: 4px solid #9EECE2; margin-bottom: 20px;">
@@ -91,6 +91,33 @@
                     </tr>
                 </table>
                 
+                <!-- Image Status Section -->
+                {% if order.images.exists %}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #9EECE2; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong style="color: #202254; font-size: 16px;"> Reference Image Received</strong><br/>
+                            <span style="font-size: 14px; color: #202254;">
+                                Perfect! I've received your reference image and will use it as a visual guide. 
+                                Feel free to send additional inspiration photos by replying to this email!
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                {% else %}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #00CEC5; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong style="color: #202254; font-size: 16px;"> Help Me Visualize Your Vision</strong><br/>
+                            <span style="font-size: 14px; color: #202254;">
+                                Want to make sure I capture your vision perfectly? Reference images are incredibly helpful! 
+                                You can send photos, color swatches, or design inspiration by simply replying to this email.
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+
                 <!-- Next Steps -->
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <tr>

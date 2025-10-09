@@ -21,16 +21,30 @@ class ProductImageInline(admin.TabularInline):
 class CustomOrderImageInline(admin.TabularInline):
     model = CustomOrderImage
     extra = 1
-    fields = ('image', 'thumbnail_preview')
-    readonly_fields = ('thumbnail_preview',)
+    fields = ('image', 'image_preview', 'download_links')
+    readonly_fields = ('image_preview', 'download_links')
     
-    def thumbnail_preview(self, obj):
-        if obj.thumbnail:
-            return mark_safe(f'<img src="{obj.thumbnail.url}" style="max-height: 100px; max-width: 100px;" />')
-        elif obj.image:
-            return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px; max-width: 100px;" />')
+    def image_preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px; max-width: 100px; object-fit: contain;" />')
         return "No Image"
-    thumbnail_preview.short_description = 'Preview'
+    image_preview.short_description = 'Preview'
+    
+    def download_links(self, obj):
+        if obj.image:
+            original_name = obj.image.name.split('/')[-1]  # Get filename
+            links = []
+            
+            # Download original image
+            if obj.image:
+                links.append(
+                    f'<a href="{obj.image.url}" download="{original_name}" style="display: block; width: fit-content; margin: 2px 0; padding: 4px 8px; background: #202254; color: white; text-decoration: none; border-radius: 3px; font-size: 12px;">'
+                    f'Download Photo</a>'
+                )
+            
+            return mark_safe(''.join(links))
+        return "No file to download"
+    download_links.short_description = 'Download'
 
 class CartItemInline(admin.TabularInline):
     model = CartItem

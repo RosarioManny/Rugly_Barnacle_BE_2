@@ -114,11 +114,7 @@ class CustomOrder(models.Model):
 
         super().save(*args, **kwargs)  # <- Save the model first
 
-        if is_new: # <- New order - send both notifications
-            OrderEmailService.send_order_notification(self)
-            OrderEmailService.send_order_confirmation(self)
-
-        elif old_status != self.status:
+        if not is_new and old_status != self.status:
             OrderEmailService.send_status_update(self, old_status) # <- Status changed - send update
             
     def __str__(self):
@@ -131,50 +127,55 @@ class CustomOrderImage(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
-        if not self.pk:
-            super().save(*args, **kwargs)
         
-        if self.image:
-            img = Image.open(self.image)
-            
-            # Resize main image if too large
-            if img.height > 800 or img.width > 800:
-                output_size = (800, 800)
-                img.thumbnail(output_size)
+        is_new = not self.pk # <- Check if this is a new image (no primary key yet)
+        
+        if is_new:
+            super().save(*args, **kwargs) # <- For new images, save first to get an ID
+        
+        if self.image: # <- Process images if the main image exists
+            try:
+                img = Image.open(self.image)
                 
-                buffer = BytesIO()
+                
+                if img.height > 800 or img.width > 800: # <- Resize main image if too large
+                    output_size = (800, 800)
+                    img.thumbnail(output_size)
+                    
+                    buffer = BytesIO()
+                    if img.format == 'PNG':
+                        img.save(buffer, format='PNG')
+                        self.image.save(
+                            os.path.splitext(self.image.name)[0] + '.png',
+                            ContentFile(buffer.getvalue()),
+                            save=False
+                        )
+                    else:
+                        img.save(buffer, format='JPEG', quality=85)
+                        self.image.save(
+                            os.path.splitext(self.image.name)[0] + '.jpg',
+                            ContentFile(buffer.getvalue()),
+                            save=False
+                        )
+                
+                
+                img.thumbnail((200, 200)) # <- Create thumbnail
+                thumb_buffer = BytesIO()
                 if img.format == 'PNG':
-                    img.save(buffer, format='PNG')
-                    self.image.save(
-                        os.path.splitext(self.image.name)[0] + '.png',
-                        ContentFile(buffer.getvalue()),
-                        save=False
-                    )
+                    img.save(thumb_buffer, format='PNG')
+                    thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
                 else:
-                    img.save(buffer, format='JPEG', quality=85)
-                    self.image.save(
-                        os.path.splitext(self.image.name)[0] + '.jpg',
-                        ContentFile(buffer.getvalue()),
-                        save=False
-                    )
-            
-            # Create thumbnail
-            img.thumbnail((200, 200))
-            thumb_buffer = BytesIO()
-            if img.format == 'PNG':
-                img.save(thumb_buffer, format='PNG')
-                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
-            else:
-                img.save(thumb_buffer, format='JPEG', quality=75)
-                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
-            
-            self.thumbnail.save(
-                thumb_name,
-                ContentFile(thumb_buffer.getvalue()),
-                save=False
-            )
-        
-        super().save(*args, **kwargs)
+                    img.save(thumb_buffer, format='JPEG', quality=75)
+                    thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
+                
+                self.thumbnail.save(
+                    thumb_name,
+                    ContentFile(thumb_buffer.getvalue()),
+                    save=False
+                )
+                
+            except Exception as e:
+                print(f"Error processing image: {e}") # <- Don't break the save if image processing fails      
     
     def delete(self, *args, **kwargs):
         if self.image:
@@ -185,8 +186,8 @@ class CustomOrderImage(models.Model):
     
     def __str__(self):
         return f"Image for {self.custom_order.reference_id}"
-# ------------------------------------------------------ PRODUCT ------------------------------------------------------
 
+# <- ------------------------------------------------------ PRODUCT ------------------------------------------------------
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='products/')
@@ -194,22 +195,22 @@ class ProductImage(models.Model):
     is_primary = models.BooleanField(default=False)
     
     def save(self, *args, **kwargs):
-        # First save to generate image path
-        if not self.pk:
+        
+        if not self.pk: # <- First save to generate image path
             super().save(*args, **kwargs)
         
-        # Process image if it's new or changed
-        if self.image:
-            # Open the original image
-            img = Image.open(self.image)
+        
+        if self.image: # <- Process image if it's new or changed
             
-            # Resize main image if too large
-            if img.height > 800 or img.width > 800:
+            img = Image.open(self.image) # <- Open the original image
+            
+            
+            if img.height > 800 or img.width > 800: # <- Resize main image if too large
                 output_size = (800, 800)
                 img.thumbnail(output_size)
                 
-                # Save the resized image
-                buffer = BytesIO()
+                
+                buffer = BytesIO() # <- Save the resized image
                 if img.format == 'PNG':
                     img.save(buffer, format='PNG')
                     self.image.save(
@@ -225,8 +226,8 @@ class ProductImage(models.Model):
                         save=False
                     )
             
-            # Create thumbnail
-            img.thumbnail((200, 200))
+            
+            img.thumbnail((200, 200)) # <- Create thumbnail
             thumb_buffer = BytesIO()
             if img.format == 'PNG':
                 img.save(thumb_buffer, format='PNG')
@@ -241,8 +242,8 @@ class ProductImage(models.Model):
                 save=False
             )
         
-        # Ensure only one primary image per product
-        if self.is_primary:
+        
+        if self.is_primary: # <- Ensure only one primary image per product
             ProductImage.objects.filter(
                 product=self.product, 
                 is_primary=True

@@ -1,61 +1,88 @@
 # main_app/services/email_service.py
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 import os
 
+host_email = os.getenv('TEST_EMAIL_HOST_USER')
+
 class OrderEmailService:
     
+    # TO OWNER
     @staticmethod
     def send_order_notification(order):
         """Send notification to owner about new order"""
         try:
+            print(f"DEBUG: Starting email send for order #{order.reference_id}")
+            
+            # Validate essential data
+            if not host_email:
+                print("ERROR: host_email environment variable not set")
+                return False
+                
+            if not order.email:
+                print("ERROR: Customer email is missing from order")
+                
             subject = f"RB New Custom Order - #{order.reference_id}"
-
+            customer_email = order.email
+            
+            # Try to load HTML template with correct paths
             html_message = None
             template_paths_to_try = [
-                'emails/custom_order_notification.html',
-                '../templates/emails/custom_order_notification.html',
-                './templates/emails/custom_order_notification.html',
+                'emails/custom_order_notification.html',  # This should work with Django's template loader
             ]
             
-            for path in template_paths_to_try:
-                try: 
-                    html_message = render_to_string(path, {'order': order})
+            for template_path in template_paths_to_try:
+                try:
+                    print(f"DEBUG: Trying template path: {template_path}")
+                    html_message = render_to_string(template_path, {'order': order})
+                    print(f"DEBUG: Successfully loaded template: {template_path}")
                     break
-                except:
+                except Exception as template_error:
+                    print(f"DEBUG: Failed to load {template_path}: {template_error}")
                     continue
             
-            if html_message is None: # <- Fallback to plain text
-                
-                OrderEmailService._send_plain_text_notification(order)
-                return
+            # Fallback to plain text if HTML template not found
+            if html_message is None:
+                print("DEBUG: Using plain text fallback - no template found")
+                return OrderEmailService._send_plain_text_notification(order)
             
-            host_email = os.getenv('EMAIL_HOST_USER')
-            sender = "Rugly Barnacle"
-            receiver = os.getenv('TEST_EMAIL_HOST_USER')
-
+            # Create and send HTML email
             email = EmailMessage(
                 subject=subject,
                 body=html_message,
-                from_email=sender,
-                to=[receiver],
-                reply_to=[order.email]
+                from_email=host_email,
+                to=[host_email],
+                reply_to=[customer_email]
             )
-
             email.content_subtype = 'html'
+            has_image = order.images.exists()
+            print(f"DEBUG: Attempting to send email to: {[host_email]}")
+            print(f"DEBUG: Image Provided: {has_image}")
             email.send(fail_silently=False)
-            print(f"Order notification email sent for order #{order.reference_id}")
+            print(f"SUCCESS: Order notification email sent for order #{order.reference_id}")
+            return True
             
         except Exception as e:
-            print(f"Failed to send order notification: {str(e)}")
-            OrderEmailService._send_plain_text_notification(order)
-    
-    
+            print(f"ERROR: Failed to send order notification: {str(e)}")
+            import traceback
+            print(f"ERROR TRACEBACK: {traceback.format_exc()}")
+            # Try plain text as last resort
+            try:
+                OrderEmailService._send_plain_text_notification(order)
+            except Exception as fallback_error:
+                print(f"CRITICAL: All email methods failed: {fallback_error}")
+            return False
+        
     @staticmethod 
-    def _send_plain_text_notification(order): # <- FALLBACK EMAIL 
+    def _send_plain_text_notification(order):
         """Private method for plain text fallback"""
         try:
-            subject = f"New Order - #{order.reference_id}"
+            subject = f"RB New Custom Order - #{order.reference_id}"
+            customer_email = order.email
+            
+            has_images = order.images.exists()
+            image_info = "INCLUDES REFERENCE IMAGE(S)" if has_images else "NO REFERENCE IMAGES - Consider asking for visual references"
+            
             plain_message = f"""
 NEW CUSTOM ORDER RECEIVED!
 
@@ -66,6 +93,7 @@ Customer Name: {order.customer_name}
 Customer Email: {order.email}
 Preferred Contact: {order.contact_method.title()}
 Contact Info: {order.contact_info or 'Use email above'}
+Image Status: {image_info}
 
 DESIGN DESCRIPTION:
 ──────────────────
@@ -77,51 +105,74 @@ Status: {order.status.title()}
 Submitted: {order.created_at}
 
 ACTION REQUIRED:
-Review the order details above
-Update order status in admin panel
-Contact customer within 24-48 hours
-Provide quote and timeline
+• Review the order details above
+{'• Check reference images in admin panel' if has_images else '• Consider asking customer for reference images'}
+• Update order status in admin panel  
+• Contact customer within 24-48 hours
+• Provide quote and timeline
 """
-            sender = os.getenv('TEST_EMAIL_HOST_USER')
-            receiver = os.getenv('TEST_EMAIL_HOST_USER')
-        
-            send_mail(
+
+            # FIX: Use EmailMessage with correct parameters
+            email = EmailMessage(
                 subject=subject,
-                message=plain_message.strip(),
-                from_email=sender,
-                recipient_list=[receiver],
-                reply_to=[order.email],
-                fail_silently=False
+                body=plain_message.strip(),  # Changed from 'message' to 'body'
+                from_email=host_email,
+                to=[host_email],  # Changed from 'recipient_list' to 'to'
+                reply_to=[customer_email]  # Ensure this is a list
             )
+            
+            email.send(fail_silently=False)
             print(f"Plain text email sent for order #{order.reference_id}")
+            return True
 
         except Exception as e:
             print(f"Failed to send plain text email: {e}")
+            return False
     
+    # CUSTOMER
     @staticmethod
     def send_order_confirmation(order):
         """Send confirmation email to customer"""
         try:
-            subject = f"Custom Order Confirmation - #{order.reference_id}"
-            
+            customer_email = order.email
+            subject = f"Custom Order Request - #{order.reference_id}"
             
             html_message = None
             try:
-                html_message = render_to_string('emails/customer_confirmation.html', {
+                html_message = render_to_string('emails/customer_confirmation.html', {  # Fixed path
                     'order': order
                 })
-            except:
-                pass  # <- If fail to get html, continue to Fallback to plain text. At this point html_message will remain as None
+            except Exception as e:
+                print(f"Template error: {e}")
+                pass
             
-            if html_message: # <- HTML email if found
+            if html_message:  # HTML email if found
                 email = EmailMessage(
                     subject=subject,
                     body=html_message,
-                    from_email="Rugly Barnacle <orders@ruglybarnacle.com>",
-                    to=[order.email],
+                    from_email=host_email,
+                    to=[customer_email],
                 )
                 email.content_subtype = "html"
-            else: # Plain text fallback if html_message is still None
+            else:  # Plain text fallback
+                has_images = order.images.exists()
+                
+                if has_images:
+                    image_section = f"""
+IMAGE CONFIRMATION:
+──────────────────
+Perfect! I've received your reference image and will use it as a visual guide while creating your custom rug. 
+Feel free to send any additional inspiration photos by replying to this email!
+"""
+                else:
+                    image_section = f"""
+VISUAL REFERENCES:
+─────────────────
+Want to make sure I capture your vision perfectly? Reference images are incredibly helpful! 
+You can send photos, color swatches, or design inspiration by simply replying to this email 
+with your images attached. The more visual references, the better!
+"""
+                
                 plain_message = f"""
 Thank you for your custom order with Rugly Barnacle!
 
@@ -130,6 +181,8 @@ ORDER CONFIRMATION:
 Order Reference: #{order.reference_id}
 Customer Name: {order.customer_name}
 Submitted: {order.created_at.strftime('%B %d, %Y at %I:%M %p')}
+
+{image_section}
 
 WHAT HAPPENS NEXT:
 ─────────────────
@@ -145,27 +198,30 @@ If you have any questions, simply reply to this email.
 
 Thank you for choosing Rugly Barnacle!
                 """
+
                 email = EmailMessage(
                     subject=subject,
                     body=plain_message.strip(),
-                    from_email="Rugly Barnacle <orders@ruglybarnacle.com>",
-                    to=[order.email],
+                    from_email=host_email,
+                    to=[customer_email],
                 )
             
             email.send(fail_silently=False)
             print(f"Order confirmation sent to customer for order #{order.reference_id}")
+            return True
             
         except Exception as e:
             print(f"Failed to send customer confirmation: {str(e)}")
+            return False
     
+    # CUSTOMER
     @staticmethod
     def send_status_update(order, old_status):
         """Send status update email to customer"""
         try:
-            
-            if old_status == 'pending' and order.status == 'pending': # <- Don't send for initial pending status
+            if old_status == 'pending' and order.status == 'pending':
                 return
-                
+            
             # Map status to subject lines
             status_subjects = {
                 'accepted': f"Order Accepted! - #{order.reference_id}",
@@ -175,7 +231,7 @@ Thank you for choosing Rugly Barnacle!
             }
             
             subject = status_subjects.get(order.status, f"Order Update - #{order.reference_id}")
-            
+            customer_email = order.email  # Added this line
             
             html_message = None
             try:
@@ -184,26 +240,39 @@ Thank you for choosing Rugly Barnacle!
                 })
             except Exception as template_error:
                 print(f"Template error: {template_error}")
-                
                 pass
             
             if html_message:
-                
                 email = EmailMessage(
                     subject=subject,
                     body=html_message,
-                    from_email="Rugly Barnacle <orders@ruglybarnacle.com>",
-                    to=[order.email],
+                    from_email=host_email,
+                    to=[customer_email],  # Fixed: should be a list
                 )
                 email.content_subtype = "html"
             else:
-                
                 status_messages = {
-                    'accepted': "has been accepted! Waiting for payment to begin. ",
+                    'accepted': "has been accepted! Waiting for payment to begin.",
                     'in_progress': "is now in progress! Work on your rug has begun.",
                     'completed': "is completed! Your custom rug is ready.",
                     'declined': "could not be accepted at this time.",
                 }
+                
+                has_images = order.images.exists()
+                image_note = ""
+                
+                if has_images:
+                    if order.status == 'in_progress':
+                        image_note = "I'm using your reference images to guide the creation process - they're super helpful!"
+                    elif order.status == 'completed':
+                        image_note = "Your reference images were invaluable in creating the final design!"
+                    elif order.status == 'accepted':
+                        image_note = "Your reference images give me a great starting point for your design!"
+                else:
+                    if order.status == 'accepted':
+                        image_note = "Want to send reference images? They help ensure I capture your vision perfectly! Just reply with photos."
+                    elif order.status == 'in_progress':
+                        image_note = "It's not too late to send reference images if you have any - they can still help guide the final details!"
                 
                 plain_message = f"""
 Order Status Update
@@ -213,6 +282,8 @@ Order Reference: #{order.reference_id}
 Hi {order.customer_name},
 
 Your custom rug order {status_messages.get(order.status, 'has been updated.')}
+
+{image_note}
 
 {('Update: ' + order.admin_notes) if order.admin_notes else ''}
 
@@ -226,12 +297,14 @@ The Rugly Barnacle Team
                 email = EmailMessage(
                     subject=subject,
                     body=plain_message.strip(),
-                    from_email="Rugly Barnacle <orders@ruglybarnacle.com>",
-                    to=[order.email],
+                    from_email=host_email,
+                    to=[customer_email],  # Fixed: should be a list
                 )
             
             email.send(fail_silently=False)
             print(f"Status update email sent for order #{order.reference_id} (Status changed from {old_status} to {order.status})")
+            return True
             
         except Exception as e:
             print(f"Failed to send status update email: {str(e)}")
+            return False
