@@ -187,7 +187,7 @@ class CustomOrderImage(models.Model):
     def __str__(self):
         return f"Image for {self.custom_order.reference_id}"
 
-# <- ------------------------------------------------------ PRODUCT ------------------------------------------------------
+# ------------------------------------------------------ PRODUCT ------------------------------------------------------
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='products/')
@@ -261,6 +261,84 @@ class ProductImage(models.Model):
     
     def __str__(self):
         return f"Image for {self.product.name}"
+    
+# ------------------------------------------------------ FAQ ------------------------------------------------------
+class FaqModel(models.Model):
+    question = models.CharField(max_length=500, blank=True)
+    answer = models.CharField(max_length=500)
+# ------------------------------------------------------ PORTFOLIO ------------------------------------------------------
+
+class PortfolioImage(models.Model):
+    class Meta:
+        db_table = 'portfolio images'
+        verbose_name_plural = "Portfolio Images"
+        ordering = ['-created_at']
+    title = models.CharField(max_length=200, blank=True, help_text="Short description of the rug (e.g., 'Blue Geometric Pattern Rug')")
+    image = models.ImageField(upload_to='portfolio/')
+    is_visible = models.BooleanField(default=True, help_text="Toggle to show this in the portfolio")
+    created_at = models.DateField(auto_now_add=True)
+    thumbnail = models.ImageField(upload_to='portfolio/thumbnails/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+
+        if is_new:
+            super().save(*args, **kwargs)
+        
+        if self.image:
+            try:
+                img = Image.open(self.image)
+
+                if img.height > 1200 or img.width > 1200:
+                    output_size = (1200, 1200)
+                    img.thumbnail(output_size)
+
+                    buffer = BytesIO()
+                    if img.format == 'PNG':
+                        img.save(buffer, format='PNG')
+                        self.image.save(
+                            os.path.splitext(self.image.name)[0] + 'png',
+                            ContentFile(buffer.getvalue()),
+                            save=False
+                        )
+                    else:
+                        img.save(buffer, format == 'JPG', quality=85)
+                        self.image.save(
+                            os.path.splitext(self.image.name)[0] + 'jpg',
+                            ContentFile(buffer.getvalue()),
+                            save=False
+                        )
+                
+                img.thumbnail((400, 400)) # <- Create thumbnail
+                thumb_buffer = BytesIO()
+                if img.format == 'PNG':
+                    img.save(thumb_buffer, format='PNG')
+                    thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
+                else:
+                    img.save(thumb_buffer, format='JPEG', quality=75)
+                    thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
+                
+                self.thumbnail.save(
+                    thumb_name,
+                    ContentFile(thumb_buffer.getvalue()),
+                    save=False
+                )
+                
+            except Exception as e:
+                print(f"Error processing portfolio image: {e}")
+                
+        super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        # Delete associated files
+        if self.image:
+            self.image.delete(save=False)
+        if self.thumbnail:
+            self.thumbnail.delete(save=False)
+        super().delete(*args, **kwargs)
+    
+    def __str__(self):
+        return self.title
 """
 Make migrations::
 > python manage.py makemigrations

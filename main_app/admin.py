@@ -5,7 +5,6 @@ from django.utils.html import format_html
 from .models import *
 
 # ------------------------------------------------------ INLINE CLASSES ------------------------------------------------------
-
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
@@ -168,4 +167,21 @@ class CustomOrderAdmin(admin.ModelAdmin):
         return "No images"
     images_preview.short_description = 'Reference Images Preview'
 
-# No need to register CustomOrderImage separately since it's inline with CustomOrder
+@admin.register(FaqModel)
+class FaqAdmin(admin.ModelAdmin):
+    list_display = ['question', 'answer', 'id']  
+    search_fields = ['question', 'answer']
+    list_display_links = ['question']  # <- Makes question clickable
+
+@admin.register(PortfolioImage)
+class PortfolioImageAdmin(admin.ModelAdmin):
+    list_display = ['title', 'is_visible', 'created_at', 'id', 'image_preview']
+    list_filter = ['created_at', 'is_visible']
+    search_fields = ['title']
+    list_editable = ['is_visible']  # <- Quick edit in list view
+
+    def image_preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" style="max-height: 50px; max-width: 50px;" />')
+        return "No Image"
+    image_preview.short_description = 'Preview'

@@ -5,6 +5,7 @@ from .views.categoryviews import CategoryView
 from .views.customOrdersviews import CustomOrderView, CustomOrderDetailView
 from .views.productviews import ProductList, ProductDetails
 from .views.propertiesview import PropertiesView
+from .views.faqview import FaqList
 
 
 urlpatterns = [
@@ -27,5 +28,10 @@ urlpatterns = [
   path('category/', CategoryView.as_view(), name='category'),
 
 # PROPERTY
-  path('properties/', PropertiesView.as_view(), name='properties')
+  path('properties/', PropertiesView.as_view(), name='properties'),
+
+# FAQ
+  path('faq/', FaqList.as_view(), name='faq'),
+# PORTFOLIO
+  path('portfolio/', PortfolioView.as_view(), name='portfolio')
 ]

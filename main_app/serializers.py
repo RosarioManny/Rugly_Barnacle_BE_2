@@ -115,3 +115,17 @@ class CustomOrderSerializer(serializers.ModelSerializer):
     
     def get_image_count(self, obj):
         return obj.images.count()
+    
+# FAQ
+class FaqSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = FaqModel
+    fields = ['__all__']
+
+#PORTFOLIO
+
+class PortfolioSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = PortfolioImage
+    fields = ['title', 'image', 'is_visible', 'created_at']
+    read_only_fields = ['title', 'created_at']
