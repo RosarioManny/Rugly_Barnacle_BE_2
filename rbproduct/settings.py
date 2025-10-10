@@ -101,21 +101,22 @@ WSGI_APPLICATION = 'rbproduct.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 import dj_database_url
 
-if 'DATABASE_URL' in os.environ:
+if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
-            conn_health_checks=True
+            conn_health_checks=True,
         )
     }
 else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'rbproduct',
-            'USER': os.getenv('RB_USER'),
-            'PASSWORD': os.getenv('RB_PASSWORD'),
+            'NAME': os.getenv('RB_DB_NAME', 'rbproduct'),
+            'USER': os.getenv('RB_USER', 'postgres'),
+            'PASSWORD': os.getenv('RB_PASSWORD', ''),
+            'HOST': os.getenv('RB_HOST', 'localhost'),
+            'PORT': os.getenv('RB_PORT', '5432'),
         }
     }
 
