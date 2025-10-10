@@ -116,7 +116,7 @@ if not DATABASES['default']:
         'USER': os.getenv('PGUSER', 'postgres'),
         'PASSWORD': os.getenv('PGPASSWORD', ''),
         'HOST': os.getenv('PGHOST', 'localhost'),
-        'PORT': os.getenv('PGPORT', '5432'),  # ← Changed from PORT to PGPORT
+        'PORT': os.getenv('PGPORT', '5432'), 
     }
 
 # Password validation

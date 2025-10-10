@@ -12,6 +12,7 @@ django-cors-headers = "*"
 django-filter = "*"
 pillow = "*" 
 dj-database-url = "*"  
+gunicorn = "==21.2.0"
 
 [dev-packages]
 
