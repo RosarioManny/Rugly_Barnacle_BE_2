@@ -30,6 +30,7 @@ class Category(models.Model):
 class Property(models.Model):
     class Meta:
         db_table = 'properties'
+        verbose_name_plural = 'Rug Properties'
     name = models.CharField(max_length=32, unique=True)
     display_name = models.CharField(max_length=32)
 
@@ -264,6 +265,8 @@ class ProductImage(models.Model):
     
 # ------------------------------------------------------ FAQ ------------------------------------------------------
 class FaqModel(models.Model):
+    class Meta:
+        verbose_name_plural = 'FAQ'
     question = models.CharField(max_length=500, blank=True)
     answer = models.CharField(max_length=500)
 # ------------------------------------------------------ PORTFOLIO ------------------------------------------------------
@@ -326,7 +329,7 @@ class PortfolioImage(models.Model):
                 
             except Exception as e:
                 print(f"Error processing portfolio image: {e}")
-                
+
         super().save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):

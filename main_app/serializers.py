@@ -120,12 +120,12 @@ class CustomOrderSerializer(serializers.ModelSerializer):
 class FaqSerializer(serializers.ModelSerializer):
   class Meta:
     model = FaqModel
-    fields = ['__all__']
+    fields = '__all__'
 
 #PORTFOLIO
 
 class PortfolioSerializer(serializers.ModelSerializer):
   class Meta:
     model = PortfolioImage
-    fields = ['title', 'image', 'is_visible', 'created_at']
-    read_only_fields = ['title', 'created_at']
+    fields = ['title', 'image', 'is_visible', 'created_at', 'id', 'thumbnail']
+    read_only_fields = ['id', 'created_at']
