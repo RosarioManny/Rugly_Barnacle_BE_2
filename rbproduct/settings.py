@@ -112,11 +112,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('RB_DB_NAME', 'rbproduct'),
-            'USER': os.getenv('RB_USER', 'postgres'),
-            'PASSWORD': os.getenv('RB_PASSWORD', ''),
-            'HOST': os.getenv('RB_HOST', 'localhost'),
-            'PORT': os.getenv('RB_PORT', '5432'),
+            'NAME': os.getenv('PGDATABASE', 'rbproduct'),
+            'USER': os.getenv('PGUSER', 'postgres'),
+            'PASSWORD': os.getenv('PGPASSWORD', ''),
+            'HOST': os.getenv('PGHOST', 'localhost'),
+            'PORT': os.getenv('PGPORT', '5432'),
         }
     }
 
