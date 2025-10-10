@@ -1,99 +1,266 @@
+from django.core.files.base import ContentFile
 from django.db import models
+# from django.utils import timezone
+from io import BytesIO
+from PIL import Image
+import os
+import uuid
+from .services.email_service import OrderEmailService  
 
 # To Create an enums or choice 
 PRICES = (
-  ('3ft', '$150-$249'),
-  ('4ft', '$250-$349'),
-  ('5ft', '$350-$449'),
-  ('6ft +', '$450+'),
+    ('3ft', '$150-$249'),
+    ('4ft', '$250-$349'),
+    ('5ft', '$350-$449'),
+    ('6ft +', '$450+'),
 )
 
 # ------------------------------------------------------ CATEGORY ------------------------------------------------------
 
 class Category(models.Model):
-  class Meta: 
-    verbose_name_plural = "Categories"
-    db_table = 'category'
-  slug = models.SlugField(unique=True)
-  name = models.CharField(max_length=100)
-  
-  def __str__(self):
-    return self.name
+    class Meta: 
+        verbose_name_plural = "Categories"
+        db_table = 'category'
+    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.name
 
 class Property(models.Model):
-  class Meta:
-    db_table = 'properties'
-  name = models.CharField(max_length=32, unique=True)
-  display_name = models.CharField(max_length=32)
+    class Meta:
+        db_table = 'properties'
+    name = models.CharField(max_length=32, unique=True)
+    display_name = models.CharField(max_length=32)
 
-  def __str__(self):
-    return f"{self.id} - {self.display_name}"
+    def __str__(self):
+        return f"{self.id} - {self.display_name}"
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
 
 class Product(models.Model):
-  class Meta:
-    db_table = 'product'
-  name = models.CharField(max_length=100, unique=True)
-  price = models.DecimalField(decimal_places=2, max_digits=10)
-  category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-  description = models.TextField(max_length=400, blank=True, null=True)
-  dimensions = models.CharField(max_length=40)
-  quantity = models.PositiveIntegerField(default=1)
-  properties = models.ManyToManyField(Property, blank=True)
-  created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now=True)
-  # TODO: in_stock checker. 
+    class Meta:
+        db_table = 'product'
+    name = models.CharField(max_length=100, unique=True)
+    price = models.DecimalField(decimal_places=2, max_digits=10)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    description = models.TextField(max_length=600, blank=True, null=True)
+    dimensions = models.CharField(max_length=40)
+    quantity = models.PositiveIntegerField(default=1)
+    properties = models.ManyToManyField(Property, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    # TODO: in_stock checker. 
 
-  # Change the name of the display on admin panel
-  def __str__(self):
-    return f"Id: {self.id} - {self.name}"
+    def __str__(self): # <- Change the name of the display on admin panel
+        return f"Id: {self.id} - {self.name}"
 
 # ------------------------------------------------------ CART ------------------------------------------------------
 
 class Cart(models.Model):   
-  session_key = models.CharField(max_length=48, unique=True, db_index=True)
-  created_at = models.DateTimeField(auto_now_add=True)
-  updated_at = models.DateTimeField(auto_now=True)
+    session_key = models.CharField(max_length=48, unique=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-  def __str__(self):
-    return f"Cart {self.id} - ({self.created_at.date()})"
+    def __str__(self):
+        return f"Cart {self.id} - ({self.created_at.date()})"
 
 class CartItem(models.Model):
-  cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-  product = models.ForeignKey(Product, on_delete=models.CASCADE)
-  added_at = models.DateTimeField(auto_now_add=True)
-  quantity = models.PositiveIntegerField(default=1)
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveIntegerField(default=1)
 
-  def __str__(self):
-    return f"Amount: {self.quantity}x - Product: {self.product.name} - Cart: {self.cart.id} - Date: {self.added_at.month} / {self.added_at.day} / {self.added_at.year}"
-  
+    def __str__(self):
+        return f"{self.quantity}x {self.product.name} - {self.added_at.month} / {self.added_at.day} / {self.added_at.year} - Cart: {self.cart.id} "
+    
 # ------------------------------------------------------ CUSTOM ------------------------------------------------------ 
 
 class CustomOrder(models.Model):
-  description = models.TextField(max_length=400, blank=True, null=True)
-  email = models.EmailField(max_length=64, null=True)
-  size_with_price = models.CharField(
-    max_length=10, 
-    choices=PRICES, 
-    default=PRICES[0][0], 
-    verbose_name="Rug Size & Price Range"
-  )
-  created_at = models.DateTimeField(auto_now_add=True)
-  # TODO: Create an Accepted / Rejected / Pending
+    customer_name = models.CharField(max_length=100, blank=True)
+    description = models.TextField(max_length=400, blank=True, null=True)
+    contact_method = models.CharField(
+        max_length=20, 
+        choices=[
+            ('instagram', 'Instagram'),
+            ('phone', 'Phone'),
+            ('email', 'Email')
+        ], 
+        default='email'
+    )
+    contact_info = models.CharField(max_length=100, blank=True, null=True)
+    email = models.EmailField(max_length=250, blank=True, null=True)
+    reference_id = models.CharField(max_length=20, unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    STATUS_CHOICE = [ 
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('declined', 'Declined')
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='pending', blank=True, )
+    admin_notes = models.TextField(blank=True, null=True)
 
-  def __str__(self):
-    return f"Custom order {self.id}: {self.email} - ({self.created_at.date()})"
-  
-# ------------------------------------------------------ PRODUCT ------------------------------------------------------
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        old_status = None
+        
+        if not is_new: # <- Get old status if update
+            old_instance = CustomOrder.objects.get(pk=self.pk)
+            old_status = old_instance.status
 
-# 6. TODO:: Create ProductImage Model
-# class ProductImage(models.Model):
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-#     image = models.ImageField(upload_to='products/')
-#     is_primary = models.BooleanField(default=False)  # Mark the main image
+        if not self.reference_id: # <- Generate reference_id if it doesn't exist
+            self.reference_id = f"CUST-{uuid.uuid4().hex[:6].upper()}"
 
-#     def __str__(self):
-#         return f"Image for {self.product.name}"
+        super().save(*args, **kwargs)  # <- Save the model first
+
+        if not is_new and old_status != self.status:
+            OrderEmailService.send_status_update(self, old_status) # <- Status changed - send update
+            
+    def __str__(self):
+        return f"{self.reference_id}: {self.customer_name} - {self.email}"
+    
+class CustomOrderImage(models.Model):
+    custom_order = models.ForeignKey(CustomOrder, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='custom_orders/')
+    thumbnail = models.ImageField(upload_to='custom_orders/thumbnails/', blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def save(self, *args, **kwargs):
+        
+        is_new = not self.pk # <- Check if this is a new image (no primary key yet)
+        
+        if is_new:
+            super().save(*args, **kwargs) # <- For new images, save first to get an ID
+        
+        if self.image: # <- Process images if the main image exists
+            try:
+                img = Image.open(self.image)
+                
+                
+                if img.height > 800 or img.width > 800: # <- Resize main image if too large
+                    output_size = (800, 800)
+                    img.thumbnail(output_size)
+                    
+                    buffer = BytesIO()
+                    if img.format == 'PNG':
+                        img.save(buffer, format='PNG')
+                        self.image.save(
+                            os.path.splitext(self.image.name)[0] + '.png',
+                            ContentFile(buffer.getvalue()),
+                            save=False
+                        )
+                    else:
+                        img.save(buffer, format='JPEG', quality=85)
+                        self.image.save(
+                            os.path.splitext(self.image.name)[0] + '.jpg',
+                            ContentFile(buffer.getvalue()),
+                            save=False
+                        )
+                
+                
+                img.thumbnail((200, 200)) # <- Create thumbnail
+                thumb_buffer = BytesIO()
+                if img.format == 'PNG':
+                    img.save(thumb_buffer, format='PNG')
+                    thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
+                else:
+                    img.save(thumb_buffer, format='JPEG', quality=75)
+                    thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
+                
+                self.thumbnail.save(
+                    thumb_name,
+                    ContentFile(thumb_buffer.getvalue()),
+                    save=False
+                )
+                
+            except Exception as e:
+                print(f"Error processing image: {e}") # <- Don't break the save if image processing fails      
+    
+    def delete(self, *args, **kwargs):
+        if self.image:
+            self.image.delete(save=False)
+        if self.thumbnail:
+            self.thumbnail.delete(save=False)
+        super().delete(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Image for {self.custom_order.reference_id}"
+
+# <- ------------------------------------------------------ PRODUCT ------------------------------------------------------
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/')
+    thumbnail = models.ImageField(upload_to='products/thumbnails/', blank=True, null=True)
+    is_primary = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        
+        if not self.pk: # <- First save to generate image path
+            super().save(*args, **kwargs)
+        
+        
+        if self.image: # <- Process image if it's new or changed
+            
+            img = Image.open(self.image) # <- Open the original image
+            
+            
+            if img.height > 800 or img.width > 800: # <- Resize main image if too large
+                output_size = (800, 800)
+                img.thumbnail(output_size)
+                
+                
+                buffer = BytesIO() # <- Save the resized image
+                if img.format == 'PNG':
+                    img.save(buffer, format='PNG')
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + '.png',
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+                else:
+                    img.save(buffer, format='JPEG', quality=85)
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + '.jpg',
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+            
+            
+            img.thumbnail((200, 200)) # <- Create thumbnail
+            thumb_buffer = BytesIO()
+            if img.format == 'PNG':
+                img.save(thumb_buffer, format='PNG')
+                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
+            else:
+                img.save(thumb_buffer, format='JPEG', quality=75)
+                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
+            
+            self.thumbnail.save(
+                thumb_name,
+                ContentFile(thumb_buffer.getvalue()),
+                save=False
+            )
+        
+        
+        if self.is_primary: # <- Ensure only one primary image per product
+            ProductImage.objects.filter(
+                product=self.product, 
+                is_primary=True
+            ).exclude(id=self.id).update(is_primary=False)
+            
+        super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        # Delete associated files
+        if self.image:
+            self.image.delete(save=False)
+        if self.thumbnail:
+            self.thumbnail.delete(save=False)
+        super().delete(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Image for {self.product.name}"
 """
 Make migrations::
 > python manage.py makemigrations

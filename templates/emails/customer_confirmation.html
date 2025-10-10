@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Order Request Form</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; margin: 0 auto; background: white;">
+        <!-- Header -->
+        <tr>
+            <td style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" align="center">
+                <img src="https://i.postimg.cc/vm1kzx9c/Rugly-Barnacle-Logo.webp" alt="Rugly Barnacle Logo" style="max-width: 300px; height: auto; display: block; margin: 0 auto 15px auto;" />
+                <h1 style="margin: 0; font-size: 28px; color: white;">Order Request Form!</h1>
+            </td>
+        </tr>
+        
+        <!-- Content -->
+        <tr>
+            <td style="padding: 30px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FEB5FF; color: #202254; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong>Order Reference: #{{ order.reference_id }}</strong>
+                        </td>
+                    </tr>
+                </table>
+                
+                <p style="margin: 0 0 20px 0;">Hi <strong>{{ order.customer_name }}</strong>,</p>
+                
+                <p style="margin: 0 0 20px 0;">Thank you for your custom order! I will review your order as soon as possible!</p>
+                
+                <!-- Order Details Section -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; border-left: 4px solid #9EECE2; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Your Order Details</h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">Name:</span>
+                                        <span style="color: #202254;">{{ order.customer_name }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">Email:</span>
+                                        <span style="color: #202254;">{{ order.email }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">Preferred Contact:</span>
+                                        <span style="color: #202254;">{{ order.contact_method|title }}</span>
+                                    </td>
+                                </tr>
+                                {% if order.contact_info and order.contact_method != 'email' %}
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">
+                                            {% if order.contact_method == 'instagram' %}
+                                                Instagram Handle:
+                                            {% elif order.contact_method == 'phone' %}
+                                                Phone Number:
+                                            {% else %}
+                                                Contact Info:
+                                            {% endif %}
+                                        </span>
+                                        <span style="color: #202254;">{{ order.contact_info }}</span>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Design Description Section -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; border-left: 4px solid #FEB5FF; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Your Design Request</h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0;">
+                                <tr>
+                                    <td>
+                                        <div style="white-space: pre-line; font-family: Arial, sans-serif; line-height: 1.5;">{{ order.description|linebreaksbr }}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Image Status Section -->
+                {% if order.images.exists %}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #9EECE2; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong style="color: #202254; font-size: 16px;"> Reference Image Received</strong><br/>
+                            <span style="font-size: 14px; color: #202254;">
+                                Perfect! I've received your reference image and will use it as a visual guide. 
+                                Feel free to send additional inspiration photos by replying to this email!
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                {% else %}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #00CEC5; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong style="color: #202254; font-size: 16px;"> Help Me Visualize Your Vision</strong><br/>
+                            <span style="font-size: 14px; color: #202254;">
+                                Want to make sure I capture your vision perfectly? Reference images are incredibly helpful! 
+                                You can send photos, color swatches, or design inspiration by simply replying to this email.
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+
+                <!-- Next Steps -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">What Happens Next</h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="padding: 8px 0 8px 25px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">1</span>
+                                        I'll review your order within the <strong>next 1-2 business days</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 25px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">2</span>
+                                        If approved, you'll receive a notification via email with a detailed quote
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 25px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">3</span>
+                                        To check your order status anytime, visit the <strong>Custom Orders</strong> page on our website or reply to this email
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 25px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">4</span>
+                                        Once approved and the down payment is received, creation of your custom rug begins!
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Helpful Note -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 15px; padding: 12px; background: #9EECE2; border-radius: 6px;">
+                                <tr>
+                                    <td align="center">
+                                        <p style="margin: 0; font-size: 14px; color: #202254;">
+                                            <strong>Order Reference: #{{ order.reference_id }}</strong><br/>
+                                            Keep this number for all future communications
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: #666;">
+                    <strong>Order Submitted:</strong> {{ order.created_at|date:"F j, Y g:i A" }}<br/>
+                    <strong>Need to make changes?</strong> Simply reply to this email.
+                </p>
+                
+                <p style="margin: 0; font-style: italic; color: #5652E7;">
+                    Thank you for choosing Rugly Barnacle! Tufts and hugs!<br/>
+                    <strong>Your Rug Artisan.</strong>
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

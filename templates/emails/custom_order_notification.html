@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>New Custom Order Notification</title>
+    <!--[if mso]>
+    <style type="text/css">
+        .body-table {
+            width: 100% !important;
+        }
+        .container-table {
+            width: 600px !important;
+        }
+    </style>
+    <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
+    <!--[if mso]>
+    <center>
+    <table class="body-table" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1;">
+        <tr>
+            <td align="center">
+    <![endif]-->
+    
+    <table class="container-table" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; margin: 0 auto; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <!-- Header -->
+        <tr>
+            <td style="background: #5652E7; color: white; padding: 30px 20px 20px 20px; text-align: center;" align="center">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center">
+                            <img src="https://i.postimg.cc/vm1kzx9c/Rugly-Barnacle-Logo.webp" alt="Rugly Barnacle Logo" style="max-width: 300px; height: auto; display: block; margin: 0 auto 15px auto;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <h1 style="margin: 0; font-size: 32px; color: white;">New Custom Order!</h1>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Order Alert -->
+        <tr>
+            <td style="background: #5652E7; color: white; padding: 20px; text-align: center; font-style: italic; font-size: 16px;" align="center">
+                <strong>New Rug Order Requires Your Attention</strong>
+            </td>
+        </tr>
+        
+        <!-- Content -->
+        <tr>
+            <td style="padding: 30px;">
+                <!-- Reference ID -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FEB5FF; color: #202254; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong>Order Reference: #{{ order.reference_id }}</strong>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Customer Information -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; border-left: 4px solid #9EECE2; margin-bottom: 25px;">
+                    <tr>
+                        <td>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                                <tr>
+                                    <td width="90%" style="vertical-align: middle;">
+                                        <h2 style="color: #202254; margin: 0; font-size: 20px;">Customer Details</h2>
+                                    </td>
+                                    <td width="10%" align="right" style="vertical-align: middle;">
+                                        <img src="https://yourdomain.com/assets/design/icons/X_Star_Pink.webp" alt="" style="width: 24px; height: 24px;" aria-hidden="true"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">Name:</span>
+                                        <span style="color: #202254;">{{ order.customer_name }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">Email:</span>
+                                        <span style="color: #202254;">{{ order.email }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">Contact Method:</span>
+                                        <span style="color: #202254;">{{ order.contact_method|title }}</span>
+                                    </td>
+                                </tr>
+                                {% if order.contact_info and order.contact_method != 'email' %}
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">Contact Info:</span>
+                                        <span style="color: #202254;">{{ order.contact_info }}</span>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td style="padding: 5px 0;">
+                                        <span style="font-weight: bold; color: #5652E7; display: block;">Submitted:</span>
+                                        <span style="color: #202254;">{{ order.created_at|date:"F j, Y g:i A" }}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Design Information -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F0F0F1; padding: 20px; border-radius: 8px; border-left: 4px solid #FEB5FF; margin-bottom: 25px;">
+                    <tr>
+                        <td>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                                <tr>
+                                    <td width="90%" style="vertical-align: middle;">
+                                        <h2 style="color: #202254; margin: 0; font-size: 20px;">Design Request</h2>
+                                    </td>
+                                    <td width="10%" align="right" style="vertical-align: middle;">
+                                        <img src="https://yourdomain.com/assets/design/icons/X_Star_Pink.webp" alt="" style="width: 24px; height: 24px;" aria-hidden="true"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0;">
+                                <tr>
+                                    <td>
+                                        <div style="white-space: pre-line; font-family: Arial, sans-serif;">{{ order.description|linebreaksbr }}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Image Status Section -->
+                {% if order.images.exists %}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #9EECE2; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong style="color: #202254; font-size: 16px;"> Reference Image Available</strong><br/>
+                            <span style="font-size: 14px; color: #202254;">
+                                Client has submitted a reference image. Check the <strong>Admin Panel</strong> to view it!
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                {% else %}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FEB5FF; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <strong style="color: #202254; font-size: 16px;">🖼️ No Reference Image Provided</strong><br/>
+                            <span style="font-size: 14px; color: #202254;">
+                                Consider asking the customer for visual references to better understand their vision.
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+
+                <!-- Action Required Section -->
+                <tr>
+                    <td style="background: #114C56; color: white; padding: 30px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center" style="padding-bottom: 25px;">
+                                    <img src="https://yourdomain.com/assets/design/icons/X_Star_Pink.webp" alt="" style="width: 24px; height: 24px; margin-bottom: 15px;" aria-hidden="true"/>
+                                    <h2 style="color: white; margin: 0; font-size: 24px;">Action Required</h2>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0;">
+                                        <tr>
+                                            <td style="padding: 5px 0 5px 25px; position: relative;">
+                                                <span style="position: absolute; left: 0; color: #00CEC5; font-weight: bold;">✓</span>
+                                                Review the order details above
+                                            </td>
+                                        </tr>
+                                        {% if order.image_count %}
+                                        <tr>
+                                            <td style="padding: 5px 0 5px 25px; position: relative;">
+                                                <span style="position: absolute; left: 0; color: #00CEC5; font-weight: bold;">✓</span>
+                                                Check reference image in admin panel
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td style="padding: 5px 0 5px 25px; position: relative;">
+                                                <span style="position: absolute; left: 0; color: #00CEC5; font-weight: bold;">✓</span>
+                                                Consider requesting reference images
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr>
+                                            <td style="padding: 5px 0 5px 25px; position: relative;">
+                                                <span style="position: absolute; left: 0; color: #00CEC5; font-weight: bold;">✓</span>
+                                                Contact customer within 24-48 hours
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 5px 0 5px 25px; position: relative;">
+                                                <span style="position: absolute; left: 0; color: #00CEC5; font-weight: bold;">✓</span>
+                                                Provide quote and timeline
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 5px 0 5px 25px; position: relative;">
+                                                <span style="position: absolute; left: 0; color: #00CEC5; font-weight: bold;">✓</span>
+                                                Update order status in admin panel
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);">
+                                        <tr>
+                                            <td align="center">
+                                                <p style="margin: 0 0 15px 0;"><strong>Quick Reply:</strong> Click the email to reply to the customer!</p>
+                                                <p style="margin: 0;">
+                                                    <span style="background: #F0F0F1; color: #202254; padding: 8px 15px; border-radius: 5px; font-weight: bold; display: inline-block;">{{ order.email }}</span>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                                        <tr>
+                                            <td align="center">
+                                                <p style="margin: 5px 0; font-size: 13px;">This email was automatically generated by Rugly Barnacle Order System</p>
+                                                <p style="margin: 5px 0; font-size: 13px;">Order Reference: #{{ order.reference_id }} • {{ order.created_at|date:"M j, Y" }}</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </td>
+        </tr>
+    </table>
+    
+    <!--[if mso]>
+            </td>
+        </tr>
+    </table>
+    </center>
+    <![endif]-->
+</body>
+</html>
