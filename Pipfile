@@ -11,6 +11,7 @@ python-dotenv = "*"
 django-cors-headers = "*"
 django-filter = "*"
 pillow = "*" 
+dj-database-url = "*"  
 
 [dev-packages]
 

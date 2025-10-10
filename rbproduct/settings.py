@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-&o9pfqnk4-03!*#6k_uynv$(yi5p-udy*pqvem@&+#i9af)n3$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*'] #TODO: Change once you get url
 
 
 # Application definition
@@ -99,15 +99,25 @@ WSGI_APPLICATION = 'rbproduct.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+import dj_database_url
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rbproduct',
-        'USER': os.getenv('RB_USER'),
-        'PASSWORD': os.getenv('RB_PASSWORD'),
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'rbproduct',
+            'USER': os.getenv('RB_USER'),
+            'PASSWORD': os.getenv('RB_PASSWORD'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
