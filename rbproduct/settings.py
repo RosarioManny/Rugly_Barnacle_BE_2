@@ -53,16 +53,9 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',               # <-- This enables searching
         'rest_framework.filters.OrderingFilter',             # <-- This enables sorting
     ],
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.AllowAny',
-    # ],
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [
-    #     'rest_framework.authentication.SessionAuthentication',
-    #     'rest_framework.authentication.BasicAuthentication',
-    # ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '8/day',  # Limit anonymous users to 5 requests per day
-        'user': '20/day', # Limit logged-in users to 20 per day
+        'anon': '8/day',  # <- Limit anonymous users to 5 requests per day
+        'user': '20/day', # <- Limit logged-in users to 20 per day
     }
 }
 MIDDLEWARE = [
