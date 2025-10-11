@@ -28,6 +28,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['.railway.app', 'localhost', '127.0.0.1' ]
 
+try:
+    from django.db import connections
+    conn = connections['default']
+    conn.ensure_connection()
+    print("✓ Database connection successful")
+except Exception as e:
+    print(f"✗ Database connection failed: {e}")
 # Application definition
 
 INSTALLED_APPS = [
@@ -98,15 +105,15 @@ DATABASES = {
     )
 }
 
-if not DATABASES['default']:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PGDATABASE', 'rbproduct'),
-        'USER': os.getenv('PGUSER', 'postgres'),
-        'PASSWORD': os.getenv('PGPASSWORD', ''),
-        'HOST': os.getenv('PGHOST', 'localhost'),
-        'PORT': os.getenv('PGPORT', '5432'), 
-    }
+# if not DATABASES['default']:
+#     DATABASES['default'] = {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('PGDATABASE', 'rbproduct'),
+#         'USER': os.getenv('PGUSER', 'postgres'),
+#         'PASSWORD': os.getenv('PGPASSWORD', ''),
+#         'HOST': os.getenv('PGHOST', 'localhost'),
+#         'PORT': os.getenv('PGPORT', '5432'), 
+#     }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -142,11 +149,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static', 
-]
-STATIC_ROOT = BASE_DIR / 'staticfiles' 
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static', 
+# ]
+# STATIC_ROOT = BASE_DIR / 'staticfiles' 
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
