@@ -23,9 +23,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&o9pfqnk4-03!*#6k_uynv$(yi5p-udy*pqvem@&+#i9af)n3$'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -108,7 +105,7 @@ if not DATABASES['default']:
         'USER': os.getenv('PGUSER', 'postgres'),
         'PASSWORD': os.getenv('PGPASSWORD', ''),
         'HOST': os.getenv('PGHOST', 'localhost'),
-        'PORT': os.getenv('PGPORT', '8000'), 
+        'PORT': os.getenv('PGPORT', '5432'), 
     }
 
 # Password validation
