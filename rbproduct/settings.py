@@ -98,22 +98,29 @@ WSGI_APPLICATION = 'rbproduct.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('PGDATABASE'),
+        'USER': os.environ.get('PGUSER'),
+        'PASSWORD': os.environ.get('PGPASSWORD'),
+        'HOST': os.environ.get('PGHOST'),
+        'PORT': os.environ.get('PGPORT', '5432'),
+    }
+}
+
+print(f"Database config: {DATABASES['default']}")
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    db_from_env = dj_database_url.config(
+        default=DATABASE_URL,
         conn_max_age=600,
         conn_health_checks=True,
     )
-}
-
-# if not DATABASES['default']:
-#     DATABASES['default'] = {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('PGDATABASE', 'rbproduct'),
-#         'USER': os.getenv('PGUSER', 'postgres'),
-#         'PASSWORD': os.getenv('PGPASSWORD', ''),
-#         'HOST': os.getenv('PGHOST', 'localhost'),
-#         'PORT': os.getenv('PGPORT', '5432'), 
-#     }
+    print("✓ Database connection successful")
+    if db_from_env:
+        DATABASES['default'] = db_from_env
+        print(f"✗ Database connection failed: {e}")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -149,11 +156,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'static', 
-# ]
-# STATIC_ROOT = BASE_DIR / 'staticfiles' 
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles' 
+
+staticfiles_dir = os.path.join(BASE_DIR, 'static')
+
+if os.path.exists(staticfiles_dir):
+    STATICFILES_DIRS = [staticfiles_dir]
+else:
+    STATICFILES_DIRS = []
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
