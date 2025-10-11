@@ -101,7 +101,7 @@ DATABASES = {
     }
 }
 
-print(f"Database config: {DATABASES['default']}")
+# print(f"Database config: {DATABASES['default']}")
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
