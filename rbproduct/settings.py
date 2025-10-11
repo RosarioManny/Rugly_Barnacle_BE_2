@@ -117,11 +117,16 @@ if DATABASE_URL:
         conn_max_age=600,
         conn_health_checks=True,
     )
-    print("✓ Database connection successful")
     if db_from_env:
         DATABASES['default'] = db_from_env
-        print(f"✗ Database connection failed: {e}")
 
+try:
+    from django.db import connections
+    conn = connections['default']
+    conn.ensure_connection()
+    print("✓ Database connection successful")
+except Exception as e:
+    print(f"✗ Database connection failed: {e}")
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
