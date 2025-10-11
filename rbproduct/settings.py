@@ -71,6 +71,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'rbproduct.urls'
 
+# FOR EMAILS
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -87,7 +88,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'rbproduct.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -108,7 +108,7 @@ if not DATABASES['default']:
         'USER': os.getenv('PGUSER', 'postgres'),
         'PASSWORD': os.getenv('PGPASSWORD', ''),
         'HOST': os.getenv('PGHOST', 'localhost'),
-        'PORT': os.getenv('PGPORT', '5432'), 
+        'PORT': os.getenv('PGPORT', '8000'), 
     }
 
 # Password validation
