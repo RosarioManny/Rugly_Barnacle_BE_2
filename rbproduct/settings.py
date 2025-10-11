@@ -24,17 +24,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['.railway.app', 'localhost', '127.0.0.1' ]
 
-try:
-    from django.db import connections
-    conn = connections['default']
-    conn.ensure_connection()
-    print("✓ Database connection successful")
-except Exception as e:
-    print(f"✗ Database connection failed: {e}")
 # Application definition
 
 INSTALLED_APPS = [
@@ -120,13 +113,6 @@ if DATABASE_URL:
     if db_from_env:
         DATABASES['default'] = db_from_env
 
-try:
-    from django.db import connections
-    conn = connections['default']
-    conn.ensure_connection()
-    print("✓ Database connection successful")
-except Exception as e:
-    print(f"✗ Database connection failed: {e}")
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
