@@ -10,7 +10,7 @@ djangorestframework = "*"
 python-dotenv = "*" 
 django-cors-headers = "*"
 django-filter = "*"
-pillow = "*" 
+pillow = "==10.2.0"
 dj-database-url = "*"  
 gunicorn = "==21.2.0"
 
