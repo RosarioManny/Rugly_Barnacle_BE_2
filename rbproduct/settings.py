@@ -187,19 +187,23 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.railway.app'
 ]
 
-# Railway-specific settings
+# Add this to your settings.py
 import os
-if os.environ.get('RAILWAY_ENV'):
-    # Ensure we're using the correct port
+
+# Detect Railway environment
+RAILWAY_ENV = os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('RAILWAY_ENV')
+
+if RAILWAY_ENV:
+    # Get the port from environment variable with fallback
+    PORT = os.environ.get('PORT', '8080')
+    print(f"=== Railway Environment Detected ===")
+    print(f"PORT environment variable: {PORT}")
+    print(f"RAILWAY_ENVIRONMENT: {RAILWAY_ENV}")
+    
     ALLOWED_HOSTS = [
         '.railway.app',
         'localhost',
         '127.0.0.1'
     ]
     
-    # Debug should be False in production
     DEBUG = False
-    
-    # Optional: Add more security settings for production
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
