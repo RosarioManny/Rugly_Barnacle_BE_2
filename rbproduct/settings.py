@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'rest-framework',
+    'django_filters',
     'main_app',
 ]
 
@@ -135,13 +137,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# # Static files directories
-# staticfiles_dir = os.path.join(BASE_DIR, 'static')
-# if os.path.exists(staticfiles_dir):
-#     STATICFILES_DIRS = [staticfiles_dir]
-# else:
-#     STATICFILES_DIRS = []
 
 # WhiteNoise configuration for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
