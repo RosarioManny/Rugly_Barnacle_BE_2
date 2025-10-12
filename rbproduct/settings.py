@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'rest-framework',
+    'rest_framework',
     'django_filters',
     'main_app',
 ]
