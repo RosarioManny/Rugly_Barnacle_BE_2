@@ -5,13 +5,16 @@ set -o errexit
 # Install dependencies
 pip install -r requirements.txt
 
-# Create staticfiles directory if it doesn't exist
+# Remove old static files and create fresh directory
+rm -rf staticfiles
 mkdir -p staticfiles
 
-# Collect static files (force overwrite)
-python manage.py collectstatic --no-input --clear
+# Collect static files with verbose output
+echo "=== Collecting static files ==="
+python manage.py collectstatic --no-input --clear -v 3
 
 # Apply database migrations
+echo "=== Running migrations ==="
 python manage.py migrate
 
 echo "✓ Build completed successfully"

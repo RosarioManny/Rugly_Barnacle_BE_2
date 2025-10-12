@@ -57,8 +57,8 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # ADD THIS LINE
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -134,17 +134,21 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Static files directories
-staticfiles_dir = os.path.join(BASE_DIR, 'static')
-if os.path.exists(staticfiles_dir):
-    STATICFILES_DIRS = [staticfiles_dir]
-else:
-    STATICFILES_DIRS = []
+# # Static files directories
+# staticfiles_dir = os.path.join(BASE_DIR, 'static')
+# if os.path.exists(staticfiles_dir):
+#     STATICFILES_DIRS = [staticfiles_dir]
+# else:
+#     STATICFILES_DIRS = []
 
 # WhiteNoise configuration for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
