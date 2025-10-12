@@ -16,15 +16,44 @@ import os
 
 load_dotenv()
 
-print("=== Railway Environment ===")
-required_vars = ['DATABASE_URL', 'SECRET_KEY', 'PGDATABASE', 'PGUSER', 'PGPASSWORD', 'PGHOST', 'PGPORT']
-for var in required_vars:
-    value = os.environ.get(var)
-    if value:
-        print(f"✓ {var}: {'*' * 8 if 'PASSWORD' in var or 'SECRET' in var else value}")
-    else:
-        print(f"✗ {var}: NOT SET")
-    
+# Add detailed initialization logging
+import sys
+
+print("=== Django Initialization Debug ===")
+
+try:
+    # Test database connection
+    from django.db import connections
+    conn = connections['default']
+    conn.ensure_connection()
+    print("✓ Database connection successful")
+except Exception as e:
+    print(f"✗ Database connection failed: {e}")
+    import traceback
+    traceback.print_exc()
+
+try:
+    # Test URL configuration
+    from django.urls import get_resolver
+    get_resolver()
+    print("✓ URL configuration loaded")
+except Exception as e:
+    print(f"✗ URL configuration failed: {e}")
+    import traceback
+    traceback.print_exc()
+
+try:
+    # Test middleware
+    from django.core.handlers.wsgi import WSGIHandler
+    handler = WSGIHandler()
+    print("✓ WSGI handler created")
+except Exception as e:
+    print(f"✗ WSGI handler failed: {e}")
+    import traceback
+    traceback.print_exc()
+
+print("=== Django Initialization Complete ===")
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
@@ -46,10 +75,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
+    # 'rest_framework',
+    # 'corsheaders',
     'main_app',
-    'django_filters', # <-- pip install django-filters / ALLOW for filters
+    # 'django_filters', # <-- pip install django-filters / ALLOW for filters
 ]
 
 # For Filtering abilities add REST_FRAMEWORK variable.
