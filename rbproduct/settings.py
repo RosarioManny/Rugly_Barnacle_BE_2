@@ -16,6 +16,7 @@ import os
 
 load_dotenv()
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
@@ -186,3 +187,19 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.railway.app'
 ]
 
+# Railway-specific settings
+import os
+if os.environ.get('RAILWAY_ENV'):
+    # Ensure we're using the correct port
+    ALLOWED_HOSTS = [
+        '.railway.app',
+        'localhost',
+        '127.0.0.1'
+    ]
+    
+    # Debug should be False in production
+    DEBUG = False
+    
+    # Optional: Add more security settings for production
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
