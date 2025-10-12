@@ -90,6 +90,8 @@ WSGI_APPLICATION = 'rbproduct.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import dj_database_url
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -97,7 +99,7 @@ DATABASES = {
     }
 }
 
-# Use PostgreSQL if DATABASE_URL is available (for production)
+# Try DATABASE_URL first (for production)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     DATABASES['default'] = dj_database_url.config(
@@ -105,7 +107,9 @@ if DATABASE_URL:
         conn_max_age=600,
         conn_health_checks=True,
     )
-
+    print("✓ Using PostgreSQL database")
+else:
+    print("⚠ Using SQLite database (DATABASE_URL not found)")
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
