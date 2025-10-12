@@ -16,6 +16,15 @@ import os
 
 load_dotenv()
 
+print("=== Railway Environment ===")
+required_vars = ['DATABASE_URL', 'SECRET_KEY', 'PGDATABASE', 'PGUSER', 'PGPASSWORD', 'PGHOST', 'PGPORT']
+for var in required_vars:
+    value = os.environ.get(var)
+    if value:
+        print(f"✓ {var}: {'*' * 8 if 'PASSWORD' in var or 'SECRET' in var else value}")
+    else:
+        print(f"✗ {var}: NOT SET")
+    
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
