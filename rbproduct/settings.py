@@ -16,44 +16,6 @@ import os
 
 load_dotenv()
 
-# Add detailed initialization logging
-import sys
-
-print("=== Django Initialization Debug ===")
-
-try:
-    # Test database connection
-    from django.db import connections
-    conn = connections['default']
-    conn.ensure_connection()
-    print("✓ Database connection successful")
-except Exception as e:
-    print(f"✗ Database connection failed: {e}")
-    import traceback
-    traceback.print_exc()
-
-try:
-    # Test URL configuration
-    from django.urls import get_resolver
-    get_resolver()
-    print("✓ URL configuration loaded")
-except Exception as e:
-    print(f"✗ URL configuration failed: {e}")
-    import traceback
-    traceback.print_exc()
-
-try:
-    # Test middleware
-    from django.core.handlers.wsgi import WSGIHandler
-    handler = WSGIHandler()
-    print("✓ WSGI handler created")
-except Exception as e:
-    print(f"✗ WSGI handler failed: {e}")
-    import traceback
-    traceback.print_exc()
-
-print("=== Django Initialization Complete ===")
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
