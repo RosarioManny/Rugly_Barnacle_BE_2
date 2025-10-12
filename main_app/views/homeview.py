@@ -1,8 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-# Database Home view
 class Home(APIView):
-  def get(self, request):
-    content = {'message': 'Rugly Barncale: Welcome to the Rugly Barnacle Database!'}
-    return Response(content)
+    def get(self, request):
+        try:
+            content = {'message': 'Rugly Barnacle: Welcome to the Rugly Barnacle Database!'}
+            return Response(content)
+        except Exception as e:
+            # Return the error for debugging
+            return Response({'error': str(e)}, status=500)
