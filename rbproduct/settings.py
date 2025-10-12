@@ -174,6 +174,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Your Vite/React dev server
     "http://127.0.0.1:5173",  # Alternative localhost
+    'https://*.railway.app',
 ]
 
 # Optional: Allow credentials if needed
