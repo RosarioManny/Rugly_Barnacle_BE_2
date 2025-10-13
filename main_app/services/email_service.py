@@ -12,8 +12,6 @@ class OrderEmailService:
     def send_order_notification(order):
         """Send notification to owner about new order"""
         try:
-            print(f"DEBUG: Starting email send for order #{order.reference_id}")
-            
             # Validate essential data
             if not host_email:
                 print("ERROR: host_email environment variable not set")
@@ -28,7 +26,7 @@ class OrderEmailService:
             # Try to load HTML template with correct paths
             html_message = None
             template_paths_to_try = [
-                'emails/custom_order_notification.html',  # This should work with Django's template loader
+                'emails/custom_order_notification.html', 
             ]
             
             for template_path in template_paths_to_try:
@@ -48,10 +46,10 @@ class OrderEmailService:
             
             # Create and send HTML email
             email = EmailMessage(
-                subject=subject,
-                body=html_message,
-                from_email=host_email,
-                to=[host_email],
+                subject=subject, # <- The title of the email
+                body=html_message, # <- The content of the email
+                from_email=f"The Rugly Barnacle <{host_email}>", # <- The senders name 
+                to=[host_email], # <- Who it's sent too
                 reply_to=[customer_email]
             )
             email.content_subtype = 'html'
@@ -112,11 +110,11 @@ ACTION REQUIRED:
 • Provide quote and timeline
 """
 
-            # FIX: Use EmailMessage with correct parameters
+            
             email = EmailMessage(
                 subject=subject,
                 body=plain_message.strip(),  # Changed from 'message' to 'body'
-                from_email=host_email,
+                from_email=f"The Rugly Barnacle <{host_email}>",
                 to=[host_email],  # Changed from 'recipient_list' to 'to'
                 reply_to=[customer_email]  # Ensure this is a list
             )
@@ -139,7 +137,7 @@ ACTION REQUIRED:
             
             html_message = None
             try:
-                html_message = render_to_string('emails/customer_confirmation.html', {  # Fixed path
+                html_message = render_to_string('emails/customer_confirmation.html', { 
                     'order': order
                 })
             except Exception as e:
@@ -150,7 +148,7 @@ ACTION REQUIRED:
                 email = EmailMessage(
                     subject=subject,
                     body=html_message,
-                    from_email=host_email,
+                    from_email=f"The Rugly Barnacle <{host_email}>",
                     to=[customer_email],
                 )
                 email.content_subtype = "html"
@@ -202,7 +200,7 @@ Thank you for choosing Rugly Barnacle!
                 email = EmailMessage(
                     subject=subject,
                     body=plain_message.strip(),
-                    from_email=host_email,
+                    from_email=f"The Rugly Barnacle <{host_email}>",
                     to=[customer_email],
                 )
             
@@ -231,7 +229,7 @@ Thank you for choosing Rugly Barnacle!
             }
             
             subject = status_subjects.get(order.status, f"Order Update - #{order.reference_id}")
-            customer_email = order.email  # Added this line
+            customer_email = order.email  
             
             html_message = None
             try:
@@ -246,8 +244,8 @@ Thank you for choosing Rugly Barnacle!
                 email = EmailMessage(
                     subject=subject,
                     body=html_message,
-                    from_email=host_email,
-                    to=[customer_email],  # Fixed: should be a list
+                    from_email=f"The Rugly Barnacle <{host_email}>",
+                    to=[customer_email],  
                 )
                 email.content_subtype = "html"
             else:
@@ -297,8 +295,8 @@ The Rugly Barnacle Team
                 email = EmailMessage(
                     subject=subject,
                     body=plain_message.strip(),
-                    from_email=host_email,
-                    to=[customer_email],  # Fixed: should be a list
+                    from_email=f"The Rugly Barnacle <{host_email}>",
+                    to=[customer_email],  
                 )
             
             email.send(fail_silently=False)
