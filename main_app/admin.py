@@ -91,6 +91,7 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ['name', 'display_name', 'product_count']
+    prepopulated_fields = {'name': ('display_name')}
     search_fields = ['name', 'display_name']
     
     def product_count(self, obj):

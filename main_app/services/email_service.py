@@ -232,13 +232,19 @@ Thank you for choosing Rugly Barnacle!
             customer_email = order.email  
             
             html_message = None
-            try:
-                html_message = render_to_string('emails/customer_order_status.html', {
-                    'order': order
-                })
-            except Exception as template_error:
-                print(f"Template error: {template_error}")
-                pass
+            template_paths_to_try = [
+                '/emails/customer_order_status.html', 
+            ]
+            
+            for template_path in template_paths_to_try:
+                try:
+                    print(f"DEBUG: Trying template path: {template_path}")
+                    html_message = render_to_string(template_path, {'order': order})
+                    print(f"DEBUG: Successfully loaded template: {template_path}")
+                    break
+                except Exception as template_error:
+                    print(f"DEBUG: Failed to load {template_path}: {template_error}")
+                    continue
             
             if html_message:
                 email = EmailMessage(
@@ -250,9 +256,9 @@ Thank you for choosing Rugly Barnacle!
                 email.content_subtype = "html"
             else:
                 status_messages = {
-                    'accepted': "has been accepted! Waiting for payment to begin.",
-                    'in_progress': "is now in progress! Work on your rug has begun.",
-                    'completed': "is completed! Your custom rug is ready.",
+                    'accepted': "has been accepted! $50 deposit via Zelle/Venmo required to secure your spot. Remaining balance due after rug completion.",
+                    'in_progress': "is now in progress! Your rug is being created. Balance payment will be requested when your rug is finished.",
+                    'completed': "is completed! Your rug is ready. Please submit the remaining balance via Zelle/Venmo to initiate shipping.",
                     'declined': "could not be accepted at this time.",
                 }
                 

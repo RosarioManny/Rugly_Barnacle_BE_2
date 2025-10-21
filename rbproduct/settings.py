@@ -27,7 +27,6 @@ ALLOWED_HOSTS = []
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-    ALLOWED_HOSTS.append('.railway.app')  # Keep railway for transition
 ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 # Application definition
@@ -165,24 +164,37 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+# Session Configurations 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# if Production else Development
+if not DEBUG:
+    SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SECURE = True
+else:
+    SESSION_COOKIE_SAMESITE = 'Lax'
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     'https://*.onrender.com',
     "https://theruglybarnacle.com"
 ]
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
 
-# Security settings for production
+# if Production else Development
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'None'
     CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+
 
 # Render.com specific detection
-print("=== Environment Detection ===")
-print(f"RENDER_EXTERNAL_HOSTNAME: {os.environ.get('RENDER_EXTERNAL_HOSTNAME')}")
-print(f"DATABASE_URL present: {bool(os.environ.get('DATABASE_URL'))}")
-print(f"DEBUG: {DEBUG}")
-print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+# print("=== Environment Detection ===")
+# print(f"RENDER_EXTERNAL_HOSTNAME: {os.environ.get('RENDER_EXTERNAL_HOSTNAME')}")
+# print(f"DATABASE_URL present: {bool(os.environ.get('DATABASE_URL'))}")
+# print(f"DEBUG: {DEBUG}")
+# print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")

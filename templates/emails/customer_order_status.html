@@ -100,7 +100,7 @@
                 <!-- Status-specific messages -->
                 {% if order.status == 'accepted' %}
                 <p style="margin: 0 0 20px 0;">
-                    t news! Your custom rug order has been <strong style="color: #114C56;">accepted</strong>! I'm excited to work on your design.
+                    Great news! Your custom rug order <strong style="color: #114C56;">has been accepted! $50 deposit via Zelle/Venmo required to secure your spot. Remaining balance due after rug completion.</strong>
                 </p>
                 
                 <table 
@@ -128,12 +128,18 @@
                                 <tr>
                                     <td style="padding: 8px 0 8px 25px; position: relative;">
                                         <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">2</span>
-                                        The down payment is $50 via Venmo or Zelle in order to lock in order. I'll begin creating your rug once received!
+                                        Submit $50 deposit via Venmo or Zelle to secure your order spot
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 8px 0 8px 25px; position: relative;">
                                         <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">3</span>
+                                        I'll begin creating your rug once deposit is received!
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 25px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">4</span>
                                         You'll receive progress updates along the way
                                     </td>
                                 </tr>
@@ -145,7 +151,7 @@
                 
                 {% if order.status == 'in_progress' %}
                 <p style="margin: 0 0 20px 0;">
-                    I'm happy to let you know that work on your custom rug has <strong style="color: #5652E7;">begun</strong>!
+                    I'm happy to let you know that your custom rug order <strong style="color: #5652E7;">is now in progress! Your rug is being created. Balance payment will be requested when your rug is finished.</strong>
                 </p>
                 
                 <table 
@@ -175,7 +181,7 @@
                 
                 {% if order.status == 'completed' %}
                 <p style="margin: 0 0 20px 0;">
-                    Fantastic news! Your custom rug is <strong style="color: #114C56;">completed</strong> and ready! 
+                    Fantastic news! Your custom rug order <strong style="color: #114C56;">is completed! Your rug is ready. Please submit the remaining balance via Zelle/Venmo to initiate shipping.</strong>
                 </p>
                 
                 <table 
@@ -188,7 +194,7 @@
                         <td align="center">
                             <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">Ready for Delivery!</h2>
                             <p style="margin: 0; color: #202254;">
-                                Your unique creation is finished! You'll receive shipping information shortly.
+                                Your unique creation is finished! Please submit the remaining balance to begin the shipping process.
                             </p>
                             {% if order.admin_notes %}
                             <p style="margin: 15px 0 0 0; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 4px;">
@@ -198,3 +204,46 @@
                         </td>
                     </tr>
                 </table>
+                {% endif %}
+
+                {% if order.status == 'declined' %}
+                <p style="margin: 0 0 20px 0;">
+                    We regret to inform you that your custom rug order <strong style="color: #ff4444;">could not be accepted at this time.</strong>
+                </p>
+                
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="background: #FEB5FF; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <p style="margin: 0; color: #202254;">
+                                Thank you for your interest in our custom rug services. Unfortunately, we are unable to proceed with your order at this time.
+                            </p>
+                            {% if order.admin_notes %}
+                            <p style="margin: 15px 0 0 0; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 4px;">
+                                <strong>Note:</strong> {{ order.admin_notes }}
+                            </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+                
+                <!-- Footer -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <tr>
+                        <td align="center" style="color: #666; font-size: 14px;">
+                            <p style="margin: 0 0 10px 0;">Thank you for choosing The Rugly Barnacle!</p>
+                            <p style="margin: 0;">If you have any questions, please reply to this email.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

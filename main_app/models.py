@@ -342,15 +342,26 @@ class PortfolioImage(models.Model):
     
     def __str__(self):
         return self.title
-"""
-Make migrations::
-> python manage.py makemigrations
+    
+# TODO:: ------------------------------------------------------ BLOG ------------------------------------------------------
+class BlogPost(models.Model):
+    # Title
+    # Content
+    # Created_at
 
->> How does models.ForeignKey Work? << 
-1. Creates a Many-to-One relation. Creates a column in the db with the specified relations (Id). This case, Cartitem -> Cart(specifically Cart's Id)
-2. Arg1 specifies what the relation is too. Ex: CartItems.cart is related Cart; CartItems.product is related to Product.
-3. related_name refers to the inverse from Cart -> CartItem. 
-  3a. Without: You'd use cart.cartitem_set.all()
-      With: You use cart.items.all() (clearer)
-4. on_delete defines what happens on delete. CASCADE refers to how it deletes; Delete all CartItems if their Cart is deleted.
-"""
+
+# TODO:: ------------------------------------------------------ CALENDAR ------------------------------------------------------
+# TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
+
+    """
+    Make migrations::
+    > python manage.py makemigrations
+
+    >> How does models.ForeignKey Work? << 
+    1. Creates a Many-to-One relation. Creates a column in the db with the specified relations (Id). This case, Cartitem -> Cart(specifically Cart's Id)
+    2. Arg1 specifies what the relation is too. Ex: CartItems.cart is related Cart; CartItems.product is related to Product.
+    3. related_name refers to the inverse from Cart -> CartItem. 
+    3a. Without: You'd use cart.cartitem_set.all()
+        With: You use cart.items.all() (clearer)
+    4. on_delete defines what happens on delete. CASCADE refers to how it deletes; Delete all CartItems if their Cart is deleted.
+    """
