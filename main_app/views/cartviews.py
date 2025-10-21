@@ -36,12 +36,13 @@ class CartView(generics.RetrieveAPIView):
     response = super().get(request, *args, **kwargs)
 
     print(f"🍪 Response cookies: {dict(response.cookies)}")
-    
+
     if hasattr(request, 'session') and request.session.modified:
         request.session.save()
         print(f"💾 Session saved and should be setting cookie")
         
     return response
+  
 class AddtoCartView(generics.CreateAPIView):
   serializer_class = ItemSerializer
 
@@ -50,7 +51,7 @@ class AddtoCartView(generics.CreateAPIView):
     session_key = self.request.session.session_key
     if not session_key:
       self.request.session.save()
-      session_key = request.session.session_key
+      session_key = self.request.session.session_key
 
     # Get or create cart - get_or_create returns a tuple. _ needed
     cart, _ = Cart.objects.get_or_create(session_key=session_key)
