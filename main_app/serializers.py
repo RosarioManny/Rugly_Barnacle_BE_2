@@ -40,7 +40,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 # CART
-
 class ItemSerializer(serializers.ModelSerializer):
   product_name  = serializers.CharField(source='product.name', read_only=True)
   product_price = serializers.DecimalField(
@@ -123,7 +122,6 @@ class FaqSerializer(serializers.ModelSerializer):
     fields = '__all__'
 
 #PORTFOLIO
-
 class PortfolioSerializer(serializers.ModelSerializer):
   class Meta:
     model = PortfolioImage

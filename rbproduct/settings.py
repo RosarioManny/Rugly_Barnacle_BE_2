@@ -20,7 +20,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fallback-key-for-dev-only')
 
 # Debug settings
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG =True
 
 # Host settings
 ALLOWED_HOSTS = []
@@ -57,9 +57,9 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ADD THIS LINE
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -168,7 +168,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     'https://*.onrender.com',
-    "https://theruglybarnacle.com"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -194,10 +193,10 @@ CSRF_TRUSTED_ORIGINS = [
     "https://theruglybarnacle.com"
 ]
 CSRF_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True
+CSRF_USE_SESSION = False
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_DOMAIN = '.onrender.com'
-CSRF_USE_SESSION = False
+CSRF_COOKIE_SECURE = True
 
 
 
