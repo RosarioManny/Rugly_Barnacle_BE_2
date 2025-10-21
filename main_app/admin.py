@@ -81,7 +81,7 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'product_count']
-    prepopulated_fields = {'slug': ('name',)}
+    prepopulated_fields = {'slug': ['name',]}
     search_fields = ['name']
     
     def product_count(self, obj):
@@ -91,7 +91,7 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ['name', 'display_name', 'product_count']
-    prepopulated_fields = {'name': ('display_name')}
+    prepopulated_fields = {'name': ['display_name',]}
     search_fields = ['name', 'display_name']
     
     def product_count(self, obj):
