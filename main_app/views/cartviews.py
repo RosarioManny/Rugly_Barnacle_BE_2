@@ -10,18 +10,38 @@ class CartView(generics.RetrieveAPIView):
 
   def get_object(self):
 
-    session_key = self.request.session.session_key
-    # Get or create a session for the cart.
-
-    if not session_key:
-      self.request.session.save() # Create a session.
-      session_key = self.request.session.session_key
+    session_key = self.request.session.session_key # <- Get session for the cart.
     
-    cart, _ = Cart.objects.get_or_create(session_key=session_key)
+    print(f"🔍 Backend - Incoming session key: {session_key}")
+
+    if not session_key: 
+      self.request.session.create() # <- Create session for the cart.
+      session_key = self.request.session.session_key
+
+      print(f"🆕 Backend - Created new session: {session_key}")
+    
+    cart, created = Cart.objects.get_or_create(session_key=session_key)
     # Create a Cart. Setting it's session_key to the currant one created.
 
+    if created:
+      print(f"🆕 Backend - Created new cart: {cart.id} for session: {session_key}")
+    else:
+      print(f"✅ Backend - Found existing cart: {cart.id} for session: {session_key}")
+
+    self.request.session.modified = True
+    
     return cart
   
+  def get(self, request, *args, **kwargs):
+    response = super().get(request, *args, **kwargs)
+
+    print(f"🍪 Response cookies: {dict(response.cookies)}")
+    
+    if hasattr(request, 'session') and request.session.modified:
+        request.session.save()
+        print(f"💾 Session saved and should be setting cookie")
+        
+    return response
 class AddtoCartView(generics.CreateAPIView):
   serializer_class = ItemSerializer
 
