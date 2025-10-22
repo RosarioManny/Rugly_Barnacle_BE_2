@@ -11,22 +11,18 @@ class CartView(generics.RetrieveAPIView):
   def get_object(self):
 
     session_key = self.request.session.session_key # <- Get session for the cart.
-    
-    print(f"🔍 Backend - Incoming session key: {session_key}")
-
+  
     if not session_key: 
       self.request.session.create() # <- Create session for the cart.
       session_key = self.request.session.session_key
-
-      print(f"🆕 Backend - Created new session: {session_key}")
     
     cart, created = Cart.objects.get_or_create(session_key=session_key)
     # Create a Cart. Setting it's session_key to the currant one created.
 
-    if created:
-      print(f"🆕 Backend - Created new cart: {cart.id} for session: {session_key}")
-    else:
-      print(f"✅ Backend - Found existing cart: {cart.id} for session: {session_key}")
+    # if created:
+    #   print(f"🆕 Backend - Created new cart: {cart.id} for session: {session_key}")
+    # else:
+    #   print(f"✅ Backend - Found existing cart: {cart.id} for session: {session_key}")
 
     self.request.session.modified = True
     
