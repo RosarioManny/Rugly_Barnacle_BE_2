@@ -20,7 +20,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fallback-key-for-dev-only')
 
 # Debug settings
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = True
 
 # Host settings
 ALLOWED_HOSTS = []
@@ -159,7 +159,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'None'
 SESSION_SAVE_EVERY_REQUEST = True
 # SESSION_COOKIE_DOMAIN = '.onrender.com'
 
@@ -194,7 +194,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://theruglybarnacle.com",
     "https://ruglybarnaclebe.onrender.com"
 ]
-CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
 # CSRF_COOKIE_DOMAIN = '.onrender.com'
