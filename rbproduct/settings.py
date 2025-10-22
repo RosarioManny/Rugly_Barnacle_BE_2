@@ -58,7 +58,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ADD THIS LINE
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -159,15 +159,17 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_COOKIE_DOMAIN = '.onrender.com'
+# SESSION_COOKIE_DOMAIN = '.onrender.com'
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     'https://*.onrender.com',
+    "https://theruglybarnacle.com",
+    "https://ruglybarnaclebe.onrender.com"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -188,15 +190,15 @@ CORS_ALLOW_HEADERS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://ruglybarnaclebe.onrender.com",
-    "https://*.onrender.com",
-    "https://theruglybarnacle.com"
+    'https://*.onrender.com',
+    "https://theruglybarnacle.com",
+    "https://ruglybarnaclebe.onrender.com"
 ]
-CSRF_COOKIE_SAMESITE = 'None'
-CSRF_USE_SESSION = False
-CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_DOMAIN = '.onrender.com'
+CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = False
+# CSRF_COOKIE_DOMAIN = '.onrender.com'
+CSRF_USE_SESSIONS = False
 
 
 
