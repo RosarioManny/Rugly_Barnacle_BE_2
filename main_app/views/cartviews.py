@@ -11,6 +11,8 @@ class CartView(generics.RetrieveAPIView):
   def get_object(self):
 
     session_key = self.request.session.session_key # <- Get session for the cart.
+
+    session_is_new = not session_key # <- Check if we need to get a new key
   
     if not session_key: 
       self.request.session.create() # <- Create session for the cart.
@@ -19,10 +21,10 @@ class CartView(generics.RetrieveAPIView):
     cart, created = Cart.objects.get_or_create(session_key=session_key)
     # Create a Cart. Setting it's session_key to the currant one created.
 
-    # if created:
-    #   print(f"🆕 Backend - Created new cart: {cart.id} for session: {session_key}")
-    # else:
-    #   print(f"✅ Backend - Found existing cart: {cart.id} for session: {session_key}")
+    if session_is_new:
+      from django.middleware.csrf import get_token
+      get_token(self.request)
+      print("Generated new CSRF Token for new session")
 
     self.request.session.modified = True
     
@@ -46,10 +48,21 @@ class AddtoCartView(generics.CreateAPIView):
   def create(self, request, *args, **kwargs):
     # Get or create session
     session_key = self.request.session.session_key
+
+    session_is_new = not session_key # <- Check if we need to get a new key
+    
     if not session_key:
       self.request.session.save()
       session_key = self.request.session.session_key
+      print(f"AddToCart - Created new session: {session_key}")
 
+
+    if session_is_new:
+      from django.middleware.csrf import get_token
+      get_token(self.request)
+      print(f"AddToCart - Generated new CSRF token")
+
+      
     # Get or create cart - get_or_create returns a tuple. _ needed
     cart, _ = Cart.objects.get_or_create(session_key=session_key)
 
