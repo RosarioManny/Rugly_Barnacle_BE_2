@@ -39,5 +39,5 @@ urlpatterns = [
   path('portfolio/', PortfolioList.as_view(), name='portfolio'),
 
 #CSRF TOKEN
-  path('csrf/', Ensure_CSRF.as_view(), name='ensure_csrf'),
+  path('csrf/', Ensure_CSRF, name='ensure_csrf'),
 ]
