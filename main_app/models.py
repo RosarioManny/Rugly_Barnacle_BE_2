@@ -345,11 +345,30 @@ class PortfolioImage(models.Model):
     
 # TODO:: ------------------------------------------------------ BLOG ------------------------------------------------------
 class BlogPost(models.Model):
-    # Title
-    # Content
-    # Created_at
+    title = models.CharField()
+    content = models.TextField()
+    created_at = models.DateField(auto_now_add=True)
+    links = models.CharField
+    TAGS = [
+        ('personal', 'Personal'),
+        ('rug_making','Rug Making'),
+        ('inspiration', 'Inspiration'),
+        ('events', 'Events')
+    ]
+    tags = models.CharField(choices=TAGS, blank=True)
+    def __str__(self):
+        return f"{self.title} - {self.tags} - {self.created_at}"
+    
+        
 
-
+    #      STATUS_CHOICE = [ 
+    #     ('pending', 'Pending'),
+    #     ('accepted', 'Accepted'),
+    #     ('in_progress', 'In Progress'),
+    #     ('completed', 'Completed'),
+    #     ('declined', 'Declined')
+    # ]
+    # status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='pending', blank=True, )
 # TODO:: ------------------------------------------------------ CALENDAR ------------------------------------------------------
 # TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
 

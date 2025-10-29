@@ -127,3 +127,8 @@ class PortfolioSerializer(serializers.ModelSerializer):
     model = PortfolioImage
     fields = ['title', 'image', 'is_visible', 'created_at', 'id', 'thumbnail']
     read_only_fields = ['id', 'created_at']
+
+class BlogSerializer(serializers.ModelSerializer):
+  class Meta: 
+    model = BlogPost
+    fields = '__all__'

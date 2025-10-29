@@ -56,13 +56,11 @@ class AddtoCartView(generics.CreateAPIView):
       session_key = self.request.session.session_key
       print(f"AddToCart - Created new session: {session_key}")
 
-
     if session_is_new:
       from django.middleware.csrf import get_token
       get_token(self.request)
       print(f"AddToCart - Generated new CSRF token")
 
-      
     # Get or create cart - get_or_create returns a tuple. _ needed
     cart, _ = Cart.objects.get_or_create(session_key=session_key)
 
