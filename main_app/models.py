@@ -345,10 +345,10 @@ class PortfolioImage(models.Model):
     
 # TODO:: ------------------------------------------------------ BLOG ------------------------------------------------------
 class BlogPost(models.Model):
-    title = models.CharField()
-    content = models.TextField()
+    title = models.CharField(max_length=100, unique=True)
+    content = models.TextField(max_length=4000)
     created_at = models.DateField(auto_now_add=True)
-    links = models.CharField
+    links = models.CharField(blank=True)
     TAGS = [
         ('personal', 'Personal'),
         ('rug_making','Rug Making'),
@@ -356,6 +356,7 @@ class BlogPost(models.Model):
         ('events', 'Events')
     ]
     tags = models.CharField(choices=TAGS, blank=True)
+
     def __str__(self):
         return f"{self.title} - {self.tags} - {self.created_at}"
     
