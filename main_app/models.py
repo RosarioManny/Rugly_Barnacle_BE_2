@@ -348,7 +348,8 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=100, unique=True)
     content = models.TextField(max_length=2000)
     created_at = models.DateField(auto_now_add=True)
-    links = models.JSONField(default=list, blank=True)
+    links = models.CharField(max_length=200, blank=True)
+    # links = models.JSONField(default=list, blank=True)
     TAGS = [
         ('personal', 'Personal'),
         ('rug_making','Rug Making'),
