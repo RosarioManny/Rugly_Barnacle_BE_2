@@ -14,15 +14,3 @@ class BlogDetails(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = BlogSerializer
   lookup_field = 'id'
   filter_backends = []
-
-  #  title = models.CharField(max_length=100, unique=True)
-  #   content = models.TextField(max_length=2000)
-  #   created_at = models.DateField(auto_now_add=True)
-  #   links = models.CharField(blank=True)
-  #   TAGS = [
-  #       ('personal', 'Personal'),
-  #       ('rug_making','Rug Making'),
-  #       ('inspiration', 'Inspiration'),
-  #       ('events', 'Events')
-  #   ]
-  #   tags =

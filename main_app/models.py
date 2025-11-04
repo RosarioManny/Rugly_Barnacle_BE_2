@@ -348,14 +348,18 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=100, unique=True)
     content = models.TextField(max_length=4000)
     created_at = models.DateField(auto_now_add=True)
-    links = models.JSONField(default=list, blank=True, help_text="Insert links inside brackets []. Make sure links are seperated by commas and are within single quotes ('')")
+    links = models.JSONField(
+        default=list, 
+        blank=True, 
+        help_text="Insert links inside brackets []. Make sure links are seperated by commas and are within single quotes ('')"
+    )
     TAGS = [
         ('personal', 'Personal'),
         ('rug_making','Rug Making'),
         ('inspiration', 'Inspiration'),
         ('events', 'Events')
     ]
-    tags = models.CharField(choices=TAGS, blank=True)
+    tags = models.CharField(max_length=100, choices=TAGS, blank=True)
 
     def __str__(self):
         return f"{self.title} - {self.tags} - {self.created_at}"
