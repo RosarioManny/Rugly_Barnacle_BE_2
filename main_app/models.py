@@ -346,7 +346,7 @@ class PortfolioImage(models.Model):
 # TODO:: ------------------------------------------------------ BLOG ------------------------------------------------------
 class BlogPost(models.Model):
     title = models.CharField(max_length=100, unique=True)
-    content = models.TextField(max_length=2000)
+    content = models.TextField(max_length=4000)
     created_at = models.DateField(auto_now_add=True)
     links = models.JSONField(default=list, blank=True)
     TAGS = [
