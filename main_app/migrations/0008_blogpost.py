@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=100, unique=True)),
                 ('content', models.TextField(max_length=4000)),
                 ('created_at', models.DateField(auto_now_add=True)),
-                ('links', models.CharField(blank=True)),
+                ('links', models.CharField(max_length=200, blank=True)),
                 ('tags', models.CharField(blank=True, choices=[('personal', 'Personal'), ('rug_making', 'Rug Making'), ('inspiration', 'Inspiration'), ('events', 'Events')])),
             ],
         ),
