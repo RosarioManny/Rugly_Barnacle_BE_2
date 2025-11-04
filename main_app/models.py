@@ -348,7 +348,7 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=100, unique=True)
     content = models.TextField(max_length=4000)
     created_at = models.DateField(auto_now_add=True)
-    links = models.JSONField(default=list, blank=True)
+    links = models.JSONField(default=list, blank=True, help_text="Insert links inside brackets []. Make sure links are seperated by commas and are within single quotes ('')")
     TAGS = [
         ('personal', 'Personal'),
         ('rug_making','Rug Making'),
