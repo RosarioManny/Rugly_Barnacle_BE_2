@@ -346,9 +346,9 @@ class PortfolioImage(models.Model):
 # TODO:: ------------------------------------------------------ BLOG ------------------------------------------------------
 class BlogPost(models.Model):
     title = models.CharField(max_length=100, unique=True)
-    content = models.TextField(max_length=4000)
+    content = models.TextField(max_length=2000)
     created_at = models.DateField(auto_now_add=True)
-    links = models.CharField(blank=True)
+    links = models.JSONField(default=list, blank=True)
     TAGS = [
         ('personal', 'Personal'),
         ('rug_making','Rug Making'),
@@ -359,17 +359,6 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.tags} - {self.created_at}"
-    
-        
-
-    #      STATUS_CHOICE = [ 
-    #     ('pending', 'Pending'),
-    #     ('accepted', 'Accepted'),
-    #     ('in_progress', 'In Progress'),
-    #     ('completed', 'Completed'),
-    #     ('declined', 'Declined')
-    # ]
-    # status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='pending', blank=True, )
 # TODO:: ------------------------------------------------------ CALENDAR ------------------------------------------------------
 # TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
 

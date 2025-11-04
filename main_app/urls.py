@@ -8,8 +8,7 @@ from .views.propertiesview import PropertiesView
 from .views.faqview import FaqList
 from .views.portfolioviews import PortfolioList
 from .views.csrfTokenviews import Ensure_CSRF
-
-
+from .views.blogsview import BlogList, BlogDetails
 
 urlpatterns = [
   path('', Home.as_view(), name='home'),
@@ -37,6 +36,9 @@ urlpatterns = [
   path('faq/', FaqList.as_view(), name='faq'),
 # PORTFOLIO
   path('portfolio/', PortfolioList.as_view(), name='portfolio'),
+# BLOG
+  path('blogs/', BlogList.as_view(), name='blogs'),
+  path('blogs/<int:id>/', BlogDetails.as_view(), name='blog-details'),
 
 #CSRF TOKEN
   path('csrf/', Ensure_CSRF, name='ensure_csrf'),

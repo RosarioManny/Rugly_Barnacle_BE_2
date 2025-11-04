@@ -186,3 +186,10 @@ class PortfolioImageAdmin(admin.ModelAdmin):
             return mark_safe(f'<img src="{obj.image.url}" style="max-height: 50px; max-width: 50px;" />')
         return "No Image"
     image_preview.short_description = 'Preview'
+
+@admin.register(BlogPost)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ['title', 'tags', 'created_at']
+    list_filter = ['tags', 'created_at']
+    search_fields = ['title', 'content']
+    ordering = ['-created_at']
