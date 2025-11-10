@@ -362,7 +362,7 @@ class BlogPost(models.Model):
     tags = models.CharField(max_length=100, choices=TAGS, blank=True)
 
     def __str__(self):
-        return f"{self.title} - {self.tags} - {self.created_at}"
+        return f"{self.id} | {self.title} - {self.tags} - {self.created_at}"
 # TODO:: ------------------------------------------------------ CALENDAR ------------------------------------------------------
 # TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
 

@@ -132,5 +132,5 @@ class PortfolioSerializer(serializers.ModelSerializer):
 class BlogSerializer(serializers.ModelSerializer):
   class Meta: 
     model = BlogPost
-    fields = ['title', 'tags', 'content', 'created_at', 'links']
+    fields = ['title', 'tags', 'content', 'created_at', 'links', 'id']
     read_only_fields = ['created_at']
