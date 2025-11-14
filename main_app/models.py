@@ -351,7 +351,13 @@ class BlogPost(models.Model):
     links = models.JSONField(
         default=list, 
         blank=True, 
-        help_text="Insert links inside brackets []. Make sure links are seperated by commas and are within single quotes ('')"
+        help_text="""
+    1. Copy this: [{'title': 'Link Name', 'url': 'https://...'}]
+    2. Change 'Link Name' to your link's title
+    3. Change the URL to your actual link
+    4. Keep all punctuation exactly as shown
+    Example: [{'title': 'Dog Photo', 'url': 'https://unsplash.com/dog.jpg'}]
+    """
     )
     TAGS = [
         ('personal', 'Personal'),
