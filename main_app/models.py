@@ -352,7 +352,7 @@ class BlogPost(models.Model):
         default=list, 
         blank=True, 
         help_text="""
-    1. Copy this: [{'title': 'Link Name', 'url': 'https://...'}]
+    1. Copy this: [{"title": "Link Name", "url": "https://..."}]
     2. Change 'Link Name' to your link's title
     3. Change the URL to your actual link
     4. Keep all punctuation exactly as shown
