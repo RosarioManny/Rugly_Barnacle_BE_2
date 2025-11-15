@@ -397,7 +397,7 @@ class Events(models.Model):
     ]
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default='workshop')
     image = models.ImageField(upload_to='events/', blank=True, null=True)
-    
+
     class Meta:
         ordering = ['-start_time']  
     
