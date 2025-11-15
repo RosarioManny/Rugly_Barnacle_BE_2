@@ -194,7 +194,7 @@ class BlogAdmin(admin.ModelAdmin):
     search_fields = ['title', 'content']
     ordering = ['-created_at']
 
-@admin.register(Events)
+@admin.register(Event)
 class EventsAdmin(admin.ModelAdmin):
     list_display = ['status', 'title', 'location', 'status', 'event_type', 'price', 'start_time', 'end_time']
     search_fields = ['title', 'location', 'start_time', 'end_time', 'status', 'event_type']

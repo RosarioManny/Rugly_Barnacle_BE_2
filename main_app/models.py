@@ -371,7 +371,7 @@ class BlogPost(models.Model):
     def __str__(self):
         return f"{self.id} | {self.title} - {self.tags} - {self.created_at}"
 # TODO:: ------------------------------------------------------ EVENTS ------------------------------------------------------
-class Events(models.Model):
+class Event(models.Model):
     title = models.CharField(max_length=100, unique=True)
     created_at  = models.DateTimeField(auto_now_add=True)
     location = models.CharField(max_length=300)
@@ -396,7 +396,7 @@ class Events(models.Model):
         ('market', 'Market')
     ]
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default='workshop')
-    image = models.ImageField(upload_to='events/', blank=True, null=True)
+    image = models.ImageField(upload_to='event/', blank=True, null=True)
 
     class Meta:
         ordering = ['-start_time']  
