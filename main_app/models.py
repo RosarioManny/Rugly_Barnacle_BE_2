@@ -6,6 +6,7 @@ from PIL import Image
 import os
 import uuid
 from .services.email_service import OrderEmailService  
+from datetime import timezone
 
 # To Create an enums or choice 
 PRICES = (
@@ -369,7 +370,39 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return f"{self.id} | {self.title} - {self.tags} - {self.created_at}"
-# TODO:: ------------------------------------------------------ CALENDAR ------------------------------------------------------
+# TODO:: ------------------------------------------------------ EVENTS ------------------------------------------------------
+class Events(models.Model):
+    title = models.CharField(max_length=100, unique=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
+    location = models.CharField(max_length=300)
+    ticket_link = models.URLField(max_length=1000, blank=True, null=True)
+    description = models.TextField(max_length=3000)
+    start_time = models.DateTimeField()
+    end_time =  models.DateTimeField(blank=True, null=True)
+    registration_deadline = models.DateTimeField(blank=True, null=True)
+    STATUS_CHOICES = [ 
+        ('upcoming', 'Upcoming'),
+        ('past', 'Past'),
+        ('cancelled', 'Cancelled'),
+        ('ongoing', 'Ongoing')
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    EVENT_TYPE_CHOICES = [
+        ('online', 'Online'),
+        ('workshop', 'Workshop'),
+        ('meet-up', 'Meet-Up'),
+        ('venue', 'Venue'),
+        ('market', 'Market')
+    ]
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default='workshop')
+    image = models.ImageField(upload_to='events/', blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-start_time']  
+    
+    def __str__(self):
+        return f'{self.title} - {self.created_at.date} @ {self.location}'
 # TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
 
     """

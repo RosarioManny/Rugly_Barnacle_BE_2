@@ -189,7 +189,15 @@ class PortfolioImageAdmin(admin.ModelAdmin):
 
 @admin.register(BlogPost)
 class BlogAdmin(admin.ModelAdmin):
-    list_display = ['title', 'tags', 'created_at']
+    list_display = ['id', 'title', 'tags', 'created_at']
     list_filter = ['tags', 'created_at']
     search_fields = ['title', 'content']
     ordering = ['-created_at']
+
+@admin.register(Events)
+class EventsAdmin(admin.ModelAdmin):
+    list_display = ['status', 'title', 'location', 'status', 'event_type', 'price', 'start_time', 'end_time']
+    search_fields = ['title', 'location', 'start_time', 'end_time', 'status', 'event_type']
+    list_filter = ['title', 'location', 'start_time', 'end_time', 'status', 'event_type']
+    ordering = ['-created_at', 'status', 'title', 'start_time']
+

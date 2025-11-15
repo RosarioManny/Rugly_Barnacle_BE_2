@@ -134,3 +134,9 @@ class BlogSerializer(serializers.ModelSerializer):
     model = BlogPost
     fields = ['title', 'tags', 'content', 'created_at', 'links', 'id']
     read_only_fields = ['created_at']
+
+class EventSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Events
+    fields = ['id','title', 'location', 'ticket_link', 'description', 'start_time', 'end_time', 'registration_deadline', 'status', 'price', 'event_type', 'image']
+    read_only_fields = ['created_at']
