@@ -32,8 +32,8 @@ class CartView(generics.RetrieveAPIView):
   def get(self, request, *args, **kwargs):
     response = super().get(request, *args, **kwargs)
 
-    print(f"🍪 Session key in response: {request.session.session_key}")
-    print(f"🔧 Session modified: {request.session.modified}")
+    # print(f"🍪 Session key in response: {request.session.session_key}")
+    # print(f"🔧 Session modified: {request.session.modified}")
 
     if hasattr(request, 'session') and request.session.modified:
         request.session.save()
