@@ -11,11 +11,20 @@ stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 class CreateCheckoutSessionView(APIView):
   serializer_class = CartSerializer
 
+  def get(self, request):
+    return Response({'message': 'POST to this endpoint to create checkout session'})
   def post(self, request):
     cart = self.get_cart_from_user(request)
 
+    if not cart.items.exists():
+      return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+    
     line_items = []
     for item in cart.items.all():
+
+      if not item.product:
+        continue
+
       line_items.append({
         'price_data': {
           'currency': 'usd',
@@ -26,6 +35,9 @@ class CreateCheckoutSessionView(APIView):
         },
         'quantity': item.quantity,
       })
+    
+    if not line_items:
+      return Response({'error': 'No valid items in cart'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
       checkout_session = stripe.checkout.Session.create(
