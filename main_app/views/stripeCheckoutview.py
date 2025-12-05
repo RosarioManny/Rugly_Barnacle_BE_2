@@ -13,6 +13,8 @@ class CreateCheckoutSessionView(APIView):
 
   def get(self, request):
     return Response({'message': 'POST to this endpoint to create checkout session'})
+  
+
   def post(self, request):
     cart = self.get_cart_from_user(request)
 
@@ -43,9 +45,16 @@ class CreateCheckoutSessionView(APIView):
       checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=line_items,
+        automatic_tax={'enabled': True},
+        customer_email= 'customer@example.com',
+        shipping_address_collection = {
+          'allowed_countries': ['US', 'CA'],
+        },
         mode='payment',
-        success_url='https://theruglybarnacle.com/checkout/success',
-        cancel_url='https://theruglybarnacle.com/checkout/cancel',
+        # success_url='https://theruglybarnacle.com/checkout/success',
+        # cancel_url='https://theruglybarnacle.com/checkout/cancel',
+        success_url='http://localhost:5173/checkout/success',
+        cancel_url='http://localhost:5173/checkout/cancel',
       )
       return Response({'checkout_url': checkout_session.url})
     except Exception as e:
