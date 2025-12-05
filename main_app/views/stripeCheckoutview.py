@@ -68,3 +68,68 @@ class CreateCheckoutSessionView(APIView):
             session_key = request.session.session_key
         cart, _ = Cart.objects.get_or_create(session_key=session_key)
         return cart
+  
+# Add this new class to your views.py
+class GetCheckoutSessionView(APIView):
+    def get(self, request):
+        session_id = request.query_params.get('session_id')
+        
+        if not session_id:
+            return Response(
+                {'error': 'session_id parameter is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Retrieve the session from Stripe
+            session = stripe.checkout.Session.retrieve(
+                session_id,
+                expand=['total_details.breakdown']
+            )
+            
+            # Extract the relevant information
+            session_data = {
+                'id': session.id,
+                'amount_subtotal': session.amount_subtotal,  # In cents
+                'amount_total': session.amount_total,        # In cents
+                'currency': session.currency.upper(),
+                'customer_details': session.customer_details,
+                'shipping_options': session.shipping_options,
+                'status': session.status,
+            }
+            
+            # Add tax and shipping breakdown if available
+            if hasattr(session, 'total_details'):
+                session_data['total_details'] = {
+                    'amount_shipping': session.total_details.amount_shipping,
+                    'amount_tax': session.total_details.amount_tax,
+                }
+                
+                # Add detailed breakdown if expanded
+                if hasattr(session.total_details, 'breakdown'):
+                    session_data['total_details']['breakdown'] = {
+                        'taxes': [
+                            {
+                                'amount': tax.amount,
+                                'rate': {
+                                    'display_name': tax.rate.display_name,
+                                    'percentage': tax.rate.percentage,
+                                }
+                            }
+                            for tax in session.total_details.breakdown.taxes
+                        ] if session.total_details.breakdown.taxes else [],
+                        'shipping': session.total_details.breakdown.shipping.amount if session.total_details.breakdown.shipping else 0
+                    }
+            
+            return Response(session_data)
+            
+        except stripe.error.InvalidRequestError as e:
+            return Response(
+                {'error': 'Invalid session ID'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

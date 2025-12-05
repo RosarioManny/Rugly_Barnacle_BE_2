@@ -10,7 +10,7 @@ from .views.portfolioviews import PortfolioList
 from .views.csrfTokenviews import Ensure_CSRF
 from .views.blogsview import BlogList, BlogDetails
 from .views.eventsview import EventList, EventListDetails
-from .views.stripeCheckoutview import CreateCheckoutSessionView
+from .views.stripeCheckoutview import CreateCheckoutSessionView, GetCheckoutSessionView
 
 urlpatterns = [
   path('', Home.as_view(), name='home'),
@@ -47,7 +47,8 @@ urlpatterns = [
   path('event/<int:id>/', EventListDetails.as_view(), name='event-details'),
 
 # CHECKOUT
-  path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='checkout' ),
+  path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session' ),
+  path('get-checkout-session/', GetCheckoutSessionView.as_view(), name='get-checkout-session' ),
 
 #CSRF TOKEN
   path('csrf/', Ensure_CSRF, name='ensure_csrf'),
