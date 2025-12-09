@@ -14,7 +14,16 @@ class CreateCheckoutSessionView(APIView):
   def get(self, request):
     return Response({'message': 'POST to this endpoint to create checkout session'})
   
+  def calc_shipping_cost(self, cart):
+    total_price = sum(item.product.price * item.quantity for item in cart.items.all())
 
+    if total_price > 300:
+      return 'shr_1ScZPk36wcYu7XNJWziRRMHo' #Free Shipping
+    elif total_price > 100:
+      return 'shr_1ScZOC36wcYu7XNJ9NEdACJD' #Specialty Shipping
+    else:
+      return 'shr_1ScZNS36wcYu7XNJ42npURh9' #General Shipping
+    
   def post(self, request):
     cart = self.get_cart_from_user(request)
 
@@ -41,12 +50,17 @@ class CreateCheckoutSessionView(APIView):
     if not line_items:
       return Response({'error': 'No valid items in cart'}, status=status.HTTP_400_BAD_REQUEST)
     
+    
     try:
+
+      shipping_rate_id = self.calculate_shipping_rate(cart)
+
       checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=line_items,
         automatic_tax={'enabled': True},
         customer_email= 'customer@example.com',
+        shipping_options=[{'shipping_rate': shipping_rate_id}],
         shipping_address_collection = {
           'allowed_countries': ['US', 'CA'],
         },
@@ -69,7 +83,6 @@ class CreateCheckoutSessionView(APIView):
         cart, _ = Cart.objects.get_or_create(session_key=session_key)
         return cart
   
-# Add this new class to your views.py
 class GetCheckoutSessionView(APIView):
     def get(self, request):
         session_id = request.query_params.get('session_id')
