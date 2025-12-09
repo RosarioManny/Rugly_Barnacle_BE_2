@@ -70,6 +70,8 @@ class CreateCheckoutSessionView(APIView):
         success_url='http://localhost:5173/checkout/success',
         cancel_url='http://localhost:5173/checkout/cancel',
       )
+
+      print(f"Session created. Automatic tax: {checkout_session.get('automatic_tax', {})}")
       return Response({'checkout_url': checkout_session.url})
     except Exception as e:
       return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
