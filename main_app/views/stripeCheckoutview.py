@@ -53,7 +53,7 @@ class CreateCheckoutSessionView(APIView):
     
     try:
 
-      shipping_rate_id = self.calculate_shipping_rate(cart)
+      shipping_rate_id = self.calc_shipping_cost(cart)
 
       checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
