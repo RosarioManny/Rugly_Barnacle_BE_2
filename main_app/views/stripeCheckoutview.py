@@ -67,7 +67,8 @@ class CreateCheckoutSessionView(APIView):
         mode='payment',
         # success_url='https://theruglybarnacle.com/checkout/success',
         # cancel_url='https://theruglybarnacle.com/checkout/cancel',
-        success_url='http://localhost:5173/checkout/success',
+        success_url=f'http://localhost:5173/checkout/success?session_id={checkout_session.id}',
+        
         cancel_url='http://localhost:5173/checkout/cancel',
       )
 
@@ -88,7 +89,7 @@ class CreateCheckoutSessionView(APIView):
 class GetCheckoutSessionView(APIView):
     def get(self, request):
         session_id = request.query_params.get('session_id')
-        
+        print(session_id)
         if not session_id:
             return Response(
                 {'error': 'session_id parameter is required'}, 

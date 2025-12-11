@@ -1,6 +1,6 @@
 from django.urls import path
 from .views.homeview import Home
-from .views.cartviews import CartView, AddtoCartView, CartItemDetailView, RemoveFromCartView
+from .views.cartviews import *
 from .views.categoryviews import CategoryView
 from .views.customOrdersviews import CustomOrderView, CustomOrderDetailView
 from .views.productviews import ProductList, ProductDetails
@@ -23,6 +23,7 @@ urlpatterns = [
   path('cart/add-to-cart/', AddtoCartView.as_view(), name='add-to-cart'),
   path('cart/items/<int:id>/', CartItemDetailView.as_view(), name='cart-item-detail'),
   path('cart/remove-from-cart/', RemoveFromCartView.as_view(), name="remove-from-cart"),
+  path('cart/clear-cart/', ClearCartView.as_view(), name="clear-cart"),
 
 # CUSTOM ORDER
   path('custom/', CustomOrderView.as_view(), name='custom-order'),
