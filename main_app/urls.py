@@ -49,7 +49,7 @@ urlpatterns = [
 
 # CHECKOUT
   path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session' ),
-  path('get-checkout-session/', GetCheckoutSessionView.as_view(), name='get-checkout-session' ),
+  # path('get-checkout-session/', GetCheckoutSessionView.as_view(), name='get-checkout-session' ),
 
 #CSRF TOKEN
   path('csrf/', Ensure_CSRF, name='ensure_csrf'),
