@@ -105,19 +105,29 @@ class RemoveFromCartView(generics.DestroyAPIView):
   serializer_class = CartSerializer
 
   def delete(self, request, *args, **kwargs):
-    session_key = self.request.session.session_key
+    session_key = request.session.session_key
     if not session_key:
-      self.request.session.save()
-      session_key = request.session.session_key
-
-    cart, _ = Cart.objects.get_or_create(session_key=session_key)
+      return Response(
+          {"error": "No active session or cart found."}, 
+          status=status.HTTP_400_BAD_REQUEST  
+      )
+    try: 
+      cart = Cart.objects.get(session_key=session_key)
+    except Cart.DoesNotExist:
+      return Response(
+          {"error": "No active cart found."}, 
+          status=status.HTTP_404_NOT_FOUND 
+      )
 
     product_id = request.data.get('product_id')
     if not product_id:
       return Response({"error": "No product_id is provided"}, status=status.HTTP_400_BAD_REQUEST)
     
-    
-    remove_quantity = int(request.data.get('quantity', 1)) # Amount wanted to remove
+    # Remove 1 item at a time
+    try:
+      remove_quantity = int(request.data.get('quantity', 1))
+    except (ValueError, TypeError):
+      remove_quantity = 1
 
     try:
       # 
@@ -130,11 +140,18 @@ class RemoveFromCartView(generics.DestroyAPIView):
           cart_item.quantity -= remove_quantity # Remove the specified amount
           cart_item.save()
         
+        # Return updated cart
+        cart.refresh_from_db()
         serializer = self.get_serializer(cart)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except CartItem.DoesNotExist:
       return Response("Failed to remove Item", status=status.HTTP_404_NOT_FOUND)
-
+    
+    except Exception as e:
+      return Response(
+          {"error": f"Failed to remove item: {str(e)}"}, 
+          status=status.HTTP_500_INTERNAL_SERVER_ERROR
+      )
 class ClearCartView(generics.DestroyAPIView):
   serializer_class = CartSerializer
 
