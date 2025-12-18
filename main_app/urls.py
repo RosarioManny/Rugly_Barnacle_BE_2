@@ -10,7 +10,7 @@ from .views.portfolioviews import PortfolioList
 from .views.csrfTokenviews import Ensure_CSRF
 from .views.blogsview import BlogList, BlogDetails
 from .views.eventsview import EventList, EventListDetails
-from .views.stripeCheckoutview import CreateCheckoutSessionView, GetCheckoutSessionView
+from .views.stripeCheckoutview import *
 
 urlpatterns = [
   path('', Home.as_view(), name='home'),
