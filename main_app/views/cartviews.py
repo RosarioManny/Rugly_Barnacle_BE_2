@@ -119,7 +119,7 @@ class RemoveFromCartView(generics.DestroyAPIView):
           status=status.HTTP_404_NOT_FOUND 
       )
 
-    product_id = request.data.get('product_id')
+    product_id = request.data.get('product_id') or request.data.get('product_id')
     if not product_id:
       return Response({"error": "No product_id is provided"}, status=status.HTTP_400_BAD_REQUEST)
     
