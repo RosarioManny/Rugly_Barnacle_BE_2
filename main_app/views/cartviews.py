@@ -121,6 +121,7 @@ class RemoveFromCartView(APIView):
       )
 
     product_id = request.data.get('product_id') 
+    print('Removing product id:', product_id)
     if not product_id:
       return Response({"error": "No product_id is provided"}, status=status.HTTP_400_BAD_REQUEST)
     
