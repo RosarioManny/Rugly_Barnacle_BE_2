@@ -119,9 +119,10 @@ class RemoveFromCartView(APIView):
           {"error": "No active cart found."}, 
           status=status.HTTP_404_NOT_FOUND 
       )
-
+  
     product_id = request.data.get('product_id') 
     print('Removing product id:', product_id)
+    print('Cart  id:', cart.id)
     if not product_id:
       return Response({"error": "No product_id is provided"}, status=status.HTTP_400_BAD_REQUEST)
     
