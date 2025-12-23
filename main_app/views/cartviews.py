@@ -106,55 +106,91 @@ class RemoveFromCartView(APIView):
   serializer_class = CartSerializer
 
   def delete(self, request, *args, **kwargs):
-    session_key = request.session.session_key
-    if not session_key:
-      return Response(
+      """
+      Remove item from cart using cart_item_id.
+      Reduces quantity or removes item entirely based on remove_quantity.
+      """
+      session_key = request.session.session_key
+      
+      # Validate session
+      if not session_key:
+        return Response(
           {"error": "No active session or cart found."}, 
           status=status.HTTP_400_BAD_REQUEST  
-      )
-    try: 
-      cart = Cart.objects.get(session_key=session_key)
-    except Cart.DoesNotExist:
-      return Response(
+        )
+    
+      # Get cart
+      try: 
+          cart = Cart.objects.get(session_key=session_key)
+      except Cart.DoesNotExist:
+        return Response(
           {"error": "No active cart found."}, 
           status=status.HTTP_404_NOT_FOUND 
-      )
-  
-    product_id = request.data.get('product_id') 
-    print('Removing product id:', product_id)
-    print('Cart  id:', cart.id)
-    if not product_id:
-      return Response({"error": "No product_id is provided"}, status=status.HTTP_400_BAD_REQUEST)
+        )
     
-    # Remove 1 item at a time
-    try:
-      remove_quantity = int(request.data.get('quantity', 1))
-    except (ValueError, TypeError):
-      remove_quantity = 1
-
-    try:
-      # 
-      cart_item = CartItem.objects.get(cart=cart, product_id=product_id) # Get the item by id and the proper cart it's in
-
-      with transaction.atomic():
-        if remove_quantity >= cart_item.quantity: # If amount wanted to move is equal or more than, delete object
-          cart_item.delete()
-        else:
-          cart_item.quantity -= remove_quantity # Remove the specified amount
-          cart_item.save()
+      # Get cart_item_id from request
+      cart_item_id = request.data.get('cart_item_id')
+      if not cart_item_id:
+        return Response(
+          {"error": "No cart_item_id provided"}, 
+          status=status.HTTP_400_BAD_REQUEST
+        )
+      
+      # Get remove_quantity (default to 1)
+      try:
+        remove_quantity = int(request.data.get('quantity', 1))
+        if remove_quantity <= 0:
+          remove_quantity = 1
+      except (ValueError, TypeError):
+        remove_quantity = 1
+      
+      print(f'🔍 Removing cart_item_id: {cart_item_id} from cart: {cart.id}')
+      print(f'🔍 Remove quantity: {remove_quantity}')
+      
+      try:
+        # Get the specific cart item
+        cart_item = CartItem.objects.get(id=cart_item_id, cart=cart)
+        print(f'🔍 Found cart item: ID {cart_item.id}, Product: {cart_item.product.name}, Current Qty: {cart_item.quantity}')
         
-        # Return updated cart
-        cart.refresh_from_db()
-        serializer = self.get_serializer(cart)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except CartItem.DoesNotExist:
-      return Response("Failed to remove Item", status=status.HTTP_404_NOT_FOUND)
-    
-    except Exception as e:
-      return Response(
-          {"error": f"Failed to remove item: {str(e)}"}, 
-          status=status.HTTP_500_INTERNAL_SERVER_ERROR
-      )
+        with transaction.atomic():
+          # Check if we should remove the entire item or just reduce quantity
+          if remove_quantity >= cart_item.quantity:
+            # Remove entire item if remove_quantity >= current quantity
+            print(f'🗑️ Removing entire item (qty {cart_item.quantity})')
+            cart_item.delete()
+          else:
+            # Reduce quantity if remove_quantity < current quantity
+            cart_item.quantity -= remove_quantity
+            cart_item.save()
+            print(f'📉 Reduced quantity to {cart_item.quantity}')
+        
+          # Return updated cart
+          cart.refresh_from_db()
+          serializer = self.get_serializer(cart)
+          return Response(serializer.data, status=status.HTTP_200_OK)
+              
+      except CartItem.DoesNotExist:
+        print(f'❌ CartItem {cart_item_id} not found in cart {cart.id}')
+        
+        # Debug: List available cart items
+        cart_items = CartItem.objects.filter(cart=cart)
+        available_items = list(cart_items.values('id', 'product__id', 'product__name', 'quantity'))
+        print(f'🔍 Available cart items: {available_items}')
+        
+        return Response(
+            {
+                "error": "Item not found in cart",
+                "available_items": available_items
+            }, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+      except Exception as e:
+        print(f'❌ Error removing item: {str(e)}')
+        return Response(
+            {"error": f"Failed to remove item: {str(e)}"}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     
 class ClearCartView(generics.DestroyAPIView):
   serializer_class = CartSerializer
