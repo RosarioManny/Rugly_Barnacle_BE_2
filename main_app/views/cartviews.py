@@ -102,7 +102,7 @@ class AddtoCartView(generics.CreateAPIView):
     serializer = self.get_serializer(cart_item)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class RemoveFromCartView(APIView):
+class RemoveFromCartView(generics.GenericAPIView):  # Changed from APIView
   serializer_class = CartSerializer
 
   def delete(self, request, *args, **kwargs):
@@ -118,16 +118,16 @@ class RemoveFromCartView(APIView):
           {"error": "No active session or cart found."}, 
           status=status.HTTP_400_BAD_REQUEST  
         )
-    
+      
       # Get cart
       try: 
-          cart = Cart.objects.get(session_key=session_key)
+        cart = Cart.objects.get(session_key=session_key)
       except Cart.DoesNotExist:
         return Response(
           {"error": "No active cart found."}, 
           status=status.HTTP_404_NOT_FOUND 
         )
-    
+      
       # Get cart_item_id from request
       cart_item_id = request.data.get('cart_item_id')
       if not cart_item_id:
@@ -163,10 +163,10 @@ class RemoveFromCartView(APIView):
             cart_item.quantity -= remove_quantity
             cart_item.save()
             print(f'📉 Reduced quantity to {cart_item.quantity}')
-        
+          
           # Return updated cart
           cart.refresh_from_db()
-          serializer = self.get_serializer(cart)
+          serializer = self.get_serializer(cart)  # Now this works!
           return Response(serializer.data, status=status.HTTP_200_OK)
               
       except CartItem.DoesNotExist:
@@ -178,20 +178,20 @@ class RemoveFromCartView(APIView):
         print(f'🔍 Available cart items: {available_items}')
         
         return Response(
-            {
-                "error": "Item not found in cart",
-                "available_items": available_items
-            }, 
-            status=status.HTTP_404_NOT_FOUND
+          {
+              "error": "Item not found in cart",
+              "available_items": available_items
+          }, 
+          status=status.HTTP_404_NOT_FOUND
         )
         
       except Exception as e:
         print(f'❌ Error removing item: {str(e)}')
         return Response(
-            {"error": f"Failed to remove item: {str(e)}"}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+          {"error": f"Failed to remove item: {str(e)}"}, 
+          status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-    
+      
 class ClearCartView(generics.DestroyAPIView):
   serializer_class = CartSerializer
 
