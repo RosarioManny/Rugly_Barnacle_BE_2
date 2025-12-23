@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework.response import Response
 from rest_framework import generics, status 
+from rest_framework.views import APIView
 from ..models import Cart, Product, CartItem
 from ..serializers import CartSerializer, ItemSerializer
 
@@ -101,7 +102,7 @@ class AddtoCartView(generics.CreateAPIView):
     serializer = self.get_serializer(cart_item)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class RemoveFromCartView(generics.DestroyAPIView):
+class RemoveFromCartView(APIView):
   serializer_class = CartSerializer
 
   def delete(self, request, *args, **kwargs):
@@ -119,7 +120,7 @@ class RemoveFromCartView(generics.DestroyAPIView):
           status=status.HTTP_404_NOT_FOUND 
       )
 
-    product_id = request.data.get('product_id') or request.data.get('product_id')
+    product_id = request.data.get('product_id') 
     if not product_id:
       return Response({"error": "No product_id is provided"}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -152,6 +153,7 @@ class RemoveFromCartView(generics.DestroyAPIView):
           {"error": f"Failed to remove item: {str(e)}"}, 
           status=status.HTTP_500_INTERNAL_SERVER_ERROR
       )
+    
 class ClearCartView(generics.DestroyAPIView):
   serializer_class = CartSerializer
 
