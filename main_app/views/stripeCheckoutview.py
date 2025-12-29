@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 import os
-from ..models import Cart
+from ..models import Cart, CartItem, Product
+from django.db import transaction
+from django.utils import timezone
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
@@ -86,66 +88,73 @@ class CreateCheckoutSessionView(APIView):
         cart, _ = Cart.objects.get_or_create(session_key=session_key)
         return cart
   
-# class GetCheckoutSessionView(APIView):
-#     def get(self, request):
-#         session_id = request.query_params.get('session_id')
-#         print(session_id)
-#         if not session_id:
-#             return Response(
-#                 {'error': 'session_id parameter is required'}, 
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-        
-#         try:
-#             # Retrieve the session from Stripe
-#             session = stripe.checkout.Session.retrieve(
-#                 session_id,
-#                 expand=['total_details.breakdown']
-#             )
-            
-#             # Extract the relevant information
-#             session_data = {
-#                 'id': session.id,
-#                 'amount_subtotal': session.amount_subtotal,  # In cents
-#                 'amount_total': session.amount_total,        # In cents
-#                 'currency': session.currency.upper(),
-#                 'customer_details': session.customer_details,
-#                 'shipping_options': session.shipping_options,
-#                 'status': session.status,
-#             }
-            
-#             # Add tax and shipping breakdown if available
-#             if hasattr(session, 'total_details'):
-#                 session_data['total_details'] = {
-#                     'amount_shipping': session.total_details.amount_shipping,
-#                     'amount_tax': session.total_details.amount_tax,
-#                 }
-                
-#                 # Add detailed breakdown if expanded
-#                 if hasattr(session.total_details, 'breakdown'):
-#                     session_data['total_details']['breakdown'] = {
-#                         'taxes': [
-#                             {
-#                                 'amount': tax.amount,
-#                                 'rate': {
-#                                     'display_name': tax.rate.display_name,
-#                                     'percentage': tax.rate.percentage,
-#                                 }
-#                             }
-#                             for tax in session.total_details.breakdown.taxes
-#                         ] if session.total_details.breakdown.taxes else [],
-#                         'shipping': session.total_details.breakdown.shipping.amount if session.total_details.breakdown.shipping else 0
-#                     }
-            
-#             return Response(session_data)
-            
-#         except stripe.error.InvalidRequestError as e:
-#             return Response(
-#                 {'error': 'Invalid session ID'}, 
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-#         except Exception as e:
-#             return Response(
-#                 {'error': str(e)}, 
-#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#             )
+class SuccessCheckoutView(APIView):
+
+  def post(self, request):
+    session_key = request.session.session_key
+    stripe_session_id = request.data.get('session_id')
+
+    if not session_key:
+      return Response({'error': 'No active session found'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+      cart = Cart.objects.get(session_key=session_key)
+
+      cart_items = CartItem.objects.filter(cart=cart).select_related('product')
+
+      if not cart_items.exists():
+        return Response(
+          {
+            'message': 'Empty Cart - No items found in cart',
+            'deducted_items': []
+          },
+          status=status.HTTP_200_OK
+        )
+      deduction_results = self._deduct_product_quantities(cart_items)
+
+      return Response({
+        "message": "Stock quantities updated successfully",
+        "deduction_results": deduction_results,
+        "session_id": stripe_session_id,
+        "cart_id": cart.id,
+        "timestamp": timezone.now().isoformat(),
+        }, status=status.HTTP_200_OK)
+    
+    except Cart.DoesNotExist:
+      return Response({'error': 'Cart not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    except Exception as e:
+      return Response(
+        {"error": f"Failed to update quantities: {str(e)}"},
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+      )
+
+
+  def _deduct_product_quantities(self, cart_items):
+    results = []
+
+    with transaction.atomic():
+      for cart_item in cart_items:
+        product = cart_item.product 
+        original_quantity = product.quantity 
+
+        product = Product.objects.select_for_update().get(id=product.id)
+
+      if product.quantity < cart_item.quantity:
+        raise ValueError(  
+          f"Insufficient stock for {product.name}."
+          f"Available: {product.quantity}, Requested: {cart_item.quantity}"
+        )
+      
+      product.quantity -= cart_item.quantity
+      product.save()
+
+      results.append({
+        "product_id": product.id,
+        "product_name": product.name,
+        "quantity_deducted": cart_item.quantity,
+        "original_stock": original_quantity,
+        "remaining_stock": product.quantity,
+        "price": str(product.price)  # Convert Decimal to string for JSON
+      })
+    return results

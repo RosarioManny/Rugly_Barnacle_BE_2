@@ -46,7 +46,7 @@ class AddtoCartView(generics.CreateAPIView):
     # Get or create session
     session_key = self.request.session.session_key
 
-    session_is_new = not session_key # <- Check if we need to get a new key
+    session_is_new = not session_key # <- Sets to True if no session_key
     
     if not session_key:
       self.request.session.save()
