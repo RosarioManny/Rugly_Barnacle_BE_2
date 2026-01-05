@@ -72,6 +72,9 @@ class CreateCheckoutSessionView(APIView):
         success_url=f'http://localhost:5173/checkout/success?session_id={{CHECKOUT_SESSION_ID}}&cart_id={cart.id}',
         
         cancel_url='http://localhost:5173/checkout/cancel',
+        metadata={
+          'cart_id': str(cart.id),
+          }
       )
 
       print(f"Session created. Automatic tax: {checkout_session.get('automatic_tax', {})}")
@@ -90,15 +93,33 @@ class CreateCheckoutSessionView(APIView):
   
 class SuccessCheckoutView(APIView):
 
+# VERIFY STRIPE SESSION AND DEDUCT PRODUCT QUANTITIES
+  def _verify_stripe_session(self, session_id):
+    try: 
+      session = stripe.checkout.Session.retrieve(session_id)
+
+      if session.payment_status != 'paid':
+        raise ValueError(f"Payment status is {session.payment_status}, not 'paid'")
+      return session
+    except stripe.error.StripeError as e:
+      raise ValueError(f"Invalid Stripe session ID: {str(e)}")
+
+# PROCESS SUCCESSFUL CHECKOUT ***
   def post(self, request):
     session_key = request.session.session_key
     stripe_session_id = request.data.get('session_id')
 
     if not session_key:
-      return Response({'error': 'No active session found'}, status=status.HTTP_400_BAD_REQUEST)
+      return Response({'error': 'No active session key found'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not stripe_session_id:
+      return Response({'error': 'No active stripe session found'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-      cart = Cart.objects.get(session_key=session_key)
+
+      stripe_session = self._verify_stripe_session(stripe_session_id)
+
+      cart = self._validate_cart_access(session_key, stripe_session.metadata.get('cart_id'))
 
       cart_items = CartItem.objects.filter(cart=cart).select_related('product')
 
@@ -110,6 +131,7 @@ class SuccessCheckoutView(APIView):
           },
           status=status.HTTP_200_OK
         )
+      
       deduction_results = self._deduct_product_quantities(cart_items)
 
       return Response({
@@ -128,8 +150,25 @@ class SuccessCheckoutView(APIView):
         {"error": f"Failed to update quantities: {str(e)}"},
         status=status.HTTP_500_INTERNAL_SERVER_ERROR
       )
-
-
+    
+# VALIDATE USER HAS CART ACCESS
+  def _validate_cart_access(self, session_key, cart_id=None):
+    """Validate that the user has access to this cart"""
+    if cart_id:
+      try:
+        # Validate cart_id matches the user's session
+        cart = Cart.objects.get(id=cart_id, session_key=session_key)
+        return cart
+      except Cart.DoesNotExist:
+          raise ValueError("Cart ID does not match your session")
+    else:
+      # Fallback to session lookup
+      try:
+        return Cart.objects.get(session_key=session_key)
+      except Cart.DoesNotExist:
+        raise ValueError("No cart found for your session")
+      
+# DEDUCT PRODUCT QUANTITIES
   def _deduct_product_quantities(self, cart_items):
     results = []
 
@@ -140,21 +179,21 @@ class SuccessCheckoutView(APIView):
 
         product = Product.objects.select_for_update().get(id=product.id)
 
-      if product.quantity < cart_item.quantity:
-        raise ValueError(  
-          f"Insufficient stock for {product.name}."
-          f"Available: {product.quantity}, Requested: {cart_item.quantity}"
-        )
-      
-      product.quantity -= cart_item.quantity
-      product.save()
+        if product.quantity < cart_item.quantity:
+          raise ValueError(  
+            f"Insufficient stock for {product.name}."
+            f"Available: {product.quantity}, Requested: {cart_item.quantity}"
+          )
+        
+        product.quantity -= cart_item.quantity
+        product.save()
 
-      results.append({
-        "product_id": product.id,
-        "product_name": product.name,
-        "quantity_deducted": cart_item.quantity,
-        "original_stock": original_quantity,
-        "remaining_stock": product.quantity,
-        "price": str(product.price)  # Convert Decimal to string for JSON
-      })
+        results.append({
+          "product_id": product.id,
+          "product_name": product.name,
+          "quantity_deducted": cart_item.quantity,
+          "original_stock": original_quantity,
+          "remaining_stock": product.quantity,
+          "price": str(product.price)  # Convert Decimal to string for JSON
+        })
     return results
