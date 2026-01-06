@@ -7,6 +7,7 @@ import os
 from ..models import Cart, CartItem, Product
 from django.db import transaction
 from django.utils import timezone
+from django.core.cache import cache
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
@@ -114,14 +115,24 @@ class SuccessCheckoutView(APIView):
     
     if not stripe_session_id:
       return Response({'error': 'No active stripe session found'}, status=status.HTTP_400_BAD_REQUEST)
-    
+    if self._check_and_mark_processed(stripe_session_id):
+      return Response({
+          "message": "This checkout was already processed",
+          "already_processed": True,
+          "session_id": stripe_session_id
+        }, status=status.HTTP_200_OK
+      ) 
+  
     try:
 
+      # VERIFY STRIPE SESSION
       stripe_session = self._verify_stripe_session(stripe_session_id)
-
+      #  VERIFY USERS CART
       cart = self._validate_cart_access(session_key, stripe_session.metadata.get('cart_id'))
-
+      # RETREIVE CART ITEMS
       cart_items = CartItem.objects.filter(cart=cart).select_related('product')
+
+     
 
       if not cart_items.exists():
         return Response(
@@ -168,6 +179,15 @@ class SuccessCheckoutView(APIView):
       except Cart.DoesNotExist:
         raise ValueError("No cart found for your session")
       
+  def _check_and_mark_processed(self, session_id):
+    cache_key = f"stripe_session_processed_{session_id}"
+
+    if cache.get(cache_key):
+      return True
+    
+    cache.set(cache_key, True, timeout=3600)
+    return False
+  
 # DEDUCT PRODUCT QUANTITIES
   def _deduct_product_quantities(self, cart_items):
     results = []
