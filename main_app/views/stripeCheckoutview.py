@@ -115,6 +115,7 @@ class SuccessCheckoutView(APIView):
     
     if not stripe_session_id:
       return Response({'error': 'No active stripe session found'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if self._check_and_mark_processed(stripe_session_id):
       return Response({
           "message": "This checkout was already processed",
@@ -132,7 +133,6 @@ class SuccessCheckoutView(APIView):
       # RETREIVE CART ITEMS
       cart_items = CartItem.objects.filter(cart=cart).select_related('product')
 
-     
 
       if not cart_items.exists():
         return Response(
@@ -178,14 +178,19 @@ class SuccessCheckoutView(APIView):
         return Cart.objects.get(session_key=session_key)
       except Cart.DoesNotExist:
         raise ValueError("No cart found for your session")
-      
+  
   def _check_and_mark_processed(self, session_id):
     cache_key = f"stripe_session_processed_{session_id}"
 
-    if cache.get(cache_key):
+    is_processed = cache.get(cache_key)
+    print(f"🔍 Checking cache for {cache_key}: {is_processed}")
+
+    if is_processed:
+      print(f"⚠️ Session {session_id} already processed!")
       return True
     
     cache.set(cache_key, True, timeout=3600)
+    print(f"✅ Marked session {session_id} as processed")
     return False
   
 # DEDUCT PRODUCT QUANTITIES
