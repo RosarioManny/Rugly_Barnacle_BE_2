@@ -188,6 +188,7 @@ class SuccessCheckoutView(APIView):
         product.quantity -= cart_item.quantity
         product.save()
 
+        print(f"Deducted {cart_item.quantity} from {product.name}. Stock: {original_quantity} -> {product.quantity}")
         results.append({
           "product_id": product.id,
           "product_name": product.name,
