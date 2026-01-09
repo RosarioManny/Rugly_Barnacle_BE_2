@@ -63,7 +63,7 @@ class CreateCheckoutSessionView(APIView):
         line_items=line_items,
         automatic_tax={'enabled': True},
         customer_email= 'customer@example.com',
-        shipping_options=[{'shipping_rate': 15}],
+        # shipping_options=[{'shipping_rate': 15}],
         shipping_address_collection = {
           'allowed_countries': ['US', 'CA'],
         },
