@@ -56,14 +56,14 @@ class CreateCheckoutSessionView(APIView):
     
     try:
 
-      shipping_rate_id = self.calc_shipping_cost(cart)
+      # shipping_rate_id = self.calc_shipping_cost(cart)
 
       checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=line_items,
         automatic_tax={'enabled': True},
         customer_email= 'customer@example.com',
-        shipping_options=[{'shipping_rate': shipping_rate_id}],
+        shipping_options=[{'shipping_rate': 15}],
         shipping_address_collection = {
           'allowed_countries': ['US', 'CA'],
         },
@@ -220,6 +220,6 @@ class SuccessCheckoutView(APIView):
           "quantity_deducted": cart_item.quantity,
           "original_stock": original_quantity,
           "remaining_stock": product.quantity,
-          "price": str(product.price)  # Convert Decimal to string for JSON
+          "price": str(product.price)  
         })
     return results
