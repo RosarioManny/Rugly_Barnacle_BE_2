@@ -23,7 +23,7 @@ class CreateCheckoutSessionView(APIView):
     if total_price < 50:
       return 'shr_1SopKgL7WYX2dlYRpqzOeWNa' # Under $50 - 4.99 Shipping 
     elif total_price > 50 and total_price < 100: 
-      return 'shr_1SopHiL7WYX2dlYRLQ7OFx3' #$50 to $100 - 7.99 Shipping
+      return 'shr_1SopHiL7WYX2dlYRLQ7OFx34' #$50 to $100 - 7.99 Shipping
     elif total_price > 100:
       return 'shr_1SopJ7L7WYX2dlYRclNVVtsB' # Over $100 - Free Shipping 
     
