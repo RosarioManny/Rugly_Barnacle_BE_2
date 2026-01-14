@@ -214,14 +214,14 @@ CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_USE_SESSIONS = False
 
 
-import sys
-if 'runserver' not in sys.argv:  # Only in production
-    print("=== CLOUDINARY CONFIG ===")
-    print(f"CLOUD_NAME: {os.environ.get('CLOUDINARY_CLOUD_NAME', 'NOT SET')}")
-    print(f"API_KEY: {os.environ.get('CLOUDINARY_API_KEY', 'NOT SET')}")
-    print(f"API_SECRET: {'SET' if os.environ.get('CLOUDINARY_API_SECRET') else 'NOT SET'}")
-    print(f"DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
-    print("========================")
+# import sys
+# if 'runserver' not in sys.argv:  # Only in production
+#     print("=== CLOUDINARY CONFIG ===")
+#     print(f"CLOUD_NAME: {os.environ.get('CLOUDINARY_CLOUD_NAME', 'NOT SET')}")
+#     print(f"API_KEY: {os.environ.get('CLOUDINARY_API_KEY', 'NOT SET')}")
+#     print(f"API_SECRET: {'SET' if os.environ.get('CLOUDINARY_API_SECRET') else 'NOT SET'}")
+#     print(f"DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
+#     print("========================")
 # Render.com specific detection
 # print("=== Environment Detection ===")
 # print(f"RENDER_EXTERNAL_HOSTNAME: {os.environ.get('RENDER_EXTERNAL_HOSTNAME')}")
