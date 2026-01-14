@@ -11,10 +11,10 @@ import dj_database_url
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Security - Get secret key from environment
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fallback-key-for-dev-only')
@@ -28,6 +28,10 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Application definition
 INSTALLED_APPS = [
@@ -45,9 +49,6 @@ INSTALLED_APPS = [
     'main_app',
 ]
 
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
@@ -213,7 +214,14 @@ CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_USE_SESSIONS = False
 
 
-
+import sys
+if 'runserver' not in sys.argv:  # Only in production
+    print("=== CLOUDINARY CONFIG ===")
+    print(f"CLOUD_NAME: {os.environ.get('CLOUDINARY_CLOUD_NAME', 'NOT SET')}")
+    print(f"API_KEY: {os.environ.get('CLOUDINARY_API_KEY', 'NOT SET')}")
+    print(f"API_SECRET: {'SET' if os.environ.get('CLOUDINARY_API_SECRET') else 'NOT SET'}")
+    print(f"DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
+    print("========================")
 # Render.com specific detection
 # print("=== Environment Detection ===")
 # print(f"RENDER_EXTERNAL_HOSTNAME: {os.environ.get('RENDER_EXTERNAL_HOSTNAME')}")
