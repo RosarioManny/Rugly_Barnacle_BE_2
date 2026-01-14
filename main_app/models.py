@@ -8,6 +8,7 @@ import uuid
 from .services.email_service import OrderEmailService  
 from datetime import timezone
 from django.core.validators import FileExtensionValidator
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 # To Create an enums or choice 
 PRICES = (
@@ -401,6 +402,7 @@ class Event(models.Model):
         upload_to='event/', 
         blank=True, 
         null=True, 
+        storage=MediaCloudinaryStorage(),
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])])
 
     class Meta:
