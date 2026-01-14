@@ -7,6 +7,7 @@ import os
 import uuid
 from .services.email_service import OrderEmailService  
 from datetime import timezone
+from django.core.validators import FileExtensionValidator
 
 # To Create an enums or choice 
 PRICES = (
@@ -396,7 +397,11 @@ class Event(models.Model):
         ('market', 'Market')
     ]
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default='workshop')
-    image = models.ImageField(upload_to='event/', blank=True, null=True)
+    image = models.ImageField(
+        upload_to='event/', 
+        blank=True, 
+        null=True, 
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])])
 
     class Meta:
         ordering = ['-start_time']  

@@ -37,12 +37,25 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',  # Must be before django.contrib.staticfiles
+    'cloudinary',
     'corsheaders',
     'rest_framework',
     'django_filters',
     'main_app',
 ]
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # For Filtering abilities add REST_FRAMEWORK variable.
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
