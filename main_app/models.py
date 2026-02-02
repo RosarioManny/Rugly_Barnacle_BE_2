@@ -126,8 +126,24 @@ class CustomOrder(models.Model):
     
 class CustomOrderImage(models.Model):
     custom_order = models.ForeignKey(CustomOrder, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='custom_orders/')
-    thumbnail = models.ImageField(upload_to='custom_orders/thumbnails/', blank=True, null=True)
+    image = models.ImageField(upload_to='custom_orders/', 
+        blank=True, 
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+                )
+            ])
+    thumbnail = models.ImageField(upload_to='custom_orders/thumbnails/', 
+        blank=True, 
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+                )
+            ])
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
@@ -194,8 +210,24 @@ class CustomOrderImage(models.Model):
 # ------------------------------------------------------ PRODUCT ------------------------------------------------------
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='products/')
-    thumbnail = models.ImageField(upload_to='products/thumbnails/', blank=True, null=True)
+    image = models.ImageField(upload_to='products/',
+        blank=True, 
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+                )
+            ])
+    thumbnail = models.ImageField(upload_to='products/thumbnails/',
+        blank=True, 
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+                )
+            ])
     is_primary = models.BooleanField(default=False)
     
     def save(self, *args, **kwargs):
@@ -280,7 +312,17 @@ class PortfolioImage(models.Model):
         verbose_name_plural = "Portfolio Images"
         ordering = ['-created_at']
     title = models.CharField(max_length=200, blank=True, help_text="Short description of the rug (e.g., 'Blue Geometric Pattern Rug')")
-    image = models.ImageField(upload_to='portfolio/')
+    image = models.ImageField(
+        upload_to='portfolio/',
+        blank=True,
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+            )
+        ]
+    )
     is_visible = models.BooleanField(default=True, help_text="Toggle to show this in the portfolio")
     created_at = models.DateField(auto_now_add=True)
     thumbnail = models.ImageField(upload_to='portfolio/thumbnails/', blank=True, null=True)
@@ -403,7 +445,12 @@ class Event(models.Model):
         blank=True, 
         null=True, 
         storage=MediaCloudinaryStorage(),
-        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])])
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+                )
+            ]
+        )
 
     class Meta:
         ordering = ['-start_time']  
@@ -411,16 +458,30 @@ class Event(models.Model):
     def __str__(self):
         return f'{self.title} - {self.created_at.date} @ {self.location}'
 # TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
+# TODO:: ------------------------------------------------------ NEWSLETTER ------------------------------------------------------
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(unique=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True),
+    SUBSCRIBED_STATUS = [
+        ('subscribed', 'Subscribed'),
+        ('unsubscribed', 'Unsubscribed')
+    ]
+    status = models.CharField(max_length=20, choices=SUBSCRIBED_STATUS, default='subscribed'),
 
-    """
-    Make migrations::
-    > python manage.py makemigrations
+    
+    def __str__(self):
+        return self.email
 
-    >> How does models.ForeignKey Work? << 
-    1. Creates a Many-to-One relation. Creates a column in the db with the specified relations (Id). This case, Cartitem -> Cart(specifically Cart's Id)
-    2. Arg1 specifies what the relation is too. Ex: CartItems.cart is related Cart; CartItems.product is related to Product.
-    3. related_name refers to the inverse from Cart -> CartItem. 
-    3a. Without: You'd use cart.cartitem_set.all()
-        With: You use cart.items.all() (clearer)
-    4. on_delete defines what happens on delete. CASCADE refers to how it deletes; Delete all CartItems if their Cart is deleted.
-    """
+
+
+    # Make migrations::
+    # > python manage.py makemigrations
+
+    # >> How does models.ForeignKey Work? << 
+    # 1. Creates a Many-to-One relation. Creates a column in the db with the specified relations (Id). This case, Cartitem -> Cart(specifically Cart's Id)
+    # 2. Arg1 specifies what the relation is too. Ex: CartItems.cart is related Cart; CartItems.product is related to Product.
+    # 3. related_name refers to the inverse from Cart -> CartItem. 
+    # 3a. Without: You'd use cart.cartitem_set.all()
+    #     With: You use cart.items.all() (clearer)
+    # 4. on_delete defines what happens on delete. CASCADE refers to how it deletes; Delete all CartItems if their Cart is deleted.
+    # """

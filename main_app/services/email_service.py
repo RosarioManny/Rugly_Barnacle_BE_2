@@ -6,7 +6,10 @@ import os
 host_email = os.getenv('EMAIL_HOST_USER')
 
 class OrderEmailService:
-    
+    # NEWSLETTER SIGNUP
+    @staticmethod
+    def send_newsletter_signup_confirmation(email):
+        """ Send confirmation email to new newsletter subscriber """
     # TO OWNER
     @staticmethod
     def send_order_notification(order):
