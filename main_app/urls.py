@@ -51,6 +51,8 @@ urlpatterns = [
   path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session' ),
   path('checkout-success/', SuccessCheckoutView.as_view(), name='checkout-success' ),
 
+# NEWSLETTER
+  path('newsletter/subscribe/', NewsletterSubscribeView.as_view(), name='newsletter-subscribe'),
 #CSRF TOKEN
   path('csrf/', Ensure_CSRF, name='ensure_csrf'),
 ]
