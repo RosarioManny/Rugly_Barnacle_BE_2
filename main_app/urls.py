@@ -11,6 +11,7 @@ from .views.csrfTokenviews import Ensure_CSRF
 from .views.blogsview import BlogList, BlogDetails
 from .views.eventsview import EventList, EventListDetails
 from .views.stripeCheckoutview import *
+from .views.newslettersubscriber import NewsletterSubscribeView, NewsletterUnsubscribeView
 
 urlpatterns = [
   path('', Home.as_view(), name='home'),
@@ -53,6 +54,7 @@ urlpatterns = [
 
 # NEWSLETTER
   path('newsletter/subscribe/', NewsletterSubscribeView.as_view(), name='newsletter-subscribe'),
+  path('newsletter/unsubscribe/', NewsletterUnsubscribeView.as_view(), name='newsletter-unsubscribe'),
 #CSRF TOKEN
   path('csrf/', Ensure_CSRF, name='ensure_csrf'),
 ]
