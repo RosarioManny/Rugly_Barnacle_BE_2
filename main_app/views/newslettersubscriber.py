@@ -2,10 +2,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from ..serializers import NewsletterSubscriberSerializer
 from ..models import NewsletterSubscriber
-from rest_framework import status
+from rest_framework import status, generics
 
+
+# List of all newsletter subscribers (for admin use only)
+class NewsletterSubscriberListView(generics.ListAPIView):
+    queryset = NewsletterSubscriber.objects.all()
+    serializer_class = NewsletterSubscriberSerializer
+
+# Subscribe to the newsletter
 class NewsletterSubscribeView(APIView):
-
+    NewsletterSubscriberSerializer = NewsletterSubscriberSerializer
     # Createing a new serializer instance
     def post(self, request):
         serializer = self.NewsletterSubscriberSerializer(data=request.data)
@@ -19,8 +26,9 @@ class NewsletterSubscribeView(APIView):
             return Response({'message': 'Subscription successful!'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+# Unsubscribe from the newsletter
 class NewsletterUnsubscribeView(APIView):
-    
+    NewsletterSubscriberSerializer = NewsletterSubscriberSerializer
     # Delete a subscriber
     def post(self, request):
         email = request.data.get('email')

@@ -201,3 +201,9 @@ class EventsAdmin(admin.ModelAdmin):
     list_filter = ['title', 'location', 'start_time', 'end_time', 'status', 'event_type']
     ordering = ['-created_at', 'status', 'title', 'start_time']
 
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ['id', 'email', 'created_at']
+    search_fields = ['email']
+    list_filter = ['created_at']
+    ordering = ['-created_at']  
