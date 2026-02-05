@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL("DROP TABLE IF EXISTS main_app_newslettersubscriber CASCADE;"),
         migrations.CreateModel(
             name='NewsletterSubscriber',
             fields=[
