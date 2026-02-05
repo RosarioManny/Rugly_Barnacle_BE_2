@@ -56,6 +56,13 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+    secure=True
+)
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # For Filtering abilities add REST_FRAMEWORK variable.
 REST_FRAMEWORK = {
@@ -217,7 +224,7 @@ CSRF_USE_SESSIONS = False
 import sys
 if 'runserver' not in sys.argv:  # Only in production
     print("=== CLOUDINARY CONFIG ===")
-    print(f"CLOUD_NAME: {os.environ.get('CLOUDINARY_CLOUD_NAME', 'NOT SET')}")
+    print(f"CLOUD_NAME: {'Cloud name found and set' if os.environ.get('CLOUDINARY_CLOUD_NAME', 'NOT SET') else 'Cloud name not set'}")
     print(f"API_KEY: {'Key set' if os.environ.get('CLOUDINARY_API_KEY', 'NOT SET') else 'Key not set'}")
     print(f"API_SECRET: {'Secret Set' if os.environ.get('CLOUDINARY_API_SECRET') else 'Secret not set'}")
     print(f"DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
