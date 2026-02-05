@@ -203,7 +203,8 @@ class EventsAdmin(admin.ModelAdmin):
 
 @admin.register(NewsletterSubscriber)
 class NewsletterSubscriberAdmin(admin.ModelAdmin):
-    list_display = ['id', 'email', 'created_at']
-    search_fields = ['email']
-    list_filter = ['created_at']
-    ordering = ['-created_at']  
+    list_display = ['id', 'email', 'subscribed_at', 'status']
+    search_fields = ['email', 'status']
+    list_filter = ['subscribed_at', 'status']
+    ordering = ['-subscribed_at']  
+    readonly_fields = ['subscribed_at']

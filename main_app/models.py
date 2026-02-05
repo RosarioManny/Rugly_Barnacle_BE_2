@@ -461,12 +461,12 @@ class Event(models.Model):
 # TODO:: ------------------------------------------------------ NEWSLETTER ------------------------------------------------------
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
-    subscribed_at = models.DateTimeField(auto_now_add=True),
+    subscribed_at = models.DateTimeField(auto_now_add=True)
     SUBSCRIBED_STATUS = [
         ('subscribed', 'Subscribed'),
         ('unsubscribed', 'Unsubscribed')
     ]
-    status = models.CharField(max_length=20, choices=SUBSCRIBED_STATUS, default='subscribed'),
+    status = models.CharField(max_length=20, choices=SUBSCRIBED_STATUS, default='subscribed')
 
     
     def __str__(self):

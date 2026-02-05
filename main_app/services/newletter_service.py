@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 import os
 
 host_email = os.getenv('EMAIL_HOST_USER')
+
 class NewsletterEmailService:
   
     # DELETE EMAIL FROM DB IF UNSUBSCRIBED
