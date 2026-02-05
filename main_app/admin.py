@@ -204,7 +204,8 @@ class EventsAdmin(admin.ModelAdmin):
 @admin.register(NewsletterSubscriber)
 class NewsletterSubscriberAdmin(admin.ModelAdmin):
     list_display = ['id', 'email', 'subscribed_at', 'status']
-    search_fields = ['email', 'status']
+    search_fields = ['email',]
     list_filter = ['subscribed_at', 'status']
     ordering = ['-subscribed_at']  
+    list_per_page=60
     readonly_fields = ['subscribed_at']

@@ -467,8 +467,6 @@ class NewsletterSubscriber(models.Model):
         ('unsubscribed', 'Unsubscribed')
     ]
     status = models.CharField(max_length=20, choices=SUBSCRIBED_STATUS, default='subscribed')
-
-    
     def __str__(self):
         return self.email
 
