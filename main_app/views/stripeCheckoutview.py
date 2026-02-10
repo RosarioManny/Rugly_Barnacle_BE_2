@@ -19,7 +19,13 @@ class CreateCheckoutSessionView(APIView):
   
   def calc_shipping_cost(self, cart):
     total_price = sum(item.product.price * item.quantity for item in cart.items.all())
+    # Check the cart if a custom order down payment item exists.
+    has_custom_order = cart.items.filter(product__name__icontains='custom order').exists()
 
+
+    if has_custom_order:
+      return 'shr_1SopJ7L7WYX2dlYRclNVVtsB' # Over $100 - Free Shipping 
+    
     if total_price < 50:
       return 'shr_1SopKgL7WYX2dlYRpqzOeWNa' # Under $50 - 4.99 Shipping 
     elif total_price > 50 and total_price < 100: 
@@ -28,12 +34,33 @@ class CreateCheckoutSessionView(APIView):
       return 'shr_1SopJ7L7WYX2dlYRclNVVtsB' # Over $100 - Free Shipping 
     
     # If custom order set to free shipping.
+  def _validate_stock(self, cart):
+    errors = []
+    for item in cart.items.select_related('product'):
+      if item.quantity > item.product.quantity:
+        errors.append({
+          'product_id': item.product.id,
+          'product_name': item.product.name,
+          'requested_quantity': item.quantity,
+          'available_quantity': item.product.quantity,
+        })
+    return errors
   
   def post(self, request):
     cart = self.get_cart_from_user(request)
 
     if not cart.items.exists():
       return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    stock_errors = self._validate_stock(cart)
+    if stock_errors:
+      return Response(
+        {
+          'error': 'Some items in your cart exceed available stock',
+          'details': stock_errors
+        },
+        status=status.HTTP_400_BAD_REQUEST
+      )
     
     line_items = []
     for item in cart.items.all():

@@ -147,56 +147,46 @@ class CustomOrderImage(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
-        
-        is_new = not self.pk # <- Check if this is a new image (no primary key yet)
-        
-        if is_new:
-            super().save(*args, **kwargs) # <- For new images, save first to get an ID
-        
-        if self.image: # <- Process images if the main image exists
+        is_new = not self.pk
+
+        if self.image and is_new:
             try:
-                img = Image.open(self.image)
-                
-                
-                if img.height > 800 or img.width > 800: # <- Resize main image if too large
-                    output_size = (800, 800)
-                    img.thumbnail(output_size)
-                    
-                    buffer = BytesIO()
-                    if img.format == 'PNG':
-                        img.save(buffer, format='PNG')
-                        self.image.save(
-                            os.path.splitext(self.image.name)[0] + '.png',
-                            ContentFile(buffer.getvalue()),
-                            save=False
-                        )
-                    else:
-                        img.save(buffer, format='JPEG', quality=85)
-                        self.image.save(
-                            os.path.splitext(self.image.name)[0] + '.jpg',
-                            ContentFile(buffer.getvalue()),
-                            save=False
-                        )
-                
-                
-                img.thumbnail((200, 200)) # <- Create thumbnail
+                # Read the file before it goes to Cloudinary
+                raw_file = self.image.file
+                img = Image.open(raw_file)
+                img.load()  # Force load into memory
+
+                # Resize main image
+                if img.height > 800 or img.width > 800:
+                    img.thumbnail((800, 800))
+
+                # Save resized main image back to buffer
+                buffer = BytesIO()
+                fmt = 'PNG' if img.format == 'PNG' else 'JPEG'
+                img.save(buffer, format=fmt, quality=85)
+                buffer.seek(0)
+                ext = '.png' if fmt == 'PNG' else '.jpg'
+                self.image.save(
+                    os.path.splitext(self.image.name)[0] + ext,
+                    ContentFile(buffer.getvalue()),
+                    save=False
+                )
+
+                # Create thumbnail
+                img.thumbnail((200, 200))
                 thumb_buffer = BytesIO()
-                if img.format == 'PNG':
-                    img.save(thumb_buffer, format='PNG')
-                    thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
-                else:
-                    img.save(thumb_buffer, format='JPEG', quality=75)
-                    thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
-                
+                img.save(thumb_buffer, format=fmt, quality=75)
+                thumb_buffer.seek(0)
                 self.thumbnail.save(
-                    thumb_name,
+                    os.path.splitext(self.image.name)[0] + '_thumb' + ext,
                     ContentFile(thumb_buffer.getvalue()),
                     save=False
                 )
-                
+
             except Exception as e:
-                print(f"Error processing image: {e}") # <- Don't break the save if image processing fails      
-    
+                print(f"Error processing image: {e}")
+
+        super().save(*args, **kwargs)  # Save AFTER processing — uploads both to Cloudinary
     def delete(self, *args, **kwargs):
         if self.image:
             self.image.delete(save=False)
