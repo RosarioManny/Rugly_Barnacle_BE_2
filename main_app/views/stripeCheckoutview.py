@@ -96,11 +96,8 @@ class CreateCheckoutSessionView(APIView):
           'allowed_countries': ['US', 'CA'],
         },
         mode='payment',
-        # success_url='https://theruglybarnacle.com/checkout/success',
-        # cancel_url='https://theruglybarnacle.com/checkout/cancel',
-        success_url=f'http://localhost:5173/checkout/success?session_id={{CHECKOUT_SESSION_ID}}&cart_id={cart.id}',
-        
-        cancel_url='http://localhost:5173/checkout/cancel',
+        success_url='https://theruglybarnacle.com/checkout/success',
+        cancel_url='https://theruglybarnacle.com/checkout/cancel',
         metadata={
           'cart_id': str(cart.id),
           }
