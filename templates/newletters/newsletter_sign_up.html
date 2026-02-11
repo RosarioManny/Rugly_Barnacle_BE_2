@@ -1,1 +1,139 @@
-<!-- Newsletter for sign-up -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Newsletter Signup Confirmation</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
+    <table 
+        role="presentation" 
+        width="100%" 
+        cellpadding="0" 
+        cellspacing="0" 
+        border="0" 
+        style="max-width: 600px; margin: 0 auto; background: white;">
+        <!-- Header -->
+        <tr>
+            <td 
+                style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" 
+                align="center">
+                <h1 style="margin: 0; font-size: 28px; color: white;">
+                    Welcome to The Newsletter!
+                </h1>
+            </td>
+        </tr>
+        
+        <!-- Content -->
+        <tr>
+            <td style="padding: 30px;">
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="background: #9EECE2; color: #202254; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td align="center">
+                            <h2 style="margin: 0 0 10px 0; font-size: 22px; color: #202254;">🎉 You're All Set!</h2>
+                            <p style="margin: 0; font-size: 16px;">
+                                Thank you for signing up to The Rugly Barnacle Newsletter{% if subscriber_name %}, {{ subscriber_name }}{% endif %}!
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                
+                <p style="margin: 0 0 20px 0; font-size: 16px;">
+                    We're excited to have you as part of our community! 
+                </p>
+                
+                <!-- What to Expect -->
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="background: #000000; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h2 style="color: #202254; margin: 0 0 15px 0; font-size: 20px;">What You'll Receive</h2>
+                            <table 
+                                role="presentation" 
+                                width="100%" 
+                                cellpadding="0" 
+                                cellspacing="0" 
+                                border="0">
+                                <tr>
+                                    <td style="padding: 8px 0 8px 30px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">★</span>
+                                        Updates about new rug releases and designs
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 30px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">★</span>
+                                        Notifications about upcoming events
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 30px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">★</span>
+                                        Fresh blog posts and creative inspiration
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0 8px 30px; position: relative;">
+                                        <span style="position: absolute; left: 0; color: #5652E7; font-weight: bold;">★</span>
+                                        Exclusive offers and behind-the-scenes content
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <p style="margin: 0 0 20px 0; font-size: 16px;">
+                    We promise to only send you content that's worth your time. No spam, just the good stuff!
+                </p>
+                
+                <!-- Unsubscribe Section -->
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <tr>
+                        <td style="font-size: 14px; color: #666;">
+                            <strong style="color: #202254;">Changed your mind?</strong><br/>
+                            If you'd like to stop receiving emails, you can <a href="{{ unsubscribe_url }}" style="color: #5652E7; text-decoration: none; font-weight: bold;">unsubscribe here</a>. You'll be taken to The Rugly Barnacle site where you can confirm your unsubscription.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Footer -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <tr>
+                        <td align="center" style="color: #666; font-size: 14px;">
+                            <p style="margin: 0 0 10px 0;">Thank you for choosing The Rugly Barnacle!</p>
+                            <p style="margin: 0;">If you have any questions, please reply to this email.</p>
+                            <p style="margin: 15px 0 0 0; font-size: 12px; color: #999;">
+                                You're receiving this email because you signed up for our newsletter at {{ site_url }}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+<!-- 
+{{ subscriber_name }} (optional) - subscriber's name if collected
+{{ unsubscribe_url }} - link to your unsubscribe page
+{{ site_url }} - your website URL 
+-->

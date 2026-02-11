@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>The Rugly Barnacle Newsletter</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
+    <table 
+        role="presentation" 
+        width="100%" 
+        cellpadding="0" 
+        cellspacing="0" 
+        border="0" 
+        style="max-width: 600px; margin: 0 auto; background: white;">
+        <!-- Header -->
+        <tr>
+            <td 
+                style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" 
+                align="center">
+                <h1 style="margin: 0; font-size: 28px; color: white;">
+                    The Rugly Barnacle Newsletter
+                </h1>
+                <p style="margin: 10px 0 0 0; font-size: 14px; color: #E0E0E0;">
+                    {{ newsletter_date|date:"F Y" }}
+                </p>
+            </td>
+        </tr>
+        
+        <!-- Content -->
+        <tr>
+            <td style="padding: 30px;">
+                <p style="margin: 0 0 20px 0; font-size: 16px;">
+                    Hi there! Welcome to this month's edition of The Rugly Barnacle Newsletter. Here's what's new and exciting!
+                </p>
+                
+                <!-- Upcoming Events Section -->
+                {% if events %}
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="margin-bottom: 30px;">
+                    <tr>
+                        <td style="background: #00CEC5; color: white; padding: 12px 15px; border-radius: 6px 6px 0 0;">
+                            <h2 style="margin: 0; font-size: 20px; color: white;">📅 Upcoming Events</h2>
+                        </td>
+                    </tr>
+                </table>
+                
+                {% for event in events %}
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="background: #F9F9F9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #202254;">{{ event.title }}</h3>
+                            {% if event.event_date %}
+                            <p style="margin: 0 0 10px 0; color: #202254;">
+                                <strong>When:</strong> {{ event.event_date|date:"F d, Y" }}{% if event.event_time %} at {{ event.event_time }}{% endif %}
+                            </p>
+                            {% endif %}
+                            {% if event.location %}
+                            <p style="margin: 0 0 10px 0; color: #202254;">
+                                <strong>Where:</strong> {{ event.location }}
+                            </p>
+                            {% endif %}
+                            {% if event.description %}
+                            <p style="margin: 0 0 15px 0; color: #202254;">
+                                {{ event.description }}
+                            </p>
+                            {% endif %}
+                            {% if event.ticket_link %}
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="background: #5652E7; border-radius: 4px; padding: 12px 24px;">
+                                        <a href="{{ event.ticket_link }}" style="color: white; text-decoration: none; font-weight: bold; display: block;">
+                                            Get Tickets
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% endfor %}
+                {% endif %}
+                
+                <!-- Latest Blog Posts Section -->
+                {% if blog_posts %}
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="margin-bottom: 30px;">
+                    <tr>
+                        <td style="background: #FEB5FF; color: #202254; padding: 12px 15px; border-radius: 6px 6px 0 0;">
+                            <h2 style="margin: 0; font-size: 20px; color: #202254;">✍️ Latest from the Blog</h2>
+                        </td>
+                    </tr>
+                </table>
+                
+                {% for post in blog_posts %}
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="background: #F9F9F9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <tr>
+                        <td>
+                            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #202254;">{{ post.title }}</h3>
+                            <p style="margin: 0 0 5px 0; font-size: 13px; color: #666;">
+                                {{ post.created_at|date:"F d, Y" }}
+                            </p>
+                            <p style="margin: 10px 0 15px 0; color: #202254;">
+                                {{ post.content|truncatewords:30 }}
+                            </p>
+                            {% if post.slug %}
+                            <a href="{{ site_url }}/blog/{{ post.slug }}" style="color: #5652E7; text-decoration: none; font-weight: bold;">
+                                Read More →
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% endfor %}
+                {% endif %}
+                
+                <!-- New Products Section -->
+                {% if products %}
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="margin-bottom: 20px;">
+                    <tr>
+                        <td style="background: #5652E7; color: white; padding: 12px 15px; border-radius: 6px 6px 0 0;">
+                            <h2 style="margin: 0; font-size: 20px; color: white;">✨ New Arrivals</h2>
+                        </td>
+                    </tr>
+                </table>
+                
+                {% for product in products %}
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="background: #F9F9F9; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                    <tr>
+                        <td>
+                            <!-- Product Image (if available) -->
+                            {% if product.image_url %}
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 15px;">
+                                <tr>
+                                    <td align="center">
+                                        <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 100%; height: auto; border-radius: 6px; display: block;" width="560" />
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                            
+                            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #202254;">{{ product.name }}</h3>
+                            {% if product.type %}
+                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #5652E7; font-weight: bold;">
+                                {{ product.type }}
+                            </p>
+                            {% endif %}
+                            {% if product.description %}
+                            <p style="margin: 0 0 15px 0; color: #202254;">
+                                {{ product.description }}
+                            </p>
+                            {% endif %}
+                            {% if product.price %}
+                            <p style="margin: 0 0 15px 0; font-size: 20px; font-weight: bold; color: #114C56;">
+                                ${{ product.price }}
+                            </p>
+                            {% endif %}
+                            {% if product.slug %}
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="background: #5652E7; border-radius: 4px; padding: 12px 24px;">
+                                        <a href="{{ site_url }}/products/{{ product.slug }}" style="color: white; text-decoration: none; font-weight: bold; display: block;">
+                                            View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% endfor %}
+                {% endif %}
+                
+                <!-- Call to Action -->
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="background: #9EECE2; padding: 20px; border-radius: 8px; margin: 30px 0 20px 0;">
+                    <tr>
+                        <td align="center">
+                            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #202254;">Want a Custom Rug?</h3>
+                            <p style="margin: 0 0 15px 0; color: #202254;">
+                                Have an idea for a unique custom rug? Let's bring your vision to life!
+                            </p>
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="background: #5652E7; border-radius: 4px; padding: 12px 24px;">
+                                        <a href="{{ site_url }}/custom-order" style="color: white; text-decoration: none; font-weight: bold; display: block;">
+                                            Request Custom Order
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Footer -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <tr>
+                        <td align="center" style="color: #666; font-size: 14px;">
+                            <p style="margin: 0 0 10px 0;">Thank you for being part of The Rugly Barnacle community!</p>
+                            <p style="margin: 0 0 15px 0;">If you have any questions, please reply to this email.</p>
+                            <p style="margin: 0; font-size: 12px; color: #999;">
+                                You're receiving this email because you subscribed to our newsletter.<br/>
+                                <a href="{{ unsubscribe_url }}" style="color: #5652E7; text-decoration: none;">Unsubscribe</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+<!-- 
+
+# Events
+events = [
+    {
+        'title': 'Event Title',
+        'event_date': datetime,
+        'event_time': 'Time',
+        'location': 'Location',
+        'description': 'Description',
+        'ticket_link': 'URL'
+    }
+]
+
+# Blog Posts
+blog_posts = [
+    {
+        'title': 'Blog Title',
+        'content': 'Full content...',
+        'created_at': datetime,
+        'slug': 'blog-slug'
+    }
+]
+
+# Products
+products = [
+    {
+        'name': 'Product Name',
+        'type': 'Rug/Custom/etc',
+        'description': 'Description',
+        'price': '99.99',
+        'image_url': 'URL',
+        'slug': 'product-slug'
+    }
+]
+
+# Other
+newsletter_date = datetime.now()
+site_url = 'https://yoursite.com'
+unsubscribe_url = 'https://yoursite.com/unsubscribe' -->
