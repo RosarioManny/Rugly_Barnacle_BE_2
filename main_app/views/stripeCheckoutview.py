@@ -87,8 +87,8 @@ class CreateCheckoutSessionView(APIView):
             
             # USE LOCAL QUANTITY IF PROVIDED, OTHERWISE USE CART QUANTITY
             quantity = local_quantities.get(str(item.product.id), item.quantity)
-            
-            product_name = f"{item.product.name} (Qty: {quantity})"
+            print(f"Processing item: {item.product.name}, Quantity: {quantity}, Price: {item.product.price}")
+            product_name = item.product.name
 
             line_items.append({
                 'price_data': {
