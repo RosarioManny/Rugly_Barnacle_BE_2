@@ -11,6 +11,7 @@ from ..serializers import CartSerializer
 from ..models import Cart, CartItem, Product
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+RB_DOMAIN = os.getenv('RUGLY_BARNACLE_PRODUCT_DOMAIN', 'http://localhost:5173')
 
 class CreateCheckoutSessionView(APIView):
     serializer_class = CartSerializer
@@ -87,11 +88,13 @@ class CreateCheckoutSessionView(APIView):
             # USE LOCAL QUANTITY IF PROVIDED, OTHERWISE USE CART QUANTITY
             quantity = local_quantities.get(str(item.product.id), item.quantity)
             
+            product_name = f"{item.product.name} (Qty: {quantity})"
+
             line_items.append({
                 'price_data': {
                     'currency': 'usd',
                     'product_data': {
-                        'name': item.product.name,
+                        'name': product_name,
                     },
                     'unit_amount': int(item.product.price * 100),
                 },
@@ -116,6 +119,8 @@ class CreateCheckoutSessionView(APIView):
                 mode='payment',
                 success_url=f'http://localhost:5173/checkout/success?session_id={{CHECKOUT_SESSION_ID}}&cart_id={cart.id}',
                 cancel_url='http://localhost:5173/checkout/cancel',
+                # success_url=f'{RB_DOMAIN}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}&cart_id={cart.id}',
+                # cancel_url=f'{RB_DOMAIN}/checkout/cancel',
                 metadata={
                     'cart_id': str(cart.id),
                     'local_quantities': json.dumps(local_quantities),
@@ -247,7 +252,6 @@ class SuccessCheckoutView(APIView):
                 product = cart_item.product 
                 original_quantity = product.quantity
                 
-                # USE QUANTITY FROM STRIPE METADATA IF AVAILABLE, OTHERWISE FROM CART
                 if str(product.id) in local_quantities:
                     quantity_to_deduct = local_quantities[str(product.id)]
                 else:
