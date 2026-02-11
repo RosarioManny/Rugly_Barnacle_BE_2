@@ -22,16 +22,15 @@ class CreateCheckoutSessionView(APIView):
     # Check the cart if a custom order down payment item exists.
     has_custom_order = cart.items.filter(product__name__icontains='custom order').exists()
 
-
     if has_custom_order:
-      return 'shr_1SopJ7L7WYX2dlYRclNVVtsB' # Over $100 - Free Shipping 
+      return 'shr_1SoqZGLmVuX8kuAEpWwBAqgJ' # Over $100 - Free Shipping 
     
     if total_price < 50:
-      return 'shr_1SopKgL7WYX2dlYRpqzOeWNa' # Under $50 - 4.99 Shipping 
+      return 'shr_1SoqZ9LmVuX8kuAERcN0ncCe' # Under $50 - 4.99 Shipping 
     elif total_price > 50 and total_price < 100: 
-      return 'shr_1SopHiL7WYX2dlYRLQ7OFx34' #$50 to $100 - 7.99 Shipping
+      return 'shr_1Szn5xLmVuX8kuAEnxhsQxgU' #$50 to $100 - 7.99 Shipping
     elif total_price > 100:
-      return 'shr_1SopJ7L7WYX2dlYRclNVVtsB' # Over $100 - Free Shipping 
+      return 'shr_1SoqZGLmVuX8kuAEpWwBAqgJ' # Over $100 - Free Shipping 
     
     # If custom order set to free shipping.
   def _validate_stock(self, cart):
