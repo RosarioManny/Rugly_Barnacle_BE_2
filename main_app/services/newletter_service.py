@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.core.cache import cache
 from datetime import datetime
-from ..models import NewsletterSubscriber   
+from ..models import NewsletterSubscriber, BlogPost, Event
 
 host_email = os.getenv('EMAIL_HOST_USER')
 
@@ -53,7 +53,6 @@ class NewsletterEmailService:
 
 @staticmethod
 def send_newsletter_updates(trigger_instance):
-    from ..models import NewsletterSubscriber, BlogPost, Event
 
     # ---- Cooldown Check ----
     COOLDOWN_KEY = 'newsletter_last_sent'
