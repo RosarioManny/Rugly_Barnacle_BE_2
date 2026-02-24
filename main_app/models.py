@@ -1,14 +1,16 @@
 from django.core.files.base import ContentFile
 from django.db import models
-# from django.utils import timezone
 from io import BytesIO
 from PIL import Image
-import os
-import uuid
 from .services.email_service import OrderEmailService  
-from datetime import timezone
 from django.core.validators import FileExtensionValidator
 from cloudinary_storage.storage import MediaCloudinaryStorage
+from .services.newsletter_email_service import NewsletterEmailService
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import uuid
+import os
+
 
 # To Create an enums or choice 
 PRICES = (
@@ -378,7 +380,7 @@ class PortfolioImage(models.Model):
     def __str__(self):
         return self.title
     
-# TODO:: ------------------------------------------------------ BLOG ------------------------------------------------------
+# ------------------------------------------------------ BLOG ------------------------------------------------------
 class BlogPost(models.Model):
     title = models.CharField(max_length=100, unique=True)
     content = models.TextField(max_length=4000)
@@ -404,7 +406,7 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return f"{self.id} | {self.title} - {self.tags} - {self.created_at}"
-# TODO:: ------------------------------------------------------ EVENTS ------------------------------------------------------
+# ------------------------------------------------------ EVENTS ------------------------------------------------------
 class Event(models.Model):
     title = models.CharField(max_length=100, unique=True)
     created_at  = models.DateTimeField(auto_now_add=True)
@@ -448,7 +450,7 @@ class Event(models.Model):
     def __str__(self):
         return f'{self.title} - {self.created_at.date} @ {self.location}'
 # TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
-# TODO:: ------------------------------------------------------ NEWSLETTER ------------------------------------------------------
+# ------------------------------------------------------ NEWSLETTER ------------------------------------------------------
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
     subscribed_at = models.DateTimeField(auto_now_add=True)
@@ -460,16 +462,12 @@ class NewsletterSubscriber(models.Model):
     def __str__(self):
         return self.email
 
+@receiver(post_save, sender=BlogPost)
+def on_blog_post_created(sender, instance, created, **kwargs):
+    if created:
+        NewsletterEmailService.send_newsletter_updates(instance)
 
-
-    # Make migrations::
-    # > python manage.py makemigrations
-
-    # >> How does models.ForeignKey Work? << 
-    # 1. Creates a Many-to-One relation. Creates a column in the db with the specified relations (Id). This case, Cartitem -> Cart(specifically Cart's Id)
-    # 2. Arg1 specifies what the relation is too. Ex: CartItems.cart is related Cart; CartItems.product is related to Product.
-    # 3. related_name refers to the inverse from Cart -> CartItem. 
-    # 3a. Without: You'd use cart.cartitem_set.all()
-    #     With: You use cart.items.all() (clearer)
-    # 4. on_delete defines what happens on delete. CASCADE refers to how it deletes; Delete all CartItems if their Cart is deleted.
-    # """
+@receiver(post_save, sender=Event)
+def on_event_created(sender, instance, created, **kwargs):
+    if created:
+        NewsletterEmailService.send_newsletter_updates(instance)
