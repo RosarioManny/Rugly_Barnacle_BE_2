@@ -146,4 +146,4 @@ class NewsletterSubscriberSerializer(serializers.ModelSerializer):
   class Meta: 
     model = NewsletterSubscriber
     fields = ['id', 'email', 'subscribed_at', 'status']
-    read_only_fields = ['id', 'subscribed_at', 'email']  
+    read_only_fields = ['id', 'subscribed_at',]  
