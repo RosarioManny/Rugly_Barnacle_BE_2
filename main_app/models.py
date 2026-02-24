@@ -5,7 +5,7 @@ from PIL import Image
 from .services.email_service import OrderEmailService  
 from django.core.validators import FileExtensionValidator
 from cloudinary_storage.storage import MediaCloudinaryStorage
-from .services.newsletter_email_service import NewsletterEmailService
+from .services.newletter_service import NewsletterEmailService
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import uuid
