@@ -5,7 +5,6 @@ from PIL import Image
 from .services.email_service import OrderEmailService  
 from django.core.validators import FileExtensionValidator
 from cloudinary_storage.storage import MediaCloudinaryStorage
-from .services.newletter_service import NewsletterEmailService
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import uuid
@@ -465,9 +464,11 @@ class NewsletterSubscriber(models.Model):
 @receiver(post_save, sender=BlogPost)
 def on_blog_post_created(sender, instance, created, **kwargs):
     if created:
+        from .services.newletter_service import NewsletterEmailService
         NewsletterEmailService.send_newsletter_updates(instance)
 
 @receiver(post_save, sender=Event)
 def on_event_created(sender, instance, created, **kwargs):
     if created:
+        from .services.newletter_service import NewsletterEmailService
         NewsletterEmailService.send_newsletter_updates(instance)
