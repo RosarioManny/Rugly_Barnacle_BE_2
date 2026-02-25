@@ -31,17 +31,17 @@ class OrderEmailService:
             
             for template_path in template_paths_to_try:
                 try:
-                    print(f"DEBUG: Trying template path: {template_path}")
+                    # print(f"DEBUG: Trying template path: {template_path}")
                     html_message = render_to_string(template_path, {'order': order})
-                    print(f"DEBUG: Successfully loaded template: {template_path}")
+                    # print(f"DEBUG: Successfully loaded template: {template_path}")
                     break
                 except Exception as template_error:
-                    print(f"DEBUG: Failed to load {template_path}: {template_error}")
+                    # print(f"DEBUG: Failed to load {template_path}: {template_error}")
                     continue
             
             # Fallback to plain text if HTML template not found
             if html_message is None:
-                print("DEBUG: Using plain text fallback - no template found")
+                # print("DEBUG: Using plain text fallback - no template found")
                 return OrderEmailService._send_plain_text_notification(order)
             
             # Create and send HTML email
@@ -54,10 +54,10 @@ class OrderEmailService:
             )
             email.content_subtype = 'html'
             has_image = order.images.exists()
-            print(f"DEBUG: Attempting to send email to: {[host_email]}")
-            print(f"DEBUG: Image Provided: {has_image}")
+            # print(f"DEBUG: Attempting to send email to: {[host_email]}")
+            # print(f"DEBUG: Image Provided: {has_image}")
             email.send(fail_silently=False)
-            print(f"SUCCESS: Order notification email sent for order #{order.reference_id}")
+            # print(f"SUCCESS: Order notification email sent for order #{order.reference_id}")
             return True
             
         except Exception as e:

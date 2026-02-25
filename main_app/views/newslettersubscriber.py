@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from ..serializers import NewsletterSubscriberSerializer
 from ..models import NewsletterSubscriber
 from rest_framework import status, generics
+from ..services.newletter_service import NewsletterEmailService  
 
 
 # List of all newsletter subscribers (for admin use only)
@@ -23,6 +24,7 @@ class NewsletterSubscribeView(APIView):
                 return Response({'message': 'This email is already subscribed.'}, status=status.HTTP_200_OK)
             # Save the new subscriber
             serializer.save()
+            NewsletterEmailService.send_newsletter_signup_confirmation(email) 
             return Response({'message': 'Subscription successful!'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
