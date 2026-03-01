@@ -4,6 +4,9 @@ from ..serializers import NewsletterSubscriberSerializer
 from ..models import NewsletterSubscriber
 from rest_framework import status, generics
 from ..services.newletter_service import NewsletterEmailService  
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 # List of all newsletter subscribers (for admin use only)
@@ -29,6 +32,7 @@ class NewsletterSubscribeView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 # Unsubscribe from the newsletter
+@method_decorator(csrf_exempt, name='dispatch') # Makes it so that it doesn't need a token to unsubscribe
 class NewsletterUnsubscribeView(APIView):
     NewsletterSubscriberSerializer = NewsletterSubscriberSerializer
     # Delete a subscriber

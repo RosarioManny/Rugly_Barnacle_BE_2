@@ -72,7 +72,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',   # <-- This enables sorting
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '8/day', # <- Limit anonymous users to 5 requests per day
+        'anon': '21/day', # <- Limit anonymous users to 21 requests per day
         'user': '400/day',  # <- Limit logged-in users to 400 per day
     }
 }
@@ -216,7 +216,6 @@ CORS_ALLOW_HEADERS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    'https://*.onrender.com',
     "https://theruglybarnacle.com",
     "https://ruglybarnaclebe.onrender.com"
 ]
