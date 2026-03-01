@@ -16,7 +16,8 @@ class NewsletterEmailService:
             context = {
                 'subscriber_name': email,
                 'unsubscribe_url': f"{os.getenv('SITE_URL')}/newsletter/unsubscribe/",
-                'site_url': os.getenv('SITE_URL')
+                'site_url': os.getenv('SITE_URL'),
+                'logo_url': os.getenv('CLOUDINARY_LOGO_URL'), 
             }
 
             html_content = render_to_string('newletters/newsletter_sign_up.html', context)
@@ -95,6 +96,7 @@ class NewsletterEmailService:
                 ],
                 'products': [],
                 'site_url': os.getenv('SITE_URL'),
+                'logo_url': os.getenv('CLOUDINARY_LOGO_URL'), 
             }
 
             for subscriber in subscribers:
