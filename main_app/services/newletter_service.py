@@ -20,7 +20,7 @@ class NewsletterEmailService:
                 'logo_url': os.getenv('CLOUDINARY_LOGO_URL'), 
             }
 
-            html_content = render_to_string('newletters/newsletter_sign_up.html', context)
+            html_content = render_to_string('newsletters/newsletter_sign_up.html', context)
 
             email_message = EmailMessage(
                 subject='Welcome to The Rugly Barnacle Newsletter!',
@@ -102,7 +102,7 @@ class NewsletterEmailService:
             for subscriber in subscribers:
                 context['unsubscribe_url'] = f"{os.getenv('SITE_URL')}/newsletter/unsubscribe/?email={subscriber.email}"
 
-                html_content = render_to_string('/newletters/newletter_post.html', context)
+                html_content = render_to_string('newsletters/newsletter_post.html', context)
 
                 email_message = EmailMessage(
                     subject=f"The Rugly Barnacle Newsletter - {datetime.now().strftime('%B %Y')}",
