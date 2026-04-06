@@ -383,6 +383,11 @@ class PortfolioImage(models.Model):
 class BlogPost(models.Model):
     title = models.CharField(max_length=100, unique=True)
     created_at = models.DateField(auto_now_add=True)
+    quick_description = models.CharField(
+        max_length=300, 
+        blank=True, 
+        null=True,
+        help_text="A brief summary of the blog post (e.g., 'Sharing my latest rug-making project and inspiration.')")   
     content = models.TextField(max_length=4000, help_text="""
     Use this space to share news, stories, or insights about your rug-making journey.
     For font styles use these method -> 
