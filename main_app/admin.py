@@ -189,7 +189,7 @@ class PortfolioImageAdmin(admin.ModelAdmin):
 
 @admin.register(BlogPost)
 class BlogAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'tags', 'created_at']
+    list_display = ['id', 'title', 'tags', 'created_at', 'image']
     list_filter = ['tags', 'created_at']
     search_fields = ['title', 'content']
     ordering = ['-created_at']

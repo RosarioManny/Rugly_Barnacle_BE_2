@@ -130,6 +130,8 @@ class PortfolioSerializer(serializers.ModelSerializer):
 
 # BLOGS
 class BlogSerializer(serializers.ModelSerializer):
+  image = serializers.ImageField(required=False, allow_null=True)
+  
   class Meta: 
     model = BlogPost
     fields = '__all__'
