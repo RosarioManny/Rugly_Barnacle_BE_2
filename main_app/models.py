@@ -382,8 +382,25 @@ class PortfolioImage(models.Model):
 # ------------------------------------------------------ BLOG ------------------------------------------------------
 class BlogPost(models.Model):
     title = models.CharField(max_length=100, unique=True)
-    content = models.TextField(max_length=4000)
     created_at = models.DateField(auto_now_add=True)
+    content = models.TextField(max_length=4000, help_text="""
+    Use this space to share news, stories, or insights about your rug-making journey.
+    For font styles use these method -> 
+    1. Bold use **double asterisks**. 
+    2. Italics use *single asterisks*. 
+    3. Headings use ##Double Pound.
+    """)
+    image = models.ImageField(
+        upload_to='blogs/', 
+        blank=True, 
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+                )
+            ]
+        )
     links = models.JSONField(
         default=list, 
         blank=True, 
@@ -399,9 +416,10 @@ class BlogPost(models.Model):
         ('personal', 'Personal'),
         ('rug_making','Rug Making'),
         ('inspiration', 'Inspiration'),
-        ('events', 'Events')
+        ('events', 'Events'),
+        ('misc', 'Misc')
     ]
-    tags = models.CharField(max_length=100, choices=TAGS, blank=True)
+    tags = models.CharField(max_length=100, choices=TAGS, default='misc')
 
     def __str__(self):
         return f"{self.id} | {self.title} - {self.tags} - {self.created_at}"
