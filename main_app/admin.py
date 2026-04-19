@@ -57,7 +57,7 @@ class CartItemInline(admin.TabularInline):
 class PollChoiceInline(admin.TabularInline):
     model = PollChoice
     extra = 3  # gives her 3 empty choice slots by default
-    fields = ['text', 'image', 'vote_count']
+    fields = ['choice_name', 'image', 'vote_count']
     readonly_fields = ['vote_count']  # shouldn't be manually edited
 # ------------------------------------------------------ MODEL ADMIN CLASSES ------------------------------------------------------
 

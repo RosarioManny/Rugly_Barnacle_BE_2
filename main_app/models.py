@@ -452,16 +452,19 @@ class Poll(models.Model):
         return f"Poll: {self.question[:50]} | Active: {self.is_active}"
     
 class PollChoice(models.Model):
-    poll = models.ForeignKey(
-        Poll, 
-        on_delete=models.CASCADE, 
-        related_name='choices')
-    choice_name = models.CharField(max_length=200, help_text="The text for this poll choice (e.g., 'Pokemon Art Style')")
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name='choices')
+    choice_name = models.CharField(max_length=200)
     vote_count = models.PositiveIntegerField(default=0)
+    image = models.ImageField(
+        upload_to='polls/',
+        blank=True,
+        null=True,
+        storage=MediaCloudinaryStorage(),
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
+    )
 
     def __str__(self):
-        return f"{self.choice_name} - {self.vote_count} votes"
-
+        return f"{self.choice_name} ({self.vote_count} votes)"
 
 class PollVote(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
