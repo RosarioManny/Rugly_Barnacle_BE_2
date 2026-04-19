@@ -132,7 +132,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
 class PollChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = PollChoice
-        fields = ['id', 'text', 'image', 'vote_count']
+        fields = ['id', 'choice_name', 'image', 'vote_count']
 
 class PollSerializer(serializers.ModelSerializer):
     choices = PollChoiceSerializer(many=True, read_only=True)
