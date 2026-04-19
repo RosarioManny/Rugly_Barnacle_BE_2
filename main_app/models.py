@@ -1,5 +1,6 @@
 from django.core.files.base import ContentFile
 from django.db import models
+from django.utils import timezone
 from io import BytesIO
 from PIL import Image
 from .services.email_service import OrderEmailService  
@@ -59,6 +60,95 @@ class Product(models.Model):
     def __str__(self): # <- Change the name of the display on admin panel
         return f"Id: {self.id} - {self.name}"
 
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/',
+        blank=True, 
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+                )
+            ])
+    thumbnail = models.ImageField(upload_to='products/thumbnails/',
+        blank=True, 
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+                )
+            ])
+    is_primary = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        
+        if not self.pk: # <- First save to generate image path
+            super().save(*args, **kwargs)
+        
+        
+        if self.image: # <- Process image if it's new or changed
+            
+            img = Image.open(self.image) # <- Open the original image
+            
+            
+            if img.height > 800 or img.width > 800: # <- Resize main image if too large
+                output_size = (800, 800)
+                img.thumbnail(output_size)
+                
+                
+                buffer = BytesIO() # <- Save the resized image
+                if img.format == 'PNG':
+                    img.save(buffer, format='PNG')
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + '.png',
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+                else:
+                    img.save(buffer, format='JPEG', quality=85)
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + '.jpg',
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+            
+            
+            img.thumbnail((200, 200)) # <- Create thumbnail
+            thumb_buffer = BytesIO()
+            if img.format == 'PNG':
+                img.save(thumb_buffer, format='PNG')
+                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
+            else:
+                img.save(thumb_buffer, format='JPEG', quality=75)
+                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
+            
+            self.thumbnail.save(
+                thumb_name,
+                ContentFile(thumb_buffer.getvalue()),
+                save=False
+            )
+        
+        
+        if self.is_primary: # <- Ensure only one primary image per product
+            ProductImage.objects.filter(
+                product=self.product, 
+                is_primary=True
+            ).exclude(id=self.id).update(is_primary=False)
+            
+        super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        # Delete associated files
+        if self.image:
+            self.image.delete(save=False)
+        if self.thumbnail:
+            self.thumbnail.delete(save=False)
+        super().delete(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Image for {self.product.name}"
 # ------------------------------------------------------ CART ------------------------------------------------------
 
 class Cart(models.Model):   
@@ -198,97 +288,6 @@ class CustomOrderImage(models.Model):
     def __str__(self):
         return f"Image for {self.custom_order.reference_id}"
 
-# ------------------------------------------------------ PRODUCT ------------------------------------------------------
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='products/',
-        blank=True, 
-        null=True, 
-        storage=MediaCloudinaryStorage(),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
-                )
-            ])
-    thumbnail = models.ImageField(upload_to='products/thumbnails/',
-        blank=True, 
-        null=True, 
-        storage=MediaCloudinaryStorage(),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
-                )
-            ])
-    is_primary = models.BooleanField(default=False)
-    
-    def save(self, *args, **kwargs):
-        
-        if not self.pk: # <- First save to generate image path
-            super().save(*args, **kwargs)
-        
-        
-        if self.image: # <- Process image if it's new or changed
-            
-            img = Image.open(self.image) # <- Open the original image
-            
-            
-            if img.height > 800 or img.width > 800: # <- Resize main image if too large
-                output_size = (800, 800)
-                img.thumbnail(output_size)
-                
-                
-                buffer = BytesIO() # <- Save the resized image
-                if img.format == 'PNG':
-                    img.save(buffer, format='PNG')
-                    self.image.save(
-                        os.path.splitext(self.image.name)[0] + '.png',
-                        ContentFile(buffer.getvalue()),
-                        save=False
-                    )
-                else:
-                    img.save(buffer, format='JPEG', quality=85)
-                    self.image.save(
-                        os.path.splitext(self.image.name)[0] + '.jpg',
-                        ContentFile(buffer.getvalue()),
-                        save=False
-                    )
-            
-            
-            img.thumbnail((200, 200)) # <- Create thumbnail
-            thumb_buffer = BytesIO()
-            if img.format == 'PNG':
-                img.save(thumb_buffer, format='PNG')
-                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.png'
-            else:
-                img.save(thumb_buffer, format='JPEG', quality=75)
-                thumb_name = os.path.splitext(self.image.name)[0] + '_thumb.jpg'
-            
-            self.thumbnail.save(
-                thumb_name,
-                ContentFile(thumb_buffer.getvalue()),
-                save=False
-            )
-        
-        
-        if self.is_primary: # <- Ensure only one primary image per product
-            ProductImage.objects.filter(
-                product=self.product, 
-                is_primary=True
-            ).exclude(id=self.id).update(is_primary=False)
-            
-        super().save(*args, **kwargs)
-    
-    def delete(self, *args, **kwargs):
-        # Delete associated files
-        if self.image:
-            self.image.delete(save=False)
-        if self.thumbnail:
-            self.thumbnail.delete(save=False)
-        super().delete(*args, **kwargs)
-    
-    def __str__(self):
-        return f"Image for {self.product.name}"
-    
 # ------------------------------------------------------ FAQ ------------------------------------------------------
 class FaqModel(models.Model):
     class Meta:
@@ -428,6 +427,29 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return f"{self.id} | {self.title} - {self.tags} - {self.created_at}"
+    
+# ------------------------------------------------------ POLLS ------------------------------------------------------    
+
+class Polls(models.Model):
+    blog_post = models.OneToOneField(BlogPost, 
+        on_delete=models.CASCADE, 
+        related_name='poll',
+        null=True, 
+        blank=True, 
+        help_text="Associate a poll with a blog post to gather reader feedback.")
+    question = models.CharField(max_length=300, help_text="The poll question (e.g., 'Which rug style do you prefer?')")
+    start_date = models.DateTimeField(help_text="When the poll should start")
+    end_date = models.DateTimeField(help_text="When the poll should end")
+    created_at = models.DataeTimeField(auto_now_add=True)
+
+    @property 
+    def is_active(self):
+        now = timezone.now()
+        return self.start_date <= now <= self.end_date
+    
+    def __str__(self):
+        return f"Poll: {self.question[:50]} | Active: {self.is_active}"
+
 # ------------------------------------------------------ EVENTS ------------------------------------------------------
 class Event(models.Model):
     title = models.CharField(max_length=100, unique=True)
