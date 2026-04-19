@@ -128,15 +128,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
     fields = ['title', 'image', 'is_visible', 'created_at', 'id', 'thumbnail']
     read_only_fields = ['id', 'created_at']
 
-# BLOGS
-class BlogSerializer(serializers.ModelSerializer):
-  image = serializers.ImageField(required=False, allow_null=True)
-  
-  class Meta: 
-    model = BlogPost
-    fields = '__all__'
-    read_only_fields = ['created_at']
-
+# NEWSLETTER
 class PollChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = PollChoice
@@ -169,6 +161,16 @@ class PollVoteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("You have already voted on this poll.")
 
         return data
+
+class BlogSerializer(serializers.ModelSerializer):
+  image = serializers.ImageField(required=False, allow_null=True)
+  poll = PollSerializer(read_only=True)  # <- add this
+  
+  class Meta: 
+    model = BlogPost
+    fields = '__all__'
+    read_only_fields = ['created_at']
+
 
 class EventSerializer(serializers.ModelSerializer):
   class Meta:
