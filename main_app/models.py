@@ -441,7 +441,7 @@ class Poll(models.Model):
     question = models.CharField(max_length=300, help_text="The poll question (e.g., 'Which rug style do you prefer?')")
     start_date = models.DateTimeField(help_text="When the poll should start")
     end_date = models.DateTimeField(help_text="When the poll should end")
-    created_at = models.DataeTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     @property 
     def is_active(self):
