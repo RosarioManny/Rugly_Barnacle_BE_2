@@ -476,7 +476,7 @@ class PollVote(models.Model):
 
     class Meta:
         # Prevent one session from voting twice on the same poll
-        unique_together = ('choice__poll', 'session_key')  
+        unique_together = ('poll', 'session_key')  
         # Note: use a cleaner approach below ↓
 
     def __str__(self):
