@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path #type:ignore
 from .views.homeview import Home
 from .views.cartviews import *
 from .views.categoryviews import CategoryView
@@ -8,7 +8,7 @@ from .views.propertiesview import PropertiesView
 from .views.faqview import FaqList
 from .views.portfolioviews import PortfolioList
 from .views.csrfTokenviews import Ensure_CSRF
-from .views.blogsview import BlogList, BlogDetails
+from .views.blogsview import BlogList, BlogDetails, PollDetailView, CastVoteView
 from .views.eventsview import EventList, EventListDetails
 from .views.stripeCheckoutview import *
 from .views.newslettersubscriber import *
@@ -43,7 +43,8 @@ urlpatterns = [
 # BLOG
   path('blogs/', BlogList.as_view(), name='blogs'),
   path('blogs/<int:id>/', BlogDetails.as_view(), name='blog-details'),
-  
+  path('polls/<int:pk>/', PollDetailView.as_view(), name='poll-detail'),
+  path('polls/<int:pk>/vote/', CastVoteView.as_view(), name='cast-vote'),
 # EVENTS
   path('event/', EventList.as_view(), name='event'),
   path('event/<int:id>/', EventListDetails.as_view(), name='event-details'),
