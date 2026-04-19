@@ -430,8 +430,9 @@ class BlogPost(models.Model):
     
 # ------------------------------------------------------ POLLS ------------------------------------------------------    
 
-class Polls(models.Model):
-    blog_post = models.OneToOneField(BlogPost, 
+class Poll(models.Model):
+    blog_post = models.OneToOneField(
+        BlogPost, 
         on_delete=models.CASCADE, 
         related_name='poll',
         null=True, 
@@ -449,7 +450,37 @@ class Polls(models.Model):
     
     def __str__(self):
         return f"Poll: {self.question[:50]} | Active: {self.is_active}"
+    
+class PollChoice(models.Model):
+    poll = models.ForeignKey(
+        Poll, 
+        on_delete=models.CASCADE, 
+        related_name='choices')
+    choice_name = models.CharField(max_length=200, help_text="The text for this poll choice (e.g., 'Pokemon Art Style')")
+    vote_count = models.PositiveIntegerField(default=0)
 
+    def __str__(self):
+        return f"{self.choice_name} - {self.vote_count} votes"
+
+
+class PollVote(models.Model):
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    choice = models.ForeignKey(
+        PollChoice,
+        on_delete=models.CASCADE,
+        related_name='votes'
+    )
+
+    session_key = models.CharField(max_length=150)
+    voted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Prevent one session from voting twice on the same poll
+        unique_together = ('choice__poll', 'session_key')  
+        # Note: use a cleaner approach below ↓
+
+    def __str__(self):
+        return f"Vote on '{self.choice.text}' at {self.voted_at}"
 # ------------------------------------------------------ EVENTS ------------------------------------------------------
 class Event(models.Model):
     title = models.CharField(max_length=100, unique=True)
