@@ -40,11 +40,14 @@ urlpatterns = [
   path('faq/', FaqList.as_view(), name='faq'),
 # PORTFOLIO
   path('portfolio/', PortfolioList.as_view(), name='portfolio'),
-# BLOG
-  path('blogs/', BlogList.as_view(), name='blogs'),
-  path('blogs/<int:id>/', BlogDetails.as_view(), name='blog-details'),
+  
+# NEWSLETTER
+  path('newsletter/', BlogList.as_view(), name='newsletter'),
+  path('newsletter/<int:id>/', BlogDetails.as_view(), name='newsletter-details'),
   path('polls/<int:pk>/', PollDetailView.as_view(), name='poll-detail'),
   path('polls/<int:pk>/vote/', CastVoteView.as_view(), name='cast-vote'),
+  path('newsletter/subscribe/', NewsletterSubscribeView.as_view(), name='newsletter-subscribe'),
+  path('newsletter/unsubscribe/', NewsletterUnsubscribeView.as_view(), name='newsletter-unsubscribe'),
 # EVENTS
   path('event/', EventList.as_view(), name='event'),
   path('event/<int:id>/', EventListDetails.as_view(), name='event-details'),
@@ -53,9 +56,6 @@ urlpatterns = [
   path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session' ),
   path('checkout-success/', SuccessCheckoutView.as_view(), name='checkout-success' ),
 
-# NEWSLETTER
-  path('newsletter/subscribe/', NewsletterSubscribeView.as_view(), name='newsletter-subscribe'),
-  path('newsletter/unsubscribe/', NewsletterUnsubscribeView.as_view(), name='newsletter-unsubscribe'),
   # path('newsletter/subscribers/', NewsletterSubscribeView.as_view(), name='newsletter-subscribers-list'),
 #CSRF TOKEN
   path('csrf/', Ensure_CSRF, name='ensure_csrf'),
