@@ -546,14 +546,14 @@ class NewsletterSubscriber(models.Model):
     def __str__(self):
         return self.email
 
-@receiver(post_save, sender=BlogPost)
-def on_blog_post_created(sender, instance, created, **kwargs):
-    if created:
-        from .services.newletter_service import NewsletterEmailService
-        NewsletterEmailService.send_newsletter_updates(instance)
+# @receiver(post_save, sender=BlogPost)
+# def on_blog_post_created(sender, instance, created, **kwargs):
+#     if created:
+#         from .services.newletter_service import NewsletterEmailService
+#         NewsletterEmailService.send_newsletter_updates(instance)
 
-@receiver(post_save, sender=Event)
-def on_event_created(sender, instance, created, **kwargs):
-    if created:
-        from .services.newletter_service import NewsletterEmailService
-        NewsletterEmailService.send_newsletter_updates(instance)
+# @receiver(post_save, sender=Event)
+# def on_event_created(sender, instance, created, **kwargs):
+#     if created:
+#         from .services.newletter_service import NewsletterEmailService
+#         NewsletterEmailService.send_newsletter_updates(instance)

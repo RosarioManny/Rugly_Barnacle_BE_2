@@ -60,7 +60,7 @@ class EventsEmailService:
             for subscriber in subscribers:
                 context['unsubscribe_url'] = f"{os.getenv('SITE_URL')}/newsletter/unsubscribe/?email={subscriber.email}"
 
-                html_content = render_to_string('newsletters/newsletter_post.html', context)
+                html_content = render_to_string('events/event_post.html', context)
 
                 email_message = EmailMessage(
                     subject=f"The Rugly Barnacle Newsletter - {datetime.now().strftime('%B %Y')}",
