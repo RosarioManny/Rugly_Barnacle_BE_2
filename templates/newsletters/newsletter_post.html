@@ -1,9 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+Put your HTML text here<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>The Rugly Barnacle Newsletter</title>
+    <title>The Rugly Barnacle Events</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
     <table 
@@ -18,8 +18,9 @@
             <td 
                 style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" 
                 align="center">
+                <img src="https://res.cloudinary.com/durp6lcml/image/upload/v1776292420/RuglyBarnacle_logo02_fzslxn.jpg" style="height: 128px"/>
                 <h1 style="margin: 0; font-size: 28px; color: white;">
-                    The Rugly Barnacle Newsletter
+                    The Rugly Barnacle Events
                 </h1>
                 <p style="margin: 10px 0 0 0; font-size: 14px; color: #E0E0E0;">
                     {{ newsletter_date|date:"F Y" }}
@@ -30,9 +31,9 @@
         <!-- Content -->
         <tr>
             <td style="padding: 30px;">
-                <p style="margin: 0 0 20px 0; font-size: 16px;">
-                    Hi there! Welcome to this month's edition of The Rugly Barnacle Newsletter. Here's what's new and exciting!
-                </p>
+                <h2 style="margin: 0 0 20px 0; font-size: 16px; text-align: center">
+Exciting news at The Rugly Barnacle! <br /> Check out our latest events and where we'll be next.<br />Hope to see you there soon!                
+    </h2>
                 
                 <!-- Upcoming Events Section -->
                 {% if events %}
@@ -45,7 +46,7 @@
                     style="margin-bottom: 30px;">
                     <tr>
                         <td style="background: #00CEC5; color: white; padding: 12px 15px; border-radius: 6px 6px 0 0;">
-                            <h2 style="margin: 0; font-size: 20px; color: white;">📅 Upcoming Events</h2>
+                            <h2 style="margin: 0; font-size: 20px; color: white;">&#9734 Upcoming Events</h2>
                         </td>
                     </tr>
                 </table>
@@ -104,7 +105,7 @@
                     style="margin-bottom: 30px;">
                     <tr>
                         <td style="background: #FEB5FF; color: #202254; padding: 12px 15px; border-radius: 6px 6px 0 0;">
-                            <h2 style="margin: 0; font-size: 20px; color: #202254;">✍️ Latest from the Blog</h2>
+                            <h2 style="margin: 0; font-size: 20px; color: #202254;">&#9733 Latest Newsletter</h2>
                         </td>
                     </tr>
                 </table>
@@ -148,7 +149,7 @@
                     style="margin-bottom: 20px;">
                     <tr>
                         <td style="background: #5652E7; color: white; padding: 12px 15px; border-radius: 6px 6px 0 0;">
-                            <h2 style="margin: 0; font-size: 20px; color: white;">✨ New Arrivals</h2>
+                            <h2 style="margin: 0; font-size: 20px; color: white;">&#9734 New Arrivals</h2>
                         </td>
                     </tr>
                 </table>
@@ -252,43 +253,3 @@
     </table>
 </body>
 </html>
-<!-- 
-
-# Events
-events = [
-    {
-        'title': 'Event Title',
-        'event_date': datetime,
-        'event_time': 'Time',
-        'location': 'Location',
-        'description': 'Description',
-        'ticket_link': 'URL'
-    }
-]
-
-# Blog Posts
-blog_posts = [
-    {
-        'title': 'Blog Title',
-        'content': 'Full content...',
-        'created_at': datetime,
-        'slug': 'blog-slug'
-    }
-]
-
-# Products
-products = [
-    {
-        'name': 'Product Name',
-        'type': 'Rug/Custom/etc',
-        'description': 'Description',
-        'price': '99.99',
-        'image_url': 'URL',
-        'slug': 'product-slug'
-    }
-]
-
-# Other
-newsletter_date = datetime.now()
-site_url = 'https://yoursite.com'
-unsubscribe_url = 'https://yoursite.com/unsubscribe' -->

@@ -527,6 +527,12 @@ class Event(models.Model):
     
     def __str__(self):
         return f'{self.title} - {self.created_at.date} @ {self.location}'
+    
+@reciever(post_save, sender=Event)
+def on_event_created(sender, instance, created, **kwargs):
+    if created:
+        from .services.event_service import EventsEmailService 
+        EventsEmailService.send_event_notification(instance)
 # TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
 # ------------------------------------------------------ NEWSLETTER ------------------------------------------------------
 class NewsletterSubscriber(models.Model):
