@@ -67,7 +67,7 @@ class EventsEmailService:
                     body=html_content,
                     from_email=host_email,
                     # to=[subscriber.email],
-                    to="rosario.emm47@gmail.com" # TESTING ONLY
+                    to=["rosario.emm47@gmail.com"] # TESTING ONLY
                 )
                 email_message.content_subtype = 'html'
                 email_message.send()
