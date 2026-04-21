@@ -129,47 +129,48 @@ class PortfolioSerializer(serializers.ModelSerializer):
     read_only_fields = ['id', 'created_at']
 
 # NEWSLETTER
-class PollChoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PollChoice
-        fields = ['id', 'choice_name', 'image', 'vote_count']
+# DEACTIVATE FOR NOW -- 4.21.26
+# class PollChoiceSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = PollChoice
+#         fields = ['id', 'choice_name', 'image', 'vote_count']
 
-class PollSerializer(serializers.ModelSerializer):
-    choices = PollChoiceSerializer(many=True, read_only=True)
-    is_active = serializers.BooleanField(read_only=True)
+# class PollSerializer(serializers.ModelSerializer):
+#     choices = PollChoiceSerializer(many=True, read_only=True)
+#     is_active = serializers.BooleanField(read_only=True)
 
-    class Meta:
-        model = Poll
-        fields = ['id', 'question', 'start_date', 'end_date', 'is_active', 'choices']
+#     class Meta:
+#         model = Poll
+#         fields = ['id', 'question', 'start_date', 'end_date', 'is_active', 'choices']
 
-class PollVoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PollVote
-        fields = ['choice', 'session_key']
+# class PollVoteSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = PollVote
+#         fields = ['choice', 'session_key']
 
-    def validate(self, data):
-        choice = data['choice']
-        session_key = data['session_key']
-        poll = choice.poll
+#     def validate(self, data):
+#         choice = data['choice']
+#         session_key = data['session_key']
+#         poll = choice.poll
 
-        # Check poll is active
-        if not poll.is_active:
-            raise serializers.ValidationError("This poll is no longer active.")
+#         # Check poll is active
+#         if not poll.is_active:
+#             raise serializers.ValidationError("This poll is no longer active.")
 
-        # Check for duplicate vote
-        if PollVote.objects.filter(poll=poll, session_key=session_key).exists():
-            raise serializers.ValidationError("You have already voted on this poll.")
+#         # Check for duplicate vote
+#         if PollVote.objects.filter(poll=poll, session_key=session_key).exists():
+#             raise serializers.ValidationError("You have already voted on this poll.")
 
-        return data
+#         return data
 
-class BlogSerializer(serializers.ModelSerializer):
-  image = serializers.ImageField(required=False, allow_null=True)
-  poll = PollSerializer(read_only=True)  # <- add this
+# class BlogSerializer(serializers.ModelSerializer):
+#   image = serializers.ImageField(required=False, allow_null=True)
+#   poll = PollSerializer(read_only=True)  # <- add this
   
-  class Meta: 
-    model = BlogPost
-    fields = '__all__'
-    read_only_fields = ['created_at']
+#   class Meta: 
+#     model = BlogPost
+#     fields = '__all__'
+#     read_only_fields = ['created_at']
 
 
 class EventSerializer(serializers.ModelSerializer):

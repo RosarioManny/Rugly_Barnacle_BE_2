@@ -192,23 +192,23 @@ class PortfolioImageAdmin(admin.ModelAdmin):
         return "No Image"
     image_preview.short_description = 'Preview'
 
-@admin.register(BlogPost)
-class BlogAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'tags', 'created_at']
-    list_filter = ['tags', 'created_at']
-    search_fields = ['title', 'content']
-    ordering = ['-created_at']
+# @admin.register(BlogPost)
+# class BlogAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'title', 'tags', 'created_at']
+#     list_filter = ['tags', 'created_at']
+#     search_fields = ['title', 'content']
+#     ordering = ['-created_at']
 
-@admin.register(Poll)
-class PollAdmin(admin.ModelAdmin):
-    inlines = [PollChoiceInline]
-    list_display = ['question', 'blog_post', 'start_date', 'end_date', 'is_active']
-    readonly_fields = ['created_at']
+# @admin.register(Poll)
+# class PollAdmin(admin.ModelAdmin):
+#     inlines = [PollChoiceInline]
+#     list_display = ['question', 'blog_post', 'start_date', 'end_date', 'is_active']
+#     readonly_fields = ['created_at']
 
-@admin.register(PollVote)
-class PollVoteAdmin(admin.ModelAdmin):
-    list_display = ['poll', 'choice', 'session_key', 'voted_at']
-    readonly_fields = ['poll', 'choice', 'session_key', 'voted_at']
+# @admin.register(PollVote)
+# class PollVoteAdmin(admin.ModelAdmin):
+#     list_display = ['poll', 'choice', 'session_key', 'voted_at']
+#     readonly_fields = ['poll', 'choice', 'session_key', 'voted_at']
     
 @admin.register(Event)
 class EventsAdmin(admin.ModelAdmin):

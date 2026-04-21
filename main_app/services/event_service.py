@@ -4,9 +4,9 @@ from django.template.loader import render_to_string #type:ignore
 from django.core.cache import cache #type:ignore
 from datetime import datetime
 
-host_email = os.getenv('EMAIL_HOST_USER')
 DEV = True
 class EventsEmailService: 
+    host_email = os.getenv('EMAIL_HOST_USER')
 
     # WHEN AN EVENT IS CREATED, SEND AN EMAIL TO ALL NEWSLETTER SUBSCRIBERS
     @staticmethod
@@ -27,21 +27,22 @@ class EventsEmailService:
                 print("No active subscribers to send to.")
                 return
 
-            blog_posts = BlogPost.objects.order_by('-created_at')[:1]
+            # blog_posts = BlogPost.objects.order_by('-created_at')[:1]
             events = Event.objects.filter(status='upcoming').order_by('start_time')[:3]
             # products = Product.objects.order_by('-created_at')[:3]
 
             context = {
                 'newsletter_date': datetime.now(),
-                'blog_posts': [
-                    {
-                        'title': post.title,
-                        'content': post.content,
-                        'created_at': post.created_at,
-                        'slug': None,
-                    }
-                    for post in blog_posts
-                ],
+                # DEACTIVATE FOR NOW -- 4.21.26
+                # 'blog_posts': [
+                #     {
+                #         'title': post.title,
+                #         'content': post.content,
+                #         'created_at': post.created_at,
+                #         'slug': None,
+                #     }
+                #     for post in blog_posts
+                # ],
                 'events': [
                     {
                         'title': event.title,
@@ -71,6 +72,7 @@ class EventsEmailService:
                 context['unsubscribe_url'] = f"{os.getenv('SITE_URL')}/newsletter/unsubscribe/?email={subscriber.email}"
 
                 html_content = render_to_string('events/event_post.html', context)
+                print(f"DEBUG host_email: '{host_email}'")
 
                 email_message = EmailMessage(
                     subject=f"The Rugly Barnacle Newsletter - {datetime.now().strftime('%B %Y')}",
@@ -82,6 +84,7 @@ class EventsEmailService:
                 email_message.content_subtype = 'html'
                 email_message.send()
                 print(f"Newsletter sent to {subscriber.email}")
+
 
                 if DEV == True:
                     print("Dev mode — stopping after first subscriber.")

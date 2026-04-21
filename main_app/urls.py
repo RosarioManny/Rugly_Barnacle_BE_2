@@ -8,7 +8,8 @@ from .views.propertiesview import PropertiesView
 from .views.faqview import FaqList
 from .views.portfolioviews import PortfolioList
 from .views.csrfTokenviews import Ensure_CSRF
-from .views.blogsview import BlogList, BlogDetails, PollDetailView, CastVoteView
+# DEACTIVATE FOR NOW -- 4.21.26
+# from .views.blogsview import BlogList, BlogDetails, PollDetailView, CastVoteView
 from .views.eventsview import EventList, EventListDetails
 from .views.stripeCheckoutview import *
 from .views.newslettersubscriber import *
@@ -42,10 +43,12 @@ urlpatterns = [
   path('portfolio/', PortfolioList.as_view(), name='portfolio'),
   
 # NEWSLETTER
-  path('newsletter/', BlogList.as_view(), name='newsletter'),
-  path('newsletter/<int:id>/', BlogDetails.as_view(), name='newsletter-details'),
-  path('polls/<int:pk>/', PollDetailView.as_view(), name='poll-detail'),
-  path('polls/<int:pk>/vote/', CastVoteView.as_view(), name='cast-vote'),
+# DEACTIVATE FOR NOW -- 4.21.26
+  # path('newsletter/', BlogList.as_view(), name='newsletter'),
+  # path('newsletter/<int:id>/', BlogDetails.as_view(), name='newsletter-details'),
+  # path('polls/<int:pk>/', PollDetailView.as_view(), name='poll-detail'),
+  # path('polls/<int:pk>/vote/', CastVoteView.as_view(), name='cast-vote'),
+
   path('newsletter/subscribe/', NewsletterSubscribeView.as_view(), name='newsletter-subscribe'),
   path('newsletter/unsubscribe/', NewsletterUnsubscribeView.as_view(), name='newsletter-unsubscribe'),
 # EVENTS

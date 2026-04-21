@@ -6,15 +6,15 @@ from ..serializers import BlogSerializer, PollSerializer, PollVoteSerializer
 from main_app import models
 
 class BlogList(generics.ListCreateAPIView):
-  queryset = BlogPost.objects.all()
-  serializer_class = BlogSerializer
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogSerializer
 
 class BlogDetails(generics.RetrieveUpdateDestroyAPIView):
-  # Show the details of the specified single product
-  queryset = BlogPost.objects.all()
-  serializer_class = BlogSerializer
-  lookup_field = 'id'
-  filter_backends = []
+    # Show the details of the specified single product
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogSerializer
+    lookup_field = 'id'
+    filter_backends = []
 
 
 class PollDetailView(generics.RetrieveAPIView):

@@ -379,111 +379,112 @@ class PortfolioImage(models.Model):
         return self.title
     
 # ------------------------------------------------------ BLOG ------------------------------------------------------
-class BlogPost(models.Model):
-    title = models.CharField(max_length=100, unique=True)
-    created_at = models.DateField(auto_now_add=True)
-    quick_description = models.CharField(
-        max_length=300, 
-        blank=True, 
-        null=True,
-        help_text="A brief summary of the blog post (e.g., 'Sharing my latest rug-making project and inspiration.')")   
-    content = models.TextField(max_length=4000, help_text="""
-    Use this space to share news, stories, or insights about your rug-making journey.
-    For font styles use these method -> 
-    1. Bold use **double asterisks**. 
-    2. Italics use *single asterisks*. 
-    3. Headings use ##Double Pound.
-    """)
-    image = models.ImageField(
-        upload_to='blogs/', 
-        blank=True, 
-        null=True, 
-        storage=MediaCloudinaryStorage(),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
-                )
-            ]
-        )
-    links = models.JSONField(
-        default=list, 
-        blank=True, 
-        help_text="""
-    1. Copy this: [{"title": "Link Name", "url": "https://..."}]
-    2. Change 'Link Name' to your link's title
-    3. Change the URL to your actual link
-    4. Keep all punctuation exactly as shown
-    Example: [{'title': 'Dog Photo', 'url': 'https://unsplash.com/dog.jpg'}]
-    """
-    )
-    TAGS = [
-        ('personal', 'Personal'),
-        ('rug_making','Rug Making'),
-        ('inspiration', 'Inspiration'),
-        ('events', 'Events'),
-        ('misc', 'Misc')
-    ]
-    tags = models.CharField(max_length=100, choices=TAGS, default='misc')
+# DEACTIVATE FOR NOW -- 4.21.26
+# class BlogPost(models.Model):
+#     title = models.CharField(max_length=100, unique=True)
+#     created_at = models.DateField(auto_now_add=True)
+#     quick_description = models.CharField(
+#         max_length=300, 
+#         blank=True, 
+#         null=True,
+#         help_text="A brief summary of the blog post (e.g., 'Sharing my latest rug-making project and inspiration.')")   
+#     content = models.TextField(max_length=4000, help_text="""
+#     Use this space to share news, stories, or insights about your rug-making journey.
+#     For font styles use these method -> 
+#     1. Bold use **double asterisks**. 
+#     2. Italics use *single asterisks*. 
+#     3. Headings use ##Double Pound.
+#     """)
+#     image = models.ImageField(
+#         upload_to='blogs/', 
+#         blank=True, 
+#         null=True, 
+#         storage=MediaCloudinaryStorage(),
+#         validators=[
+#             FileExtensionValidator(
+#                 allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
+#                 )
+#             ]
+#         )
+#     links = models.JSONField(
+#         default=list, 
+#         blank=True, 
+#         help_text="""
+#     1. Copy this: [{"title": "Link Name", "url": "https://..."}]
+#     2. Change 'Link Name' to your link's title
+#     3. Change the URL to your actual link
+#     4. Keep all punctuation exactly as shown
+#     Example: [{'title': 'Dog Photo', 'url': 'https://unsplash.com/dog.jpg'}]
+#     """
+#     )
+#     TAGS = [
+#         ('personal', 'Personal'),
+#         ('rug_making','Rug Making'),
+#         ('inspiration', 'Inspiration'),
+#         ('events', 'Events'),
+#         ('misc', 'Misc')
+#     ]
+#     tags = models.CharField(max_length=100, choices=TAGS, default='misc')
 
-    def __str__(self):
-        return f"{self.id} | {self.title} - {self.tags} - {self.created_at}"
+#     def __str__(self):
+#         return f"{self.id} | {self.title} - {self.tags} - {self.created_at}"
     
 # ------------------------------------------------------ POLLS ------------------------------------------------------    
+# DEACTIVATE FOR NOW -- 4.21.26
+# class Poll(models.Model):
+#     blog_post = models.OneToOneField(
+#         BlogPost, 
+#         on_delete=models.CASCADE, 
+#         related_name='poll',
+#         null=True, 
+#         blank=True, 
+#         help_text="Associate a poll with a blog post to gather reader feedback.")
+#     question = models.CharField(max_length=300, help_text="The poll question (e.g., 'Which rug style do you prefer?')")
+#     start_date = models.DateTimeField(help_text="When the poll should start")
+#     end_date = models.DateTimeField(help_text="When the poll should end")
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-class Poll(models.Model):
-    blog_post = models.OneToOneField(
-        BlogPost, 
-        on_delete=models.CASCADE, 
-        related_name='poll',
-        null=True, 
-        blank=True, 
-        help_text="Associate a poll with a blog post to gather reader feedback.")
-    question = models.CharField(max_length=300, help_text="The poll question (e.g., 'Which rug style do you prefer?')")
-    start_date = models.DateTimeField(help_text="When the poll should start")
-    end_date = models.DateTimeField(help_text="When the poll should end")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    @property 
-    def is_active(self):
-        now = timezone.now()
-        return self.start_date <= now <= self.end_date
+#     @property 
+#     def is_active(self):
+#         now = timezone.now()
+#         return self.start_date <= now <= self.end_date
     
-    def __str__(self):
-        return f"Poll: {self.question[:50]} | Active: {self.is_active}"
+#     def __str__(self):
+#         return f"Poll: {self.question[:50]} | Active: {self.is_active}"
     
-class PollChoice(models.Model):
-    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name='choices')
-    choice_name = models.CharField(max_length=200)
-    vote_count = models.PositiveIntegerField(default=0)
-    image = models.ImageField(
-        upload_to='polls/',
-        blank=True,
-        null=True,
-        storage=MediaCloudinaryStorage(),
-        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
-    )
+# class PollChoice(models.Model):
+#     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name='choices')
+#     choice_name = models.CharField(max_length=200)
+#     vote_count = models.PositiveIntegerField(default=0)
+#     image = models.ImageField(
+#         upload_to='polls/',
+#         blank=True,
+#         null=True,
+#         storage=MediaCloudinaryStorage(),
+#         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])]
+#     )
 
-    def __str__(self):
-        return f"{self.choice_name} ({self.vote_count} votes)"
+#     def __str__(self):
+#         return f"{self.choice_name} ({self.vote_count} votes)"
 
-class PollVote(models.Model):
-    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
-    choice = models.ForeignKey(
-        PollChoice,
-        on_delete=models.CASCADE,
-        related_name='votes'
-    )
+# class PollVote(models.Model):
+#     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+#     choice = models.ForeignKey(
+#         PollChoice,
+#         on_delete=models.CASCADE,
+#         related_name='votes'
+#     )
 
-    session_key = models.CharField(max_length=150)
-    voted_at = models.DateTimeField(auto_now_add=True)
+#     session_key = models.CharField(max_length=150)
+#     voted_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        # Prevent one session from voting twice on the same poll
-        unique_together = ('poll', 'session_key')  
-        # Note: use a cleaner approach below ↓
+#     class Meta:
+#         # Prevent one session from voting twice on the same poll
+#         unique_together = ('poll', 'session_key')  
+#         # Note: use a cleaner approach below ↓
 
-    def __str__(self):
-        return f"Vote on '{self.choice.text}' at {self.voted_at}"
+#     def __str__(self):
+#         return f"Vote on '{self.choice.text}' at {self.voted_at}"
 # ------------------------------------------------------ EVENTS ------------------------------------------------------
 class Event(models.Model):
     title = models.CharField(max_length=100, unique=True)
