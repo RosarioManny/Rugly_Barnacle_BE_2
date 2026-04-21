@@ -11,7 +11,7 @@ class EventsEmailService:
     # WHEN AN EVENT IS CREATED, SEND AN EMAIL TO ALL NEWSLETTER SUBSCRIBERS
     @staticmethod
     def send_event_notification(trigger_instance):
-        from ..models import NewsletterSubscriber, BlogPost, Event, Product
+        from ..models import NewsletterSubscriber, Event
         # ---- Cooldown Check ----
         COOLDOWN_KEY = 'event_notification_last_sent'
         COOLDOWN_HOURS = 24  # ONCE EVERY 24 HOURS
