@@ -11,7 +11,6 @@ from django.db.models.signals import post_save #type:ignore
 from django.dispatch import receiver #type:ignore
 import uuid
 import os
-
 # To Create an enums or choice 
 PRICES = (
     ('3ft', '$150-$249'),
