@@ -6,7 +6,7 @@ from datetime import datetime
 
 DEV = True
 class EventsEmailService: 
-    host_email = os.getenv('EMAIL_HOST_USER')
+   
 
     # WHEN AN EVENT IS CREATED, SEND AN EMAIL TO ALL NEWSLETTER SUBSCRIBERS
     @staticmethod
@@ -72,6 +72,7 @@ class EventsEmailService:
                 context['unsubscribe_url'] = f"{os.getenv('SITE_URL')}/newsletter/unsubscribe/?email={subscriber.email}"
 
                 html_content = render_to_string('events/event_post.html', context)
+                host_email = os.getenv('EMAIL_HOST_USER')
                 print(f"DEBUG host_email: '{host_email}'")
 
                 email_message = EmailMessage(
