@@ -29,7 +29,7 @@ class EventsEmailService:
 
             blog_posts = BlogPost.objects.order_by('-created_at')[:1]
             events = Event.objects.filter(status='upcoming').order_by('start_time')[:3]
-            products = Product.objects.order_by('-created_at')[:3]
+            # products = Product.objects.order_by('-created_at')[:3]
 
             context = {
                 'newsletter_date': datetime.now(),
@@ -53,16 +53,16 @@ class EventsEmailService:
                     }
                     for event in events
                 ],
-                'products': [
-                    {
-                        'name': product.name,
-                        'description': product.description,
-                        'price': product.price,
-                        'image_url': product.image.url if product.image else None,
-                        'product_link': f"{os.getenv('SITE_URL')}/products/{product.id}/",
-                    }
-                    for product in products
-                ],
+                # 'products': [
+                #     {
+                #         'name': product.name,
+                #         'description': product.description,
+                #         'price': product.price,
+                #         'image_url': product.image.url if product.image else None,
+                #         'product_link': f"{os.getenv('SITE_URL')}/products/{product.id}/",
+                #     }
+                #     for product in products
+                # ],
                 'site_url': os.getenv('SITE_URL'),
                 'logo_url': os.getenv('CLOUDINARY_LOGO_URL'), 
             }
