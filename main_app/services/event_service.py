@@ -4,10 +4,8 @@ from django.template.loader import render_to_string #type:ignore
 from django.core.cache import cache #type:ignore
 from datetime import datetime
 
-DEV = True
+DEV = False
 class EventsEmailService: 
-   
-
     # WHEN AN EVENT IS CREATED, SEND AN EMAIL TO ALL NEWSLETTER SUBSCRIBERS
     @staticmethod
     def send_event_notification(trigger_instance):
@@ -73,7 +71,7 @@ class EventsEmailService:
 
                 html_content = render_to_string('events/event_post.html', context)
                 host_email = os.getenv('EMAIL_HOST_USER')
-                print(f"DEBUG host_email: '{host_email}'")
+                # print(f"DEBUG host_email: '{host_email}'")
 
                 email_message = EmailMessage(
                     subject=f"The Rugly Barnacle Newsletter - {datetime.now().strftime('%B %Y')}",
@@ -84,7 +82,7 @@ class EventsEmailService:
                 )
                 email_message.content_subtype = 'html'
                 email_message.send()
-                print(f"Newsletter sent to {subscriber.email}")
+                # print(f"Newsletter sent to {subscriber.email}")
 
 
                 if DEV == True:
