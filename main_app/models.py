@@ -1,16 +1,16 @@
-from django.core.files.base import ContentFile
-from django.db import models
-from django.utils import timezone
+from django.core.files.base import ContentFile #type:ignore
+from django.db import models #type:ignore
+# from django.utils import timezone
 from io import BytesIO
-from PIL import Image
+from PIL import Image #type:ignore
 from .services.email_service import OrderEmailService  
-from django.core.validators import FileExtensionValidator
-from cloudinary_storage.storage import MediaCloudinaryStorage
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.core.validators import FileExtensionValidator #type:ignore
+from django.core.exceptions import ValidationError #type:ignore
+from cloudinary_storage.storage import MediaCloudinaryStorage #type:ignore
+from django.db.models.signals import post_save #type:ignore
+from django.dispatch import receiver #type:ignore
 import uuid
 import os
-
 
 # To Create an enums or choice 
 PRICES = (
@@ -19,7 +19,17 @@ PRICES = (
     ('5ft', '$350-$449'),
     ('6ft +', '$450+'),
 )
-
+# ------------------------------------------------------ VALIDATOR ------------------------------------------------------
+def validate_image_extension(value):
+    # If it's already a stored Cloudinary URL string (not a new upload), skip validation
+    if hasattr(value, 'name'):
+        ext = os.path.splitext(value.name)[1].lstrip('.').lower()
+        allowed = ['jpg', 'jpeg', 'png', 'webp']
+        if ext and ext not in allowed:
+            raise ValidationError(
+                f'File extension "{ext}" is not allowed. '
+                f'Allowed extensions are: {", ".join(allowed)}.'
+            )
 # ------------------------------------------------------ CATEGORY ------------------------------------------------------
 
 class Category(models.Model):
@@ -75,11 +85,8 @@ class ProductImage(models.Model):
         blank=True, 
         null=True, 
         storage=MediaCloudinaryStorage(),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
-                )
-            ])
+        validators=[validate_image_extension]
+        )
     is_primary = models.BooleanField(default=False)
     
     def save(self, *args, **kwargs):
@@ -221,20 +228,12 @@ class CustomOrderImage(models.Model):
         blank=True, 
         null=True, 
         storage=MediaCloudinaryStorage(),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
-                )
-            ])
+        validators=[validate_image_extension])
     thumbnail = models.ImageField(upload_to='custom_orders/thumbnails/', 
         blank=True, 
         null=True, 
         storage=MediaCloudinaryStorage(),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
-                )
-            ])
+        validators=[ validate_image_extension])
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
@@ -307,11 +306,7 @@ class PortfolioImage(models.Model):
         blank=True,
         null=True, 
         storage=MediaCloudinaryStorage(),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
-            )
-        ]
+        validators=[validate_image_extension]
     )
     is_visible = models.BooleanField(default=True, help_text="Toggle to show this in the portfolio")
     created_at = models.DateField(auto_now_add=True)
@@ -516,11 +511,7 @@ class Event(models.Model):
         blank=True, 
         null=True, 
         storage=MediaCloudinaryStorage(),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png', 'webp']
-                )
-            ]
+        validators=[validate_image_extension]
         )
 
     class Meta:
