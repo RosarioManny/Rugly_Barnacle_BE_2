@@ -54,11 +54,12 @@ class CartItemInline(admin.TabularInline):
         return f"${obj.quantity * obj.product.price:.2f}"
     subtotal.short_description = 'Subtotal'
 
-class PollChoiceInline(admin.TabularInline):
-    model = PollChoice
-    extra = 3  # gives her 3 empty choice slots by default
-    fields = ['choice_name', 'image', 'vote_count']
-    readonly_fields = ['vote_count']  # shouldn't be manually edited
+# DEACTIVATE FOR NOW -- 4.21.26
+# class PollChoiceInline(admin.TabularInline):
+#     model = PollChoice
+#     extra = 3  # gives her 3 empty choice slots by default
+#     fields = ['choice_name', 'image', 'vote_count']
+#     readonly_fields = ['vote_count']  # shouldn't be manually edited
 # ------------------------------------------------------ MODEL ADMIN CLASSES ------------------------------------------------------
 
 @admin.register(Product)
@@ -192,6 +193,7 @@ class PortfolioImageAdmin(admin.ModelAdmin):
         return "No Image"
     image_preview.short_description = 'Preview'
 
+# DEACTIVATE FOR NOW -- 4.21.26
 # @admin.register(BlogPost)
 # class BlogAdmin(admin.ModelAdmin):
 #     list_display = ['id', 'title', 'tags', 'created_at']
