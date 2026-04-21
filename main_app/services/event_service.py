@@ -5,13 +5,13 @@ from django.core.cache import cache #type:ignore
 from datetime import datetime
 
 host_email = os.getenv('EMAIL_HOST_USER')
-
+DEV = True
 class EventsEmailService: 
 
     # WHEN AN EVENT IS CREATED, SEND AN EMAIL TO ALL NEWSLETTER SUBSCRIBERS
     @staticmethod
     def send_event_notification(trigger_instance):
-        from ..models import NewsletterSubscriber, BlogPost, Event
+        from ..models import NewsletterSubscriber, BlogPost, Event, Product
         # ---- Cooldown Check ----
         COOLDOWN_KEY = 'event_notification_last_sent'
         COOLDOWN_HOURS = 24  # ONCE EVERY 24 HOURS
@@ -29,6 +29,7 @@ class EventsEmailService:
 
             blog_posts = BlogPost.objects.order_by('-created_at')[:1]
             events = Event.objects.filter(status='upcoming').order_by('start_time')[:3]
+            products = Product.objects.order_by('-created_at')[:3]
 
             context = {
                 'newsletter_date': datetime.now(),
@@ -52,7 +53,16 @@ class EventsEmailService:
                     }
                     for event in events
                 ],
-                'products': [],
+                'products': [
+                    {
+                        'name': product.name,
+                        'description': product.description,
+                        'price': product.price,
+                        'image_url': product.image.url if product.image else None,
+                        'product_link': f"{os.getenv('SITE_URL')}/products/{product.id}/",
+                    }
+                    for product in products
+                ],
                 'site_url': os.getenv('SITE_URL'),
                 'logo_url': os.getenv('CLOUDINARY_LOGO_URL'), 
             }
@@ -65,7 +75,7 @@ class EventsEmailService:
                 email_message = EmailMessage(
                     subject=f"The Rugly Barnacle Newsletter - {datetime.now().strftime('%B %Y')}",
                     body=html_content,
-                    from_email=host_email,
+                    from_email=f"The Rugly Barnacle <{host_email}>",
                     # to=[subscriber.email],
                     to=["rosario.emm47@gmail.com"] # TESTING ONLY
                 )
@@ -73,6 +83,9 @@ class EventsEmailService:
                 email_message.send()
                 print(f"Newsletter sent to {subscriber.email}")
 
+                if DEV == True:
+                    print("Dev mode — stopping after first subscriber.")
+                    break
             # ---- Set cooldown AFTER successful send ----
             cache.set(COOLDOWN_KEY, True, timeout=60 * 60 * COOLDOWN_HOURS)
             print(f"Cooldown set for {COOLDOWN_HOURS} hours.")

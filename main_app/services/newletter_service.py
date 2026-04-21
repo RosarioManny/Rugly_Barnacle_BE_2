@@ -25,7 +25,7 @@ class NewsletterEmailService:
             email_message = EmailMessage(
                 subject='Welcome to The Rugly Barnacle Newsletter!',
                 body=html_content,
-                from_email=host_email,
+                from_email=f"The Rugly Barnacle <{host_email}>",
                 to=[email],
             )
 
@@ -107,7 +107,7 @@ class NewsletterEmailService:
                 email_message = EmailMessage(
                     subject=f"The Rugly Barnacle Newsletter - {datetime.now().strftime('%B %Y')}",
                     body=html_content,
-                    from_email=host_email,
+                    from_email=f"The Rugly Barnacle <{host_email}>",
                     to=[subscriber.email],
                 )
                 email_message.content_subtype = 'html'
