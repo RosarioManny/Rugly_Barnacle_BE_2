@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError #type:ignore
 from cloudinary_storage.storage import MediaCloudinaryStorage #type:ignore
 from django.db.models.signals import post_save #type:ignore
 from django.dispatch import receiver #type:ignore
+from django.core.files.uploadedfile import UploadedFile  #type:ignore
 import uuid
 import os
 # To Create an enums or choice 
@@ -20,15 +21,15 @@ PRICES = (
 )
 # ------------------------------------------------------ VALIDATOR ------------------------------------------------------
 def validate_image_extension(value):
-    # If it's already a stored Cloudinary URL string (not a new upload), skip validation
-    if hasattr(value, 'name'):
-        ext = os.path.splitext(value.name)[1].lstrip('.').lower()
-        allowed = ['jpg', 'jpeg', 'png', 'webp']
-        if ext and ext not in allowed:
-            raise ValidationError(
-                f'File extension "{ext}" is not allowed. '
-                f'Allowed extensions are: {", ".join(allowed)}.'
-            )
+    if not isinstance(value, UploadedFile):  # Only validate fresh uploads
+        return
+    ext = os.path.splitext(value.name)[1].lstrip('.').lower()
+    allowed = ['jpg', 'jpeg', 'png', 'webp']
+    if ext and ext not in allowed:
+        raise ValidationError(
+            f'File extension "{ext}" is not allowed. '
+            f'Allowed extensions are: {", ".join(allowed)}.'
+        )
 # ------------------------------------------------------ CATEGORY ------------------------------------------------------
 
 class Category(models.Model):
