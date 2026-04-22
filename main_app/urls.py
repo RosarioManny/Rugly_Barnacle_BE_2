@@ -43,14 +43,10 @@ urlpatterns = [
   path('portfolio/', PortfolioList.as_view(), name='portfolio'),
   
 # NEWSLETTER
-# DEACTIVATE FOR NOW -- 4.21.26
-  # path('newsletter/', BlogList.as_view(), name='newsletter'),
-  # path('newsletter/<int:id>/', BlogDetails.as_view(), name='newsletter-details'),
-  # path('polls/<int:pk>/', PollDetailView.as_view(), name='poll-detail'),
-  # path('polls/<int:pk>/vote/', CastVoteView.as_view(), name='cast-vote'),
-
   path('newsletter/subscribe/', NewsletterSubscribeView.as_view(), name='newsletter-subscribe'),
   path('newsletter/unsubscribe/', NewsletterUnsubscribeView.as_view(), name='newsletter-unsubscribe'),
+  path('newsletter/posts/<int:post_id>/images/', NewsletterPostImageUploadView.as_view(), name='newsletter-post-image-upload'),
+  path('newsletter/posts/images/<int:image_id>/', NewsletterPostImageDeleteView.as_view(), name='newsletter-post-image-delete'),
 # EVENTS
   path('event/', EventList.as_view(), name='event'),
   path('event/<int:id>/', EventListDetails.as_view(), name='event-details'),
@@ -63,3 +59,9 @@ urlpatterns = [
 #CSRF TOKEN
   path('csrf/', Ensure_CSRF, name='ensure_csrf'),
 ]
+
+# DEACTIVATE FOR NOW -- 4.21.26
+  # path('newsletter/', BlogList.as_view(), name='newsletter'),
+  # path('newsletter/<int:id>/', BlogDetails.as_view(), name='newsletter-details'),
+  # path('polls/<int:pk>/', PollDetailView.as_view(), name='poll-detail'),
+  # path('polls/<int:pk>/vote/', CastVoteView.as_view(), name='cast-vote'),
