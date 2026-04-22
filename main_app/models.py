@@ -473,7 +473,7 @@ class NewsletterPostImage(models.Model):
     )
     order = models.PositiveIntegerField(
         default=0,
-        help_text="Controls the display order in the newsletter"
+        help_text="Controls the display order in the newsletter. 0 is First, 1 is second, 2 is third, etc..."
     )
 
     def save(self, *args, **kwargs):
@@ -525,6 +525,7 @@ class NewsletterPostImage(models.Model):
 
     def __str__(self):
         return f"Image {self.order} for {self.post.title}"
+    
 # ------------------------------------------------------ BLOG ------------------------------------------------------
 # DEACTIVATE FOR NOW -- 4.21.26
 # class BlogPost(models.Model):
