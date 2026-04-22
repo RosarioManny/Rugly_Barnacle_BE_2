@@ -1,4 +1,3 @@
-# admin.py
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
@@ -53,6 +52,7 @@ class CartItemInline(admin.TabularInline):
     def subtotal(self, obj):
         return f"${obj.quantity * obj.product.price:.2f}"
     subtotal.short_description = 'Subtotal'
+
 
 # DEACTIVATE FOR NOW -- 4.21.26
 # class PollChoiceInline(admin.TabularInline):
@@ -192,6 +192,22 @@ class PortfolioImageAdmin(admin.ModelAdmin):
             return mark_safe(f'<img src="{obj.image.url}" style="max-height: 50px; max-width: 50px;" />')
         return "No Image"
     image_preview.short_description = 'Preview'
+    
+@admin.register(Event)
+class EventsAdmin(admin.ModelAdmin):
+    list_display = ['status', 'title', 'location', 'status', 'event_type', 'price', 'start_time', 'end_time']
+    search_fields = ['title', 'location', 'start_time', 'end_time', 'status', 'event_type']
+    list_filter = ['title', 'location', 'start_time', 'end_time', 'status', 'event_type']
+    ordering = ['-created_at', 'status', 'title', 'start_time']
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ['id', 'email', 'subscribed_at', 'status']
+    search_fields = ['email']
+    list_filter = ['subscribed_at', 'status']
+    ordering = ['-subscribed_at']  
+    list_per_page=60
+    readonly_fields = ['subscribed_at']
 
 # DEACTIVATE FOR NOW -- 4.21.26
 # @admin.register(BlogPost)
@@ -211,19 +227,3 @@ class PortfolioImageAdmin(admin.ModelAdmin):
 # class PollVoteAdmin(admin.ModelAdmin):
 #     list_display = ['poll', 'choice', 'session_key', 'voted_at']
 #     readonly_fields = ['poll', 'choice', 'session_key', 'voted_at']
-    
-@admin.register(Event)
-class EventsAdmin(admin.ModelAdmin):
-    list_display = ['status', 'title', 'location', 'status', 'event_type', 'price', 'start_time', 'end_time']
-    search_fields = ['title', 'location', 'start_time', 'end_time', 'status', 'event_type']
-    list_filter = ['title', 'location', 'start_time', 'end_time', 'status', 'event_type']
-    ordering = ['-created_at', 'status', 'title', 'start_time']
-
-@admin.register(NewsletterSubscriber)
-class NewsletterSubscriberAdmin(admin.ModelAdmin):
-    list_display = ['id', 'email', 'subscribed_at', 'status']
-    search_fields = ['email']
-    list_filter = ['subscribed_at', 'status']
-    ordering = ['-subscribed_at']  
-    list_per_page=60
-    readonly_fields = ['subscribed_at']

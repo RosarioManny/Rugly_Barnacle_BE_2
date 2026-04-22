@@ -128,6 +128,39 @@ class PortfolioSerializer(serializers.ModelSerializer):
     fields = ['title', 'image', 'is_visible', 'created_at', 'id', 'thumbnail']
     read_only_fields = ['id', 'created_at']
 
+class EventSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Event
+    fields = ['id','title', 'location', 'ticket_link', 'description', 'start_time', 'end_time', 'registration_deadline', 'status', 'price', 'event_type', 'image']
+    read_only_fields = ['created_at']
+
+# NEWSLETTERSUBSCRIHBER
+class NewsletterSubscriberSerializer(serializers.ModelSerializer):
+  class Meta: 
+    model = NewsletterSubscriber
+    fields = ['id', 'email', 'subscribed_at', 'status']
+    read_only_fields = ['id', 'subscribed_at',]  
+
+# NEWSLETTER POST
+class NewsletterPostImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsletterPostImage
+        fields = ['id', 'image', 'thumbnail', 'link', 'order']
+        read_only_fields = ['id', 'thumbnail']
+
+
+class NewsletterPostSerializer(serializers.ModelSerializer):
+    images = NewsletterPostImageSerializer(many=True, read_only=True)
+    image_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = NewsletterPost
+        fields = ['id', 'title', 'created_at', 'images', 'image_count']
+        read_only_fields = ['id', 'created_at']
+
+    def get_image_count(self, obj):
+        return obj.images.count()
+    
 # NEWSLETTER
 # DEACTIVATE FOR NOW -- 4.21.26
 # class PollChoiceSerializer(serializers.ModelSerializer):
@@ -171,17 +204,3 @@ class PortfolioSerializer(serializers.ModelSerializer):
 #     model = BlogPost
 #     fields = '__all__'
 #     read_only_fields = ['created_at']
-
-
-class EventSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = Event
-    fields = ['id','title', 'location', 'ticket_link', 'description', 'start_time', 'end_time', 'registration_deadline', 'status', 'price', 'event_type', 'image']
-    read_only_fields = ['created_at']
-
-# NEWSLETTERSUBSCRIHBER
-class NewsletterSubscriberSerializer(serializers.ModelSerializer):
-  class Meta: 
-    model = NewsletterSubscriber
-    fields = ['id', 'email', 'subscribed_at', 'status']
-    read_only_fields = ['id', 'subscribed_at',]  
