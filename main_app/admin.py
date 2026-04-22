@@ -53,7 +53,45 @@ class CartItemInline(admin.TabularInline):
         return f"${obj.quantity * obj.product.price:.2f}"
     subtotal.short_description = 'Subtotal'
 
+# NEWSLETTER POST
+class NewsletterPostImageInline(admin.TabularInline):
+    model = NewsletterPostImage
+    extra = 1
+    fields = ('image', 'link', 'order', 'image_preview')
+    readonly_fields = ('image_preview',)
+    ordering = ['order']
 
+    def image_preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px; max-width: 100px; object-fit: contain;" />')
+        return "No Image"
+    image_preview.short_description = 'Preview'
+
+
+@admin.register(NewsletterPost)
+class NewsletterPostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'created_at', 'image_count', 'images_preview']
+    search_fields = ['title']
+    ordering = ['-created_at']
+    readonly_fields = ['created_at']
+    inlines = [NewsletterPostImageInline]
+
+    def image_count(self, obj):
+        return obj.images.count()
+    image_count.short_description = 'Images'
+
+    def images_preview(self, obj):
+        images = obj.images.all()[:4]
+        if images:
+            html = '<div style="display: flex; gap: 8px;">'
+            for img in images:
+                src = img.thumbnail.url if img.thumbnail else img.image.url if img.image else None
+                if src:
+                    html += f'<img src="{src}" style="max-height: 60px; max-width: 60px; object-fit: cover; border: 1px solid #ddd;" />'
+            html += '</div>'
+            return mark_safe(html)
+        return "No Images"
+    images_preview.short_description = 'Preview'
 # DEACTIVATE FOR NOW -- 4.21.26
 # class PollChoiceInline(admin.TabularInline):
 #     model = PollChoice
