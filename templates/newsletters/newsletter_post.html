@@ -1,11 +1,11 @@
-Put your HTML text here<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>The Rugly Barnacle Events</title>
+    <title>The Rugly Barnacle Newsletter</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #202254; background: #F0F0F1;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; color: #202254; background: #F0F0F1;">
     <table 
         role="presentation" 
         width="100%" 
@@ -13,12 +13,17 @@ Put your HTML text here<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional
         cellspacing="0" 
         border="0" 
         style="max-width: 600px; margin: 0 auto; background: white;">
+
         <!-- Header -->
         <tr>
             <td 
                 style="background: #5652E7; color: white; padding: 30px 20px; text-align: center;" 
                 align="center">
-                <img src="https://res.cloudinary.com/durp6lcml/image/upload/v1776292420/RuglyBarnacle_logo02_fzslxn.jpg" style="height: 128px"/>
+                <img 
+                    src="https://res.cloudinary.com/durp6lcml/image/upload/v1776292420/RuglyBarnacle_logo02_fzslxn.jpg" 
+                    style="height: 128px; display: block; margin: 0 auto 15px auto;"
+                    alt="The Rugly Barnacle"
+                />
                 <h1 style="margin: 0; font-size: 28px; color: white;">
                     The Rugly Barnacle Newsletter
                 </h1>
@@ -27,73 +32,42 @@ Put your HTML text here<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional
                 </p>
             </td>
         </tr>
-        
-        <!-- Content -->
+
+        <!-- Images -->
+        {% for img in images %}
+        <tr>
+            <td align="center" style="padding: 0;">
+                {% if img.link %}
+                    <a href="{{ img.link }}" target="_blank" style="display: block;">
+                        <img 
+                            src="{{ img.image.url }}" 
+                            width="600" 
+                            style="display: block; width: 100%; max-width: 600px; height: auto; border: 0;" 
+                            alt="{{ post.title }}"
+                        />
+                    </a>
+                {% else %}
+                    <img 
+                        src="{{ img.image.url }}" 
+                        width="600" 
+                        style="display: block; width: 100%; max-width: 600px; height: auto; border: 0;" 
+                        alt="{{ post.title }}"
+                    />
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+        <!-- Call to Action -->
         <tr>
             <td style="padding: 30px;">
-                <h2 style="margin: 0 0 20px 0; font-size: 16px; text-align: center">
-An exciting newsletter from The Rugly Barnacle! <br /> What are we discussing today?   </h2>
-                
-             
-                <!-- Latest Newsletter Section -->
-                {% if blog_posts %}
                 <table 
                     role="presentation" 
                     width="100%" 
                     cellpadding="0" 
                     cellspacing="0" 
                     border="0" 
-                    style="margin-bottom: 0px;">
-                    <tr>
-                        <td style="background: #FEB5FF; color: #202254; padding: 12px 15px; border-radius: 8px 8px 0 0;">
-                            <h2 style="margin: 0; font-size: 20px; color: #202254;">&#9733 Latest Newsletter</h2>
-                        </td>
-                    </tr>
-                </table>
-                
-                {% for post in blog_posts %}
-                <table 
-                    role="presentation" 
-                    width="100%" 
-                    cellpadding="0" 
-                    cellspacing="0" 
-                    border="0" 
-                    style="background: #F9F9F9; padding: 20px 0 0 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <tr>
-                        <td>
-                            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #202254;">{{ post.title }}</h3>
-                            <p style="margin: 0 0 5px 0; font-size: 13px; color: #666;">
-                                {{ post.created_at|date:"F d, Y" }}
-                            </p>
-                            <hr style="border: none; height: 2px; width: 95%; background: #5652E7; "/>
-                            <p style="margin: 10px 0 15px 0; color: #202254;">
-                                {{ post.content }}
-                            </p>
-                             <hr style="border: none; height: 2px; width: 95%; background: #5652E7; "/>
-                            {% if poll.blog_post %}
-                            <a href="{{ site_url }}/blog/{{ post.slug }}" style="color: #00CEC5; text-decoration: none; font-weight: bold;">
-                                Participate in Poll →
-                            </a>
-                            {% endif %}
-                            {%if  %}
-                            
-                            {% endif %}
-                        </td>
-                    </tr>
-                </table>
-                {% endfor %}
-                {% endif %}
-                
-           
-                
-                <!-- Call to Action -->
-                <table 
-                    role="presentation" 
-                    width="100%" 
-                    cellpadding="0" 
-                    cellspacing="0" 
-                    border="0" 
-                    style="background: #202254; padding: 20px; border-radius: 8px; margin: 30px 0 20px 0;">
+                    style="background: #202254; padding: 20px; border-radius: 8px;">
                     <tr>
                         <td align="center">
                             <h3 style="margin: 0 0 10px 0; font-size: 18px; color: white;">Want a Custom Rug?</h3>
@@ -112,9 +86,15 @@ An exciting newsletter from The Rugly Barnacle! <br /> What are we discussing to
                         </td>
                     </tr>
                 </table>
-                
+
                 <!-- Footer -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <table 
+                    role="presentation" 
+                    width="100%" 
+                    cellpadding="0" 
+                    cellspacing="0" 
+                    border="0" 
+                    style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
                     <tr>
                         <td align="center" style="color: #666; font-size: 14px;">
                             <p style="margin: 0 0 10px 0;">Thank you for being part of The Rugly Barnacle community!</p>
@@ -128,6 +108,7 @@ An exciting newsletter from The Rugly Barnacle! <br /> What are we discussing to
                 </table>
             </td>
         </tr>
+
     </table>
 </body>
 </html>
