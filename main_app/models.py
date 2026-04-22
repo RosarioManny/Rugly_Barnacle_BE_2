@@ -373,6 +373,158 @@ class PortfolioImage(models.Model):
     def __str__(self):
         return self.title
     
+
+# ------------------------------------------------------ EVENTS ------------------------------------------------------
+class Event(models.Model):
+    title = models.CharField(max_length=100, unique=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
+    location = models.CharField(max_length=300)
+    ticket_link = models.URLField(max_length=1000, blank=True, null=True)
+    description = models.TextField(max_length=3000)
+    start_time = models.DateTimeField()
+    end_time =  models.DateTimeField(blank=True, null=True)
+    registration_deadline = models.DateTimeField(blank=True, null=True)
+    STATUS_CHOICES = [ 
+        ('upcoming', 'Upcoming'),
+        ('past', 'Past'),
+        ('cancelled', 'Cancelled'),
+        ('ongoing', 'Ongoing')
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    EVENT_TYPE_CHOICES = [
+        ('online', 'Online'),
+        ('workshop', 'Workshop'),
+        ('meet-up', 'Meet-Up'),
+        ('venue', 'Venue'),
+        ('market', 'Market')
+    ]
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default='workshop')
+    image = models.ImageField(
+        upload_to='event/', 
+        blank=True, 
+        null=True, 
+        storage=MediaCloudinaryStorage(),
+        validators=[validate_image_extension]
+        )
+
+    class Meta:
+        ordering = ['-start_time']  
+    
+    def __str__(self):
+        return f'{self.title} - {self.created_at.date} @ {self.location}'
+    
+@receiver(post_save, sender=Event)
+def on_event_created(sender, instance, created, **kwargs):
+    if created:
+        from .services.event_service import EventsEmailService 
+        EventsEmailService.send_event_notification(instance)
+# ------------------------------------------------------ NEWSLETTER ------------------------------------------------------
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(unique=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    SUBSCRIBED_STATUS = [
+        ('subscribed', 'Subscribed'),
+        ('unsubscribed', 'Unsubscribed')
+    ]
+    status = models.CharField(max_length=20, choices=SUBSCRIBED_STATUS, default='subscribed')
+    def __str__(self):
+        return self.email
+    
+class NewsletterPost(models.Model):
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Newsletter Posts'
+
+    title = models.CharField(max_length=200)
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.created_at}"
+    
+class NewsletterPostImage(models.Model):
+    class Meta:
+        ordering = ['order']
+
+    post = models.ForeignKey(
+        NewsletterPost, 
+        on_delete=models.CASCADE, 
+        related_name='images'
+    )
+    image = models.ImageField(
+        upload_to='newsletter/',
+        blank=True,
+        null=True,
+        storage=MediaCloudinaryStorage(),
+        validators=[validate_image_extension]
+    )
+    thumbnail = models.ImageField(
+        upload_to='newsletter/thumbnails/',
+        blank=True,
+        null=True,
+        storage=MediaCloudinaryStorage(),
+        validators=[validate_image_extension]
+    )
+    link = models.URLField(
+        max_length=1000,
+        blank=True,
+        null=True,
+        help_text="Makes this image clickable (e.g. product page, event link)"
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        help_text="Controls the display order in the newsletter"
+    )
+
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        if is_new:
+            super().save(*args, **kwargs)
+
+        if self.image:
+            try:
+                raw_file = self.image.file
+                img = Image.open(raw_file)
+                img.load()
+
+                fmt = 'PNG' if img.format == 'PNG' else 'JPEG'
+                ext = '.png' if fmt == 'PNG' else '.jpg'
+
+                if img.height > 1200 or img.width > 1200:
+                    img.thumbnail((1200, 1200))
+                    buffer = BytesIO()
+                    img.save(buffer, format=fmt, quality=85)
+                    buffer.seek(0)
+                    self.image.save(
+                        os.path.splitext(self.image.name)[0] + ext,
+                        ContentFile(buffer.getvalue()),
+                        save=False
+                    )
+
+                img.thumbnail((400, 400))
+                thumb_buffer = BytesIO()
+                img.save(thumb_buffer, format=fmt, quality=75)
+                thumb_buffer.seek(0)
+                self.thumbnail.save(
+                    os.path.splitext(self.image.name)[0] + '_thumb' + ext,
+                    ContentFile(thumb_buffer.getvalue()),
+                    save=False
+                )
+
+            except Exception as e:
+                print(f"Error processing newsletter image: {e}")
+
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.image:
+            self.image.delete(save=False)
+        if self.thumbnail:
+            self.thumbnail.delete(save=False)
+        super().delete(*args, **kwargs)
+
+    def __str__(self):
+        return f"Image {self.order} for {self.post.title}"
 # ------------------------------------------------------ BLOG ------------------------------------------------------
 # DEACTIVATE FOR NOW -- 4.21.26
 # class BlogPost(models.Model):
@@ -480,72 +632,3 @@ class PortfolioImage(models.Model):
 
 #     def __str__(self):
 #         return f"Vote on '{self.choice.text}' at {self.voted_at}"
-# ------------------------------------------------------ EVENTS ------------------------------------------------------
-class Event(models.Model):
-    title = models.CharField(max_length=100, unique=True)
-    created_at  = models.DateTimeField(auto_now_add=True)
-    location = models.CharField(max_length=300)
-    ticket_link = models.URLField(max_length=1000, blank=True, null=True)
-    description = models.TextField(max_length=3000)
-    start_time = models.DateTimeField()
-    end_time =  models.DateTimeField(blank=True, null=True)
-    registration_deadline = models.DateTimeField(blank=True, null=True)
-    STATUS_CHOICES = [ 
-        ('upcoming', 'Upcoming'),
-        ('past', 'Past'),
-        ('cancelled', 'Cancelled'),
-        ('ongoing', 'Ongoing')
-    ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    EVENT_TYPE_CHOICES = [
-        ('online', 'Online'),
-        ('workshop', 'Workshop'),
-        ('meet-up', 'Meet-Up'),
-        ('venue', 'Venue'),
-        ('market', 'Market')
-    ]
-    event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default='workshop')
-    image = models.ImageField(
-        upload_to='event/', 
-        blank=True, 
-        null=True, 
-        storage=MediaCloudinaryStorage(),
-        validators=[validate_image_extension]
-        )
-
-    class Meta:
-        ordering = ['-start_time']  
-    
-    def __str__(self):
-        return f'{self.title} - {self.created_at.date} @ {self.location}'
-    
-@receiver(post_save, sender=Event)
-def on_event_created(sender, instance, created, **kwargs):
-    if created:
-        from .services.event_service import EventsEmailService 
-        EventsEmailService.send_event_notification(instance)
-# TODO:: ------------------------------------------------------ CLASSBOOKINGS ------------------------------------------------------
-# ------------------------------------------------------ NEWSLETTER ------------------------------------------------------
-class NewsletterSubscriber(models.Model):
-    email = models.EmailField(unique=True)
-    subscribed_at = models.DateTimeField(auto_now_add=True)
-    SUBSCRIBED_STATUS = [
-        ('subscribed', 'Subscribed'),
-        ('unsubscribed', 'Unsubscribed')
-    ]
-    status = models.CharField(max_length=20, choices=SUBSCRIBED_STATUS, default='subscribed')
-    def __str__(self):
-        return self.email
-
-# @receiver(post_save, sender=BlogPost)
-# def on_blog_post_created(sender, instance, created, **kwargs):
-#     if created:
-#         from .services.newletter_service import NewsletterEmailService
-#         NewsletterEmailService.send_newsletter_updates(instance)
-
-# @receiver(post_save, sender=Event)
-# def on_event_created(sender, instance, created, **kwargs):
-#     if created:
-#         from .services.newletter_service import NewsletterEmailService
-#         NewsletterEmailService.send_newsletter_updates(instance)
