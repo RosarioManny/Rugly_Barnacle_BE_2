@@ -28,14 +28,12 @@ class NewsletterEmailService:
                 from_email=f"The Rugly Barnacle <{host_email}>",
                 to=[email],
             )
-
             email_message.content_subtype = 'html'
             email_message.send()
         except Exception as e:
             print(f"Failed to send newsletter confirmation to {email}: {e}")
             raise
 
-        """ Send confirmation email to new newsletter subscriber """
     # DELETE EMAIL FROM DB IF UNSUBSCRIBED
     @staticmethod
     def delete_user_from_newsletter(email: str):
@@ -50,16 +48,18 @@ class NewsletterEmailService:
         except Exception as e:
             print(f"Failed to delete subscriber {email}: {e}")
             raise
-        
+
+    # SEND NEWSLETTER POST TO ALL SUBSCRIBERS
     @staticmethod
-    def send_newsletter_updates(trigger_instance):
-        from ..models import NewsletterSubscriber, BlogPost, Event
+    def send_newsletter_updates(post):
+        from ..models import NewsletterSubscriber
+
         # ---- Cooldown Check ----
-        COOLDOWN_KEY = 'newsletter_last_sent'
-        COOLDOWN_HOURS = 24  # ONCE EVERY 24 HOURS
+        COOLDOWN_KEY = f'newsletter_last_sent_{post.pk}'
+        COOLDOWN_HOURS = 24
 
         if cache.get(COOLDOWN_KEY):
-            print(f"Newsletter cooldown active — skipping send triggered by {trigger_instance}")
+            print(f"Newsletter cooldown active — skipping send for post: {post.title}")
             return
 
         try:
@@ -69,38 +69,21 @@ class NewsletterEmailService:
                 print("No active subscribers to send to.")
                 return
 
-            blog_posts = BlogPost.objects.order_by('-created_at')[:1]
-            events = Event.objects.filter(status='upcoming').order_by('start_time')[:3]
+            images = post.images.all().order_by('order')
 
-            context = {
-                'newsletter_date': datetime.now(),
-                'blog_posts': [
-                    {
-                        'title': post.title,
-                        'content': post.content,
-                        'created_at': post.created_at,
-                        'slug': None,
-                    }
-                    for post in blog_posts
-                ],
-                'events': [
-                    {
-                        'title': event.title,
-                        'event_date': event.start_time,
-                        'event_time': event.start_time.strftime('%I:%M %p'),
-                        'location': event.location,
-                        'description': event.description,
-                        'ticket_link': event.ticket_link,
-                    }
-                    for event in events
-                ],
-                'products': [],
-                'site_url': os.getenv('SITE_URL'),
-                'logo_url': os.getenv('CLOUDINARY_LOGO_URL'), 
-            }
+            if not images.exists():
+                print(f"Post '{post.title}' has no images — aborting send.")
+                return
 
             for subscriber in subscribers:
-                context['unsubscribe_url'] = f"{os.getenv('SITE_URL')}/newsletter/unsubscribe/?email={subscriber.email}"
+                context = {
+                    'post': post,
+                    'images': images,
+                    'newsletter_date': datetime.now(),
+                    'site_url': os.getenv('SITE_URL'),
+                    'logo_url': os.getenv('CLOUDINARY_LOGO_URL'),
+                    'unsubscribe_url': f"{os.getenv('SITE_URL')}/newsletter/unsubscribe/?email={subscriber.email}",
+                }
 
                 html_content = render_to_string('newsletters/newsletter_post.html', context)
 
@@ -116,7 +99,7 @@ class NewsletterEmailService:
 
             # ---- Set cooldown AFTER successful send ----
             cache.set(COOLDOWN_KEY, True, timeout=60 * 60 * COOLDOWN_HOURS)
-            print(f"Cooldown set for {COOLDOWN_HOURS} hours.")
+            print(f"Cooldown set for {COOLDOWN_HOURS} hours. Post: {post.title}")
 
         except Exception as e:
             print(f"Failed to send newsletter updates: {e}")
