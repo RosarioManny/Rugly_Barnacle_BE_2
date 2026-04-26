@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from .models import *
+import os
 
 # ------------------------------------------------------ INLINE CLASSES ------------------------------------------------------
 class ProductImageInline(admin.TabularInline):
@@ -68,6 +69,8 @@ class NewsletterPostImageInline(admin.TabularInline):
     image_preview.short_description = 'Preview'
 
 
+
+
 @admin.register(NewsletterPost)
 class NewsletterPostAdmin(admin.ModelAdmin):
     list_display = ['title', 'created_at', 'image_count', 'images_preview']
@@ -75,6 +78,45 @@ class NewsletterPostAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     readonly_fields = ['created_at']
     inlines = [NewsletterPostImageInline]
+    actions = ['send_newsletter', 'send_test_newsletter']
+
+    
+    def send_newsletter(self, request, queryset):
+        if queryset.count() > 1:
+            self.message_user(request, "Please select only one post to send at a time.", level='error')
+            return
+        post = queryset.first()
+        if not post.images.exists():
+            self.message_user(request, f"'{post.title}' has no images — add images before sending.", level='error')
+            return
+        try:
+            from .services.newletter_service import NewsletterEmailService
+            NewsletterEmailService.send_newsletter_updates(post)
+            self.message_user(request, f"Newsletter '{post.title}' sent successfully!", level='success')
+        except Exception as e:
+            self.message_user(request, f"Failed to send: {e}", level='error')
+    send_newsletter.short_description = "Send selected newsletter to all subscribers"
+
+    
+    def send_test_newsletter(self, request, queryset):
+        if queryset.count() > 1:
+            self.message_user(request, "Please select only one post to test at a time.", level='error')
+            return
+        post = queryset.first()
+        if not post.images.exists():
+            self.message_user(request, f"'{post.title}' has no images — add images before testing.", level='error')
+            return
+        test_email = os.getenv('EMAIL_HOST_USER')
+        if not test_email:
+            self.message_user(request, "No test email configured — set EMAIL_HOST_USER in your environment.", level='error')
+            return
+        try:
+            from .services.newletter_service import NewsletterEmailService
+            NewsletterEmailService.send_test_newsletter(post, test_email)
+            self.message_user(request, f"Test email sent to {test_email}!", level='success')
+        except Exception as e:
+            self.message_user(request, f"Failed to send test: {e}", level='error')
+    send_test_newsletter.short_description = "Send TEST email to yourself"
 
     def image_count(self, obj):
         return obj.images.count()
