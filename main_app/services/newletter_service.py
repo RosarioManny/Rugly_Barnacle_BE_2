@@ -105,7 +105,7 @@ class NewsletterEmailService:
             print(f"Failed to send newsletter updates: {e}")
             raise
     @staticmethod
-    def send_test_newsletter(post, admin_email):
+    def send_test_newsletter(post, test_email):
         try:
             images = post.images.all().order_by('order')
 
@@ -124,11 +124,11 @@ class NewsletterEmailService:
                 subject=f"[TEST] The Rugly Barnacle Newsletter - {datetime.now().strftime('%B %Y')}",
                 body=html_content,
                 from_email=f"The Rugly Barnacle <{host_email}>",
-                to=[admin_email],
+                to=[test_email],
             )
             email_message.content_subtype = 'html'
             email_message.send()
-            print(f"Test newsletter sent to {admin_email}")
+            print(f"Test newsletter sent to {test_email}")
 
         except Exception as e:
             print(f"Failed to send test newsletter: {e}")
