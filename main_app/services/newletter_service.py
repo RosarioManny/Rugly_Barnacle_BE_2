@@ -104,3 +104,32 @@ class NewsletterEmailService:
         except Exception as e:
             print(f"Failed to send newsletter updates: {e}")
             raise
+    @staticmethod
+    def send_test_newsletter(post, admin_email):
+        try:
+            images = post.images.all().order_by('order')
+
+            context = {
+                'post': post,
+                'images': images,
+                'newsletter_date': datetime.now(),
+                'site_url': os.getenv('SITE_URL'),
+                'logo_url': os.getenv('CLOUDINARY_LOGO_URL'),
+                'unsubscribe_url': '#',
+            }
+
+            html_content = render_to_string('newsletters/newsletter_post.html', context)
+
+            email_message = EmailMessage(
+                subject=f"[TEST] The Rugly Barnacle Newsletter - {datetime.now().strftime('%B %Y')}",
+                body=html_content,
+                from_email=f"The Rugly Barnacle <{host_email}>",
+                to=[admin_email],
+            )
+            email_message.content_subtype = 'html'
+            email_message.send()
+            print(f"Test newsletter sent to {admin_email}")
+
+        except Exception as e:
+            print(f"Failed to send test newsletter: {e}")
+            raise
